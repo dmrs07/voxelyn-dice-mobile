@@ -69,6 +69,7 @@ const cloneStatuses = (input?: Partial<Record<StatusId, number>>): Record<Status
 const toCombatant = (member: CharacterState): CombatantState => ({
   id: member.id,
   name: member.name,
+  visualKey: member.visualKey,
   hp: member.hp,
   maxHp: member.maxHp,
   armor: member.armor,
@@ -199,6 +200,13 @@ const mapEnemyToCombatant = (
   return {
     id: `${enemyId}_${uniqueSuffix}`,
     name: blueprint?.name ?? 'Inimigo',
+    visualKey: blueprint?.tags.includes('machine')
+      ? 'enemy:machine'
+      : blueprint?.tags.includes('cult')
+        ? 'enemy:cult'
+        : blueprint?.tags.includes('beast')
+          ? 'enemy:beast'
+          : 'enemy:default',
     hp: (blueprint?.hp ?? 10) + hpBonus + threatBonus,
     maxHp: (blueprint?.hp ?? 10) + hpBonus + threatBonus,
     armor: blueprint?.armor ?? 0,

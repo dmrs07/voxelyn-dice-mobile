@@ -38,6 +38,7 @@ import type {
   StatusId,
 } from '../domain/shared/types';
 import { triggerLightHaptic } from '../platform/capacitor/haptics';
+import { getBiomeTheme } from '../render/pixel/asset-loader';
 import { CombatFxController } from '../render/ui/combat-fx-controller';
 import { renderCombatScreen } from '../screens/combat-screen';
 import { renderEventScreen } from '../screens/event-screen';
@@ -105,6 +106,7 @@ export class GameRouter {
   }
 
   public render(): void {
+    this.applyBiomeTheme();
     const message = this.state.message;
 
     if (this.state.phase === 'meta') {
@@ -206,6 +208,7 @@ export class GameRouter {
         },
       );
       this.combatFxController.attach(this.root);
+      this.combatFxController.syncCombatants(this.state.combat);
       return;
     }
 
@@ -254,6 +257,21 @@ export class GameRouter {
     }
 
     this.root.innerHTML = '<main class="screen"><p>Estado invalido do app.</p></main>';
+  }
+
+  private applyBiomeTheme(): void {
+    const biomeId = this.state.run?.map.biomeId ?? this.state.content.biome.id;
+    const theme = getBiomeTheme(biomeId);
+    if (!theme || theme.palette.length < 6) {
+      return;
+    }
+
+    const rootStyle = this.root.style;
+    rootStyle.setProperty('--ink-0', theme.palette[0] ?? '#0a1020');
+    rootStyle.setProperty('--ink-1', theme.palette[1] ?? '#111a2e');
+    rootStyle.setProperty('--accent-1', theme.palette[3] ?? '#7ea650');
+    rootStyle.setProperty('--accent-0', theme.palette[4] ?? '#d38a2c');
+    rootStyle.setProperty('--paper-0', theme.palette[5] ?? '#efe2bf');
   }
 
   private startAnimationLoop(): void {
@@ -449,6 +467,7 @@ export class GameRouter {
       return {
         id: `char_${index + 1}`,
         name: `${classDef.name} ${index + 1}`,
+        visualKey: `party:${classDef.id}`,
         classId: classDef.id,
         backgroundId: backgroundDef.id,
         tags: [

@@ -1,5 +1,5 @@
 import type { AnimationDriver } from '../../anim/voxelyn-animation-adapter';
-import type { CombatFxEvent } from '../../domain/shared/types';
+import type { CombatFxEvent, CombatState, CombatantState } from '../../domain/shared/types';
 
 type RollFxState = {
   rollId: string;
@@ -29,6 +29,12 @@ type PulseFxState = {
   amount: number;
   remainingMs: number;
   boundEl: HTMLElement | null;
+};
+
+type CombatantBinding = {
+  canvas: HTMLCanvasElement;
+  visualKey: string;
+  isEnemy: boolean;
 };
 
 const positiveStatuses = new Set(['block', 'dodge', 'inspired', 'charged', 'turret']);
@@ -75,6 +81,27 @@ const pulseAmount = (kind: PulseKind, flavor: PulseFlavor, amount: number): numb
   return normalized;
 };
 
+const deriveVisualKey = (combatant: CombatantState): string => {
+  if (combatant.visualKey) {
+    return combatant.visualKey;
+  }
+
+  if (!combatant.isEnemy) {
+    return `party:${combatant.classId ?? 'default'}`;
+  }
+
+  if (combatant.tags.includes('machine')) {
+    return 'enemy:machine';
+  }
+  if (combatant.tags.includes('cult')) {
+    return 'enemy:cult';
+  }
+  if (combatant.tags.includes('beast')) {
+    return 'enemy:beast';
+  }
+  return 'enemy:default';
+};
+
 export class CombatFxController {
   private readonly driver: AnimationDriver;
 
@@ -86,6 +113,8 @@ export class CombatFxController {
 
   private targetElements = new Map<string, HTMLElement>();
 
+  private targetCanvases = new Map<string, HTMLCanvasElement>();
+
   private rollStates = new Map<string, RollFxState>();
 
   private pulseStates: PulseFxState[] = [];
@@ -93,6 +122,10 @@ export class CombatFxController {
   private idleTargets = new Set<string>();
 
   private idleBindings = new Map<string, HTMLElement>();
+
+  private combatantVisuals = new Map<string, { visualKey: string; isEnemy: boolean; alive: boolean }>();
+
+  private combatantBindings = new Map<string, CombatantBinding>();
 
   private pulseSerial = 0;
 
@@ -112,9 +145,52 @@ export class CombatFxController {
   public attach(root: HTMLElement): void {
     this.root = root;
     this.rebuildElementIndex();
+    this.rebindCombatants();
     this.rebindIdle();
     this.rebindRolls();
     this.rebindPulses();
+  }
+
+  public syncCombatants(combat: CombatState): void {
+    if (!this.combatId || combat.id !== this.combatId) {
+      return;
+    }
+
+    const next = new Map<string, { visualKey: string; isEnemy: boolean; alive: boolean }>();
+
+    for (const entry of combat.party) {
+      next.set(entry.id, {
+        visualKey: deriveVisualKey(entry),
+        isEnemy: false,
+        alive: entry.alive,
+      });
+    }
+
+    for (const entry of combat.enemies) {
+      next.set(entry.id, {
+        visualKey: deriveVisualKey(entry),
+        isEnemy: true,
+        alive: entry.alive,
+      });
+    }
+
+    for (const [entityId] of this.combatantVisuals) {
+      if (!next.has(entityId)) {
+        this.driver.unregisterCombatant(entityId);
+        this.combatantBindings.delete(entityId);
+      }
+    }
+
+    this.combatantVisuals = next;
+    this.rebindCombatants();
+
+    for (const [entityId, descriptor] of this.combatantVisuals) {
+      if (descriptor.alive) {
+        this.driver.setCombatantIntent(entityId, 'idle');
+      } else {
+        this.driver.setCombatantIntent(entityId, 'die');
+      }
+    }
   }
 
   public enqueue(events: CombatFxEvent[]): void {
@@ -133,6 +209,7 @@ export class CombatFxController {
           queuedSettle: null,
           boundEl: null,
         });
+        this.driver.setCombatantIntent(event.ownerId, 'cast', event.durationMs);
         continue;
       }
 
@@ -154,16 +231,19 @@ export class CombatFxController {
             boundEl: null,
           });
         }
+        this.driver.setCombatantIntent(event.ownerId, 'attack', event.durationMs);
         continue;
       }
 
       if (event.type === 'hit') {
         this.pushPulse(event.targetId, 'hit', 'damage', Math.max(1, event.amount));
+        this.driver.setCombatantIntent(event.targetId, 'hit');
         continue;
       }
 
       if (event.type === 'heal') {
         this.pushPulse(event.targetId, 'heal', 'heal', Math.max(1, event.amount));
+        this.driver.setCombatantIntent(event.targetId, 'cast');
         continue;
       }
 
@@ -175,12 +255,15 @@ export class CombatFxController {
         const weightedAmount =
           !positiveById && heavyDebuffStatuses.has(event.statusId) ? amount + 1 : amount;
         this.pushPulse(event.targetId, kind, flavor, weightedAmount);
+        this.driver.setCombatantIntent(event.targetId, kind === 'hit' ? 'hit' : 'cast');
         continue;
       }
 
       if (event.type === 'swap') {
         this.pushPulse(event.aId, 'hit', 'swap', 1);
         this.pushPulse(event.bId, 'hit', 'swap', 1);
+        this.driver.setCombatantIntent(event.aId, 'move', 220);
+        this.driver.setCombatantIntent(event.bId, 'move', 220);
         continue;
       }
 
@@ -188,12 +271,14 @@ export class CombatFxController {
         const kind: PulseKind = event.delta < 0 ? 'hit' : 'heal';
         const flavor: PulseFlavor = event.delta < 0 ? 'focus_spend' : 'focus_gain';
         this.pushPulse(event.ownerId, kind, flavor, Math.max(1, Math.abs(event.delta)));
+        this.driver.setCombatantIntent(event.ownerId, kind === 'hit' ? 'hit' : 'cast');
         continue;
       }
 
       if (event.type === 'idle') {
         if (event.enabled) {
           this.idleTargets.add(event.targetId);
+          this.driver.setCombatantIntent(event.targetId, 'idle');
         } else {
           this.idleTargets.delete(event.targetId);
           const bound = this.idleBindings.get(event.targetId);
@@ -245,6 +330,7 @@ export class CombatFxController {
     }
     this.pulseStates = nextPulses;
 
+    this.rebindCombatants();
     this.rebindRolls();
     this.rebindPulses();
     this.rebindIdle();
@@ -255,18 +341,26 @@ export class CombatFxController {
       this.driver.stopIdle(el);
     }
 
+    for (const entityId of this.combatantBindings.keys()) {
+      this.driver.unregisterCombatant(entityId);
+    }
+
     this.root = null;
     this.rollElements.clear();
     this.targetElements.clear();
+    this.targetCanvases.clear();
     this.rollStates.clear();
     this.pulseStates = [];
     this.idleTargets.clear();
     this.idleBindings.clear();
+    this.combatantVisuals.clear();
+    this.combatantBindings.clear();
   }
 
   private rebuildElementIndex(): void {
     this.rollElements.clear();
     this.targetElements.clear();
+    this.targetCanvases.clear();
 
     if (!this.root) {
       return;
@@ -286,7 +380,52 @@ export class CombatFxController {
         return;
       }
       this.targetElements.set(targetId, el);
+
+      const canvas = el.querySelector<HTMLCanvasElement>('.combatant-canvas');
+      if (canvas) {
+        this.targetCanvases.set(targetId, canvas);
+      }
     });
+  }
+
+  private rebindCombatants(): void {
+    for (const [entityId, descriptor] of this.combatantVisuals) {
+      const canvas = this.targetCanvases.get(entityId);
+      if (!canvas) {
+        continue;
+      }
+
+      const bound = this.combatantBindings.get(entityId);
+      if (
+        bound &&
+        bound.canvas === canvas &&
+        bound.visualKey === descriptor.visualKey &&
+        bound.isEnemy === descriptor.isEnemy
+      ) {
+        continue;
+      }
+
+      this.driver.registerCombatant(entityId, canvas, {
+        visualKey: descriptor.visualKey,
+        isEnemy: descriptor.isEnemy,
+        width: 32,
+        height: 32,
+        facing: descriptor.isEnemy ? 'dl' : 'dr',
+      });
+
+      this.combatantBindings.set(entityId, {
+        canvas,
+        visualKey: descriptor.visualKey,
+        isEnemy: descriptor.isEnemy,
+      });
+    }
+
+    for (const [entityId] of this.combatantBindings) {
+      if (!this.combatantVisuals.has(entityId)) {
+        this.driver.unregisterCombatant(entityId);
+        this.combatantBindings.delete(entityId);
+      }
+    }
   }
 
   private rebindRolls(): void {

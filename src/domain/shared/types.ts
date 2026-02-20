@@ -13,6 +13,8 @@ export type NegativeStatusId = (typeof NEGATIVE_STATUS_IDS)[number];
 export type NodeType = (typeof NODE_TYPES)[number];
 export type AppPhase = (typeof APP_PHASES)[number];
 export type ResourceId = (typeof RESOURCE_IDS)[number];
+export type CombatantVisualKey = string;
+export type DiceFaceVisualKey = string;
 
 export type CombatFxEvent =
   | { type: 'die_roll'; rollId: string; ownerId: string; durationMs: number }
@@ -113,6 +115,7 @@ export type FaceEffectDef =
 
 export interface DiceFaceDef {
   id: string;
+  visualKey?: DiceFaceVisualKey;
   label: string;
   kind: FaceKind;
   value: number;
@@ -159,6 +162,7 @@ export interface BackgroundDef {
 export interface CharacterState {
   id: string;
   name: string;
+  visualKey?: CombatantVisualKey;
   classId: string;
   backgroundId: string;
   tags: string[];
@@ -406,6 +410,7 @@ export interface CombatIntent {
 export interface CombatantState {
   id: string;
   name: string;
+  visualKey?: CombatantVisualKey;
   hp: number;
   maxHp: number;
   armor: number;

@@ -3,6 +3,7 @@ import { createGameState } from '../core/state-machine';
 import { loadProfile, saveProfile } from '../domain/meta/profile-store';
 import { sanitizeProfileForContent } from '../domain/meta/unlocks';
 import { assertVoxelynAnimationApi } from '../anim/voxelyn-animation-adapter';
+import { warmPixelAssets } from '../render/pixel/asset-loader';
 import { GameRouter } from './router';
 
 export const bootstrapApp = async (): Promise<void> => {
@@ -13,6 +14,7 @@ export const bootstrapApp = async (): Promise<void> => {
 
   root.innerHTML = '<main class="screen"><p>Carregando Voxelyn Dice Expedition...</p></main>';
   assertVoxelynAnimationApi();
+  await warmPixelAssets();
 
   const content = await loadContent();
   const loadedProfile = await loadProfile();

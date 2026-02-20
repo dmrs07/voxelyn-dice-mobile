@@ -1,0 +1,288 @@
+{
+  "version": 1,
+  "generatedAt": "2026-02-20T06:20:19.054Z",
+  "atlases": [],
+  "combatants": [
+    {
+      "visualKey": "party:aviadora",
+      "source": "procedural",
+      "style": "player",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "party:ocultista",
+      "source": "procedural",
+      "style": "guardian",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "party:cacador",
+      "source": "procedural",
+      "style": "player",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "party:mecanico",
+      "source": "procedural",
+      "style": "bruiser",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "enemy:beast",
+      "source": "procedural",
+      "style": "stalker",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "enemy:cult",
+      "source": "procedural",
+      "style": "spitter",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "enemy:machine",
+      "source": "procedural",
+      "style": "guardian",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "enemy:default",
+      "source": "procedural",
+      "style": "stalker",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "visualKey": "enemy:human",
+      "source": "procedural",
+      "style": "stalker",
+      "width": 32,
+      "height": 32,
+      "anchorX": 0.5,
+      "anchorY": 1
+    },
+    {
+      "visualKey": "enemy:construct",
+      "source": "procedural",
+      "style": "stalker",
+      "width": 32,
+      "height": 32,
+      "anchorX": 0.5,
+      "anchorY": 1
+    },
+    {
+      "visualKey": "enemy:summon_only",
+      "source": "procedural",
+      "style": "stalker",
+      "width": 32,
+      "height": 32,
+      "anchorX": 0.5,
+      "anchorY": 1
+    },
+    {
+      "visualKey": "enemy:boss",
+      "source": "procedural",
+      "style": "stalker",
+      "width": 32,
+      "height": 32,
+      "anchorX": 0.5,
+      "anchorY": 1
+    },
+    {
+      "visualKey": "enemy:airship",
+      "source": "procedural",
+      "style": "stalker",
+      "width": 32,
+      "height": 32,
+      "anchorX": 0.5,
+      "anchorY": 1
+    }
+  ],
+  "uiIcons": [
+    {
+      "id": "face.attack",
+      "fallbackKind": "attack",
+      "contrastIconId": "face.attack.contrast"
+    },
+    {
+      "id": "face.attack.contrast",
+      "fallbackKind": "attack"
+    },
+    {
+      "id": "face.block",
+      "fallbackKind": "block",
+      "contrastIconId": "face.block.contrast"
+    },
+    {
+      "id": "face.block.contrast",
+      "fallbackKind": "block"
+    },
+    {
+      "id": "face.heal",
+      "fallbackKind": "heal",
+      "contrastIconId": "face.heal.contrast"
+    },
+    {
+      "id": "face.heal.contrast",
+      "fallbackKind": "heal"
+    },
+    {
+      "id": "face.mark",
+      "fallbackKind": "mark",
+      "contrastIconId": "face.mark.contrast"
+    },
+    {
+      "id": "face.mark.contrast",
+      "fallbackKind": "mark"
+    },
+    {
+      "id": "face.cleanse",
+      "fallbackKind": "cleanse",
+      "contrastIconId": "face.cleanse.contrast"
+    },
+    {
+      "id": "face.cleanse.contrast",
+      "fallbackKind": "cleanse"
+    },
+    {
+      "id": "face.swap",
+      "fallbackKind": "swap",
+      "contrastIconId": "face.swap.contrast"
+    },
+    {
+      "id": "face.swap.contrast",
+      "fallbackKind": "swap"
+    },
+    {
+      "id": "face.stun",
+      "fallbackKind": "stun",
+      "contrastIconId": "face.stun.contrast"
+    },
+    {
+      "id": "face.stun.contrast",
+      "fallbackKind": "stun"
+    },
+    {
+      "id": "face.focus",
+      "fallbackKind": "focus",
+      "contrastIconId": "face.focus.contrast"
+    },
+    {
+      "id": "face.focus.contrast",
+      "fallbackKind": "focus"
+    },
+    {
+      "id": "face.special",
+      "fallbackKind": "special",
+      "contrastIconId": "face.special.contrast"
+    },
+    {
+      "id": "face.special.contrast",
+      "fallbackKind": "special"
+    },
+    {
+      "id": "status.block",
+      "fallbackKind": "block",
+      "contrastIconId": "status.block.contrast"
+    },
+    {
+      "id": "status.block.contrast",
+      "fallbackKind": "block"
+    },
+    {
+      "id": "status.poison",
+      "fallbackKind": "stun",
+      "contrastIconId": "status.poison.contrast"
+    },
+    {
+      "id": "status.poison.contrast",
+      "fallbackKind": "stun"
+    },
+    {
+      "id": "resource.gold",
+      "fallbackKind": "focus",
+      "contrastIconId": "resource.gold.contrast"
+    },
+    {
+      "id": "resource.gold.contrast",
+      "fallbackKind": "focus"
+    },
+    {
+      "id": "node.combat",
+      "fallbackKind": "attack",
+      "contrastIconId": "node.combat.contrast"
+    },
+    {
+      "id": "node.combat.contrast",
+      "fallbackKind": "attack"
+    }
+  ],
+  "diceFaces": [
+    {
+      "kind": "attack",
+      "iconId": "face.attack",
+      "contrastIconId": "face.attack.contrast"
+    },
+    {
+      "kind": "block",
+      "iconId": "face.block",
+      "contrastIconId": "face.block.contrast"
+    },
+    {
+      "kind": "heal",
+      "iconId": "face.heal",
+      "contrastIconId": "face.heal.contrast"
+    },
+    {
+      "kind": "mark",
+      "iconId": "face.mark",
+      "contrastIconId": "face.mark.contrast"
+    },
+    {
+      "kind": "cleanse",
+      "iconId": "face.cleanse",
+      "contrastIconId": "face.cleanse.contrast"
+    },
+    {
+      "kind": "swap",
+      "iconId": "face.swap",
+      "contrastIconId": "face.swap.contrast"
+    },
+    {
+      "kind": "stun",
+      "iconId": "face.stun",
+      "contrastIconId": "face.stun.contrast"
+    },
+    {
+      "kind": "focus",
+      "iconId": "face.focus",
+      "contrastIconId": "face.focus.contrast"
+    },
+    {
+      "kind": "special",
+      "iconId": "face.special",
+      "contrastIconId": "face.special.contrast"
+    }
+  ],
+  "biomeThemes": [
+    {
+      "biomeId": "amazonia_nuvens",
+      "palette": [
+        "#0f1a23",
+        "#1f3946",
+        "#3f6f5f",
+        "#83aa6f",
+        "#d4b47c",
+        "#e9d7b0"
+      ],
+      "uiFrame": "deco_pulp_navy_gold"
+    }
+  ]
+}

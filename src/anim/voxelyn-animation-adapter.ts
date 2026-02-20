@@ -1,5 +1,23 @@
 import * as VoxAnim from '@voxelyn/animation';
-import type { AnimationIntent, AnimationPlayer, ProceduralCharacterDef } from '@voxelyn/animation';
+import type {
+  AnimationFacing,
+  AnimationIntent,
+  AnimationPlayer,
+  ProceduralCharacterDef,
+} from '@voxelyn/animation';
+import {
+  loadCombatantAnimationSet,
+  resolveCombatantFallbackStyle,
+} from '../render/pixel/asset-loader';
+
+export interface CombatantRegistrationOptions {
+  visualKey: string;
+  isEnemy?: boolean;
+  width?: number;
+  height?: number;
+  seedHint?: string;
+  facing?: AnimationFacing;
+}
 
 export interface AnimationDriver {
   update(dtMs: number): void;
@@ -9,6 +27,9 @@ export interface AnimationDriver {
   playHeal(el: HTMLElement, amount: number): void;
   playIdle(el: HTMLElement): void;
   stopIdle(el: HTMLElement): void;
+  registerCombatant(entityId: string, canvas: HTMLCanvasElement, options: CombatantRegistrationOptions): void;
+  unregisterCombatant(entityId: string): void;
+  setCombatantIntent(entityId: string, intent: AnimationIntent, durationMs?: number): void;
 }
 
 type CompositeState = {
@@ -53,6 +74,23 @@ type PulseMotion = {
 type IdleMotion = {
   phaseOffset: number;
   player: AnimationPlayer;
+};
+
+type CombatantMotion = {
+  entityId: string;
+  visualKey: string;
+  isEnemy: boolean;
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  player: AnimationPlayer;
+  facing: AnimationFacing;
+  width: number;
+  height: number;
+  desiredIntent: AnimationIntent;
+  intentUntilMs: number;
+  stickyIntent: AnimationIntent | null;
+  generation: number;
+  imageData: ImageData | null;
 };
 
 const requiredExports = ['createAnimationPlayer', 'createProceduralCharacter', 'stepAnimation'] as const;
@@ -212,10 +250,25 @@ const styleFor = (kind: 'idle' | 'roll' | 'pulse'): NonNullable<ProceduralCharac
   return 'guardian';
 };
 
+const isValidFacing = (value: string): value is AnimationFacing =>
+  value === 'dr' || value === 'dl' || value === 'ur' || value === 'ul';
+
+const defaultIntentDuration = (intent: AnimationIntent): number => {
+  if (intent === 'hit') {
+    return 220;
+  }
+  if (intent === 'attack' || intent === 'cast' || intent === 'move') {
+    return 260;
+  }
+  return 0;
+};
+
 export const createVoxelynAnimationDriver = (): AnimationDriver => {
   assertVoxelynAnimationApi();
 
   let serial = 0;
+  let clockMs = 0;
+
   const makePlayer = (kind: 'idle' | 'roll' | 'pulse', seedHint: string): AnimationPlayer => {
     const procedural = VoxAnim.createProceduralCharacter({
       id: `fx_${kind}_${seedHint}_${serial}`,
@@ -232,10 +285,72 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
     });
   };
 
+  const makeCombatantPlayer = (
+    entityId: string,
+    visualKey: string,
+    isEnemy: boolean,
+    width: number,
+    height: number,
+    seedHint: string,
+    styleHint?: ProceduralCharacterDef['style'],
+  ): AnimationPlayer => {
+    const procedural = VoxAnim.createProceduralCharacter({
+      id: `combat_${entityId}_${serial}`,
+      seed: hashString(`${visualKey}:${seedHint}:${serial}`),
+      width,
+      height,
+      style: styleHint ?? resolveCombatantFallbackStyle(visualKey, isEnemy),
+    });
+    serial += 1;
+
+    return VoxAnim.createAnimationPlayer({
+      set: procedural.clips,
+      width: procedural.width,
+      height: procedural.height,
+      seed: procedural.seed,
+    });
+  };
+
   const knownElements = new Set<HTMLElement>();
   const rollStates = new Map<HTMLElement, RollMotion>();
   const pulseStates = new Map<HTMLElement, PulseMotion>();
   const idleStates = new Map<HTMLElement, IdleMotion>();
+  const combatantStates = new Map<string, CombatantMotion>();
+
+  const drawCombatant = (state: CombatantMotion, dtMs: number): void => {
+    const intent =
+      state.stickyIntent === 'die'
+        ? 'die'
+        : state.intentUntilMs > clockMs
+          ? state.desiredIntent
+          : 'idle';
+
+    if (intent === 'idle' && state.desiredIntent !== 'idle' && state.stickyIntent !== 'die') {
+      state.desiredIntent = 'idle';
+    }
+
+    const frame = VoxAnim.stepAnimation(state.player, dtMs, intent, state.facing);
+    const sprite = frame.sprite;
+
+    if (state.canvas.width !== sprite.width || state.canvas.height !== sprite.height) {
+      state.canvas.width = sprite.width;
+      state.canvas.height = sprite.height;
+      state.imageData = null;
+      state.ctx.imageSmoothingEnabled = false;
+    }
+
+    if (!state.imageData || state.imageData.width !== sprite.width || state.imageData.height !== sprite.height) {
+      state.imageData = state.ctx.createImageData(sprite.width, sprite.height);
+    }
+
+    const spriteBytes = new Uint8ClampedArray(
+      sprite.pixels.buffer,
+      sprite.pixels.byteOffset,
+      sprite.width * sprite.height * 4,
+    );
+    state.imageData.data.set(spriteBytes);
+    state.ctx.putImageData(state.imageData, 0, 0);
+  };
 
   const purgeDisconnected = (): void => {
     for (const el of Array.from(knownElements)) {
@@ -246,6 +361,12 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
       rollStates.delete(el);
       pulseStates.delete(el);
       idleStates.delete(el);
+    }
+
+    for (const [entityId, state] of combatantStates) {
+      if (!state.canvas.isConnected) {
+        combatantStates.delete(entityId);
+      }
     }
   };
 
@@ -336,6 +457,16 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
     }
   };
 
+  const updateCombatants = (dtMs: number): void => {
+    for (const [entityId, state] of combatantStates) {
+      if (!state.canvas.isConnected) {
+        combatantStates.delete(entityId);
+        continue;
+      }
+      drawCombatant(state, dtMs);
+    }
+  };
+
   const applyComposed = (composed: Map<HTMLElement, CompositeState>): void => {
     for (const [el, state] of composed) {
       knownElements.add(el);
@@ -364,12 +495,14 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
   return {
     update(dtMs: number): void {
       const frameDt = Math.max(0, Math.min(80, dtMs));
+      clockMs += frameDt;
       purgeDisconnected();
 
       const composed = new Map<HTMLElement, CompositeState>();
       updateIdle(frameDt, composed);
       updateRoll(frameDt, composed);
       updatePulse(frameDt, composed);
+      updateCombatants(frameDt);
       applyComposed(composed);
     },
 
@@ -469,6 +602,107 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
       if (!rollStates.has(el) && !pulseStates.has(el)) {
         clearElementFx(el);
       }
+    },
+
+    registerCombatant(entityId: string, canvas: HTMLCanvasElement, options: CombatantRegistrationOptions): void {
+      const width = Math.max(16, Math.floor(options.width ?? 32));
+      const height = Math.max(16, Math.floor(options.height ?? 32));
+      const isEnemy = options.isEnemy ?? false;
+      const facing = options.facing ?? (isEnemy ? 'dl' : 'dr');
+      const seedHint = options.seedHint ?? options.visualKey;
+
+      const ctx = canvas.getContext('2d', { alpha: true });
+      if (!ctx) {
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      canvas.style.imageRendering = 'pixelated';
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, width, height);
+
+      const nextGeneration = (combatantStates.get(entityId)?.generation ?? 0) + 1;
+      const motion: CombatantMotion = {
+        entityId,
+        visualKey: options.visualKey,
+        isEnemy,
+        canvas,
+        ctx,
+        player: makeCombatantPlayer(
+          entityId,
+          options.visualKey,
+          isEnemy,
+          width,
+          height,
+          seedHint,
+        ),
+        facing: isValidFacing(facing) ? facing : 'dr',
+        width,
+        height,
+        desiredIntent: 'idle',
+        intentUntilMs: 0,
+        stickyIntent: null,
+        generation: nextGeneration,
+        imageData: null,
+      };
+
+      combatantStates.set(entityId, motion);
+
+      void loadCombatantAnimationSet(options.visualKey, {
+        isEnemy,
+        width,
+        height,
+      }).then((resolved) => {
+        if (!resolved) {
+          return;
+        }
+
+        const current = combatantStates.get(entityId);
+        if (!current || current.generation !== nextGeneration) {
+          return;
+        }
+
+        current.player = VoxAnim.createAnimationPlayer({
+          set: resolved.set,
+          width: resolved.width,
+          height: resolved.height,
+          seed: hashString(`${entityId}:${options.visualKey}:${resolved.styleHint ?? 'clip'}`),
+        });
+        current.facing = resolved.facing;
+        current.canvas.width = resolved.width;
+        current.canvas.height = resolved.height;
+        current.imageData = null;
+      });
+    },
+
+    unregisterCombatant(entityId: string): void {
+      const state = combatantStates.get(entityId);
+      if (!state) {
+        return;
+      }
+      state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
+      combatantStates.delete(entityId);
+    },
+
+    setCombatantIntent(entityId: string, intent: AnimationIntent, durationMs?: number): void {
+      const state = combatantStates.get(entityId);
+      if (!state) {
+        return;
+      }
+
+      if (intent === 'die') {
+        state.desiredIntent = 'die';
+        state.stickyIntent = 'die';
+        state.intentUntilMs = Number.POSITIVE_INFINITY;
+        return;
+      }
+
+      state.stickyIntent = null;
+      state.desiredIntent = intent;
+      const defaultMs = defaultIntentDuration(intent);
+      const finalDuration = clampDuration(durationMs ?? defaultMs, 0, 1200);
+      state.intentUntilMs = finalDuration > 0 ? clockMs + finalDuration : 0;
     },
   };
 };
