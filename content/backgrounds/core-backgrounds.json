@@ -1,0 +1,50 @@
+[
+  {
+    "id": "ex_correio_aereo",
+    "name": "Ex-Correio Aereo",
+    "tags": ["ceus", "rotas", "contrabando"],
+    "perk": "Comeca cada combate com +1 FOCO.",
+    "starterDieId": "die_bg_ex_correio_aereo",
+    "exclusiveEventIds": ["pista_de_pouso_improvisada", "zepelim_caido"]
+  },
+  {
+    "id": "cartografo_posteres",
+    "name": "Cartografo de Posteres",
+    "tags": ["mapas", "arte", "ruinas"],
+    "perk": "Revela 1 no a frente no mapa.",
+    "starterDieId": "die_bg_cartografo_posteres",
+    "exclusiveEventIds": ["mercador_de_mapas_falsos", "ponte_de_cipos"]
+  },
+  {
+    "id": "reporter_radio",
+    "name": "Reporter de Radio",
+    "tags": ["midia", "sociedade", "fama"],
+    "perk": "1x por evento, pode rerrolar um teste gratuitamente.",
+    "starterDieId": "die_bg_reporter_radio",
+    "exclusiveEventIds": ["acampamento_de_sinais", "o_clube_do_gramofone"]
+  },
+  {
+    "id": "guia_local",
+    "name": "Guia Local",
+    "tags": ["trilhas", "fauna", "sobrevivencia"],
+    "perk": "Emboscadas menos frequentes; acampamento cura +1.",
+    "starterDieId": "die_bg_guia_local",
+    "exclusiveEventIds": ["a_fera_observa_de_cima", "ponte_de_cipos"]
+  },
+  {
+    "id": "colecionador_selos",
+    "name": "Colecionador de Selos",
+    "tags": ["dinheiro", "reliquias", "negocio"],
+    "perk": "Lojas tem 1 opcao extra.",
+    "starterDieId": "die_bg_colecionador_selos",
+    "exclusiveEventIds": ["carimbo_de_alfandega", "mercador_de_mapas_falsos"]
+  },
+  {
+    "id": "ex_combatente",
+    "name": "Ex-Combatente",
+    "tags": ["guerra", "trauma", "armamento"],
+    "perk": "+1 HP maximo; comeca combate com MEDO 1.",
+    "starterDieId": "die_bg_ex_combatente",
+    "exclusiveEventIds": ["sociedade_do_sol_negro_convite", "o_contrabandista_do_rio"]
+  }
+]

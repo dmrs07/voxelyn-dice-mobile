@@ -1,0 +1,22 @@
+[
+  { "id": "relic_compasso_de_lata", "name": "Compasso de Lata", "rarity": "common", "description": "+1 FOCO inicial no combate", "tags": ["mapa"], "effect": { "kind": "reroll_bonus", "value": 1 } },
+  { "id": "relic_fivela_do_veterano", "name": "Fivela do Veterano", "rarity": "common", "description": "+1 armadura por turno", "tags": ["militar"], "effect": { "kind": "guard_turn_start", "value": 1 } },
+  { "id": "relic_bussola_rachada", "name": "Bussola Rachada", "rarity": "common", "description": "Ameaca cresce mais devagar", "tags": ["mapa"], "effect": { "kind": "threat_slow", "value": 1 } },
+  { "id": "relic_frasco_de_erva", "name": "Frasco de Erva", "rarity": "common", "description": "Cura 1 apos combate", "tags": ["cura"], "effect": { "kind": "heal_after_combat", "value": 1 } },
+  { "id": "relic_medalha_do_campo", "name": "Medalha do Campo", "rarity": "common", "description": "+1 moral ao vencer", "tags": ["moral"], "effect": { "kind": "morale_on_win", "value": 1 } },
+  { "id": "relic_mapa_laminado", "name": "Mapa Laminado", "rarity": "common", "description": "+2 suprimentos em eventos", "tags": ["exploracao"], "effect": { "kind": "supplies_on_event", "value": 2 } },
+  { "id": "relic_placa_bastiao", "name": "Placa Bastiao", "rarity": "rare", "description": "+2 armadura por turno", "tags": ["defesa"], "effect": { "kind": "guard_turn_start", "value": 2 } },
+  { "id": "relic_tomo_de_acido", "name": "Tomo de Acido", "rarity": "rare", "description": "+2 max HP", "tags": ["lore"], "effect": { "kind": "max_hp_bonus", "value": 2 } },
+  { "id": "relic_cartucho_vivo", "name": "Cartucho Vivo", "rarity": "common", "description": "Cura 2 apos combate", "tags": ["armamento"], "effect": { "kind": "heal_after_combat", "value": 2 } },
+  { "id": "relic_anel_das_rotas", "name": "Anel das Rotas", "rarity": "common", "description": "+1 suprimento em eventos", "tags": ["rotas"], "effect": { "kind": "supplies_on_event", "value": 1 } },
+  { "id": "relic_garrafa_termica", "name": "Garrafa Termica", "rarity": "common", "description": "+1 moral ao vencer", "tags": ["campo"], "effect": { "kind": "morale_on_win", "value": 1 } },
+  { "id": "relic_lupa_heliografica", "name": "Lupa Heliografica", "rarity": "rare", "description": "+2 FOCO inicial", "tags": ["tecnico"], "effect": { "kind": "reroll_bonus", "value": 2 } },
+  { "id": "relic_placa_de_quartzo", "name": "Placa de Quartzo", "rarity": "common", "description": "Ameaca -1 por no", "tags": ["ritual"], "effect": { "kind": "threat_slow", "value": 1 } },
+  { "id": "relic_luva_ao_vapor", "name": "Luva ao Vapor", "rarity": "common", "description": "+1 max HP", "tags": ["oficina"], "effect": { "kind": "max_hp_bonus", "value": 1 } },
+  { "id": "relic_passaporte_pulp", "name": "Passaporte Pulp", "rarity": "common", "description": "+1 suprimento em eventos", "tags": ["pulp"], "effect": { "kind": "supplies_on_event", "value": 1 } },
+  { "id": "relic_lanterna_de_radio", "name": "Lanterna de Radio", "rarity": "common", "description": "+1 armadura por turno", "tags": ["expedicao"], "effect": { "kind": "guard_turn_start", "value": 1 } },
+  { "id": "relic_estampa_de_aquila", "name": "Estampa de Aquila", "rarity": "rare", "description": "Cura 3 apos combate", "tags": ["elite"], "effect": { "kind": "heal_after_combat", "value": 3 } },
+  { "id": "relic_cordao_do_guia", "name": "Cordao do Guia", "rarity": "common", "description": "Ameaca cresce menos", "tags": ["fauna"], "effect": { "kind": "threat_slow", "value": 1 } },
+  { "id": "relic_moeda_do_culto", "name": "Moeda do Culto", "rarity": "rare", "description": "+2 moral ao vencer", "tags": ["sociedade"], "effect": { "kind": "morale_on_win", "value": 2 } },
+  { "id": "relic_fita_telegrapho", "name": "Fita Telegraph", "rarity": "common", "description": "+1 FOCO inicial", "tags": ["comms"], "effect": { "kind": "reroll_bonus", "value": 1 } }
+]

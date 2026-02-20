@@ -1,0 +1,1081 @@
+[
+  {
+    "id": "die_class_aviadora",
+    "label": "Asas de Manobra",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "av1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["ranged"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 2, "range": "ranged", "target": "target" }
+        ]
+      },
+      {
+        "id": "av2",
+        "label": "ATK+MARK",
+        "kind": "attack",
+        "value": 1,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 1, "range": "ranged", "target": "target" },
+          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "av3",
+        "label": "SWAP+BLK",
+        "kind": "swap",
+        "value": 1,
+        "tags": ["maneuver"],
+        "target": "ally",
+        "effects": [
+          { "type": "swap" },
+          { "type": "block", "value": 1, "target": "self" }
+        ]
+      },
+      {
+        "id": "av4",
+        "label": "Rajada",
+        "kind": "attack",
+        "value": 1,
+        "tags": ["aoe"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 1, "range": "ranged", "target": "enemy_front_all" }
+        ]
+      },
+      {
+        "id": "av5",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "av6",
+        "label": "CLEANSE+BLK",
+        "kind": "cleanse",
+        "value": 1,
+        "tags": ["utility"],
+        "target": "ally",
+        "effects": [
+          { "type": "cleanse", "value": 1, "target": "target" },
+          { "type": "block", "value": 1, "target": "target" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_class_ocultista",
+    "label": "Cifras do Vazio",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "oc1",
+        "label": "ATK+VENENO",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["poison"],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "poison",
+            "applyStatusStacks": 1
+          }
+        ]
+      },
+      {
+        "id": "oc2",
+        "label": "MARK 2",
+        "kind": "mark",
+        "value": 2,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 2, "target": "target" }
+        ]
+      },
+      {
+        "id": "oc3",
+        "label": "MEDO+FOCO",
+        "kind": "special",
+        "value": 1,
+        "tags": ["fear"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "fear", "value": 1, "target": "target" },
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "oc4",
+        "label": "Escudo Arcano",
+        "kind": "block",
+        "value": 3,
+        "tags": ["shield"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 3, "target": "self" }
+        ]
+      },
+      {
+        "id": "oc5",
+        "label": "Ritual",
+        "kind": "special",
+        "value": 2,
+        "tags": ["charge"],
+        "target": "self",
+        "effects": [
+          { "type": "status", "statusId": "charged", "value": 1, "target": "self" }
+        ]
+      },
+      {
+        "id": "oc6",
+        "label": "Quebra-Selo",
+        "kind": "special",
+        "value": 1,
+        "tags": ["shred"],
+        "target": "enemy",
+        "effects": [
+          { "type": "shred_armor", "value": 1, "target": "target" },
+          { "type": "damage", "value": 1, "range": "ranged", "target": "target" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_class_cacador",
+    "label": "Mira de Precisao",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "ca1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["ranged"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 2, "range": "ranged", "target": "target" }
+        ]
+      },
+      {
+        "id": "ca2",
+        "label": "ATK+BLEED",
+        "kind": "attack",
+        "value": 1,
+        "tags": ["bleed"],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "bleed",
+            "applyStatusStacks": 1
+          }
+        ]
+      },
+      {
+        "id": "ca3",
+        "label": "Armadilha",
+        "kind": "stun",
+        "value": 1,
+        "tags": ["control"],
+        "target": "enemy",
+        "condition": { "requiresTargetFront": true },
+        "effects": [
+          { "type": "status", "statusId": "stun", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "ca4",
+        "label": "Mirar",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["setup"],
+        "target": "self",
+        "effects": [
+          { "type": "lock_die", "value": 1 },
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "ca5",
+        "label": "HEAL+CLEANSE",
+        "kind": "heal",
+        "value": 1,
+        "tags": ["utility"],
+        "target": "ally",
+        "effects": [
+          { "type": "heal", "value": 1, "target": "target", "removeBleed": true },
+          { "type": "cleanse", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "ca6",
+        "label": "Tiro Certeiro",
+        "kind": "attack",
+        "value": 3,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 3, "range": "ranged", "target": "target", "consumeMark": false },
+          { "type": "damage", "value": 1, "range": "ranged", "target": "target", "requiresMarked": true, "consumeMark": true }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_class_mecanico",
+    "label": "Ferramentas de Campo",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "me1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["melee"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 2, "range": "melee", "target": "target" }
+        ]
+      },
+      {
+        "id": "me2",
+        "label": "BLK 3",
+        "kind": "block",
+        "value": 3,
+        "tags": ["tank"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 3, "target": "self" }
+        ]
+      },
+      {
+        "id": "me3",
+        "label": "Reparar",
+        "kind": "heal",
+        "value": 2,
+        "tags": ["repair"],
+        "target": "ally",
+        "effects": [
+          { "type": "heal", "value": 2, "target": "target", "removeBleed": true },
+          { "type": "cleanse", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "me4",
+        "label": "Placas",
+        "kind": "block",
+        "value": 2,
+        "tags": ["support"],
+        "target": "ally",
+        "effects": [
+          { "type": "block", "value": 2, "target": "target" }
+        ]
+      },
+      {
+        "id": "me5",
+        "label": "FOCO+BLK",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 },
+          { "type": "block", "value": 1, "target": "self" }
+        ]
+      },
+      {
+        "id": "me6",
+        "label": "Torreta 2",
+        "kind": "special",
+        "value": 2,
+        "tags": ["turret"],
+        "target": "self",
+        "effects": [
+          { "type": "turret", "value": 2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_bg_ex_correio_aereo",
+    "label": "Bolsa Aerea",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "ea1",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "ea2",
+        "label": "SWAP+ATK",
+        "kind": "swap",
+        "value": 1,
+        "tags": ["mobility"],
+        "target": "ally",
+        "effects": [
+          { "type": "swap" },
+          { "type": "damage", "value": 1, "range": "ranged", "target": "enemy_random" }
+        ]
+      },
+      {
+        "id": "ea3",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": ["guard"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 2, "target": "self" }
+        ]
+      },
+      {
+        "id": "ea4",
+        "label": "Sinalizador",
+        "kind": "mark",
+        "value": 1,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 1, "target": "enemy_front_all" }
+        ]
+      },
+      {
+        "id": "ea5",
+        "label": "CLEANSE",
+        "kind": "cleanse",
+        "value": 1,
+        "tags": ["cleanse"],
+        "target": "self",
+        "effects": [
+          { "type": "cleanse", "value": 1, "target": "self" }
+        ]
+      },
+      {
+        "id": "ea6",
+        "label": "Contrabando",
+        "kind": "special",
+        "value": 1,
+        "tags": ["contrabando"],
+        "target": "self",
+        "effects": [
+          { "type": "post_combat", "resource": "consumables", "value": 1, "threatDelta": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_bg_cartografo_posteres",
+    "label": "Prancheta de Rotas",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "cp1",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "cp2",
+        "label": "MARK 1",
+        "kind": "mark",
+        "value": 1,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "cp3",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": ["defense"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 2, "target": "self" }
+        ]
+      },
+      {
+        "id": "cp4",
+        "label": "SWAP",
+        "kind": "swap",
+        "value": 1,
+        "tags": ["swap"],
+        "target": "ally",
+        "effects": [
+          { "type": "swap" }
+        ]
+      },
+      {
+        "id": "cp5",
+        "label": "Terreno",
+        "kind": "block",
+        "value": 1,
+        "tags": ["aoe"],
+        "target": "ally",
+        "effects": [
+          { "type": "block", "value": 1, "target": "all_allies" }
+        ]
+      },
+      {
+        "id": "cp6",
+        "label": "CLEANSE+HEAL",
+        "kind": "cleanse",
+        "value": 1,
+        "tags": ["utility"],
+        "target": "ally",
+        "effects": [
+          { "type": "cleanse", "value": 1, "target": "target" },
+          { "type": "heal", "value": 1, "target": "target", "removeBleed": true }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_bg_reporter_radio",
+    "label": "Microfone de Campo",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "rr1",
+        "label": "Inspirar",
+        "kind": "special",
+        "value": 1,
+        "tags": ["buff"],
+        "target": "ally",
+        "effects": [
+          { "type": "status", "statusId": "inspired", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "rr2",
+        "label": "MEDO 1",
+        "kind": "special",
+        "value": 1,
+        "tags": ["fear"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "fear", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "rr3",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "rr4",
+        "label": "MARK 2",
+        "kind": "mark",
+        "value": 2,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 2, "target": "target" }
+        ]
+      },
+      {
+        "id": "rr5",
+        "label": "HEAL 1",
+        "kind": "heal",
+        "value": 1,
+        "tags": ["heal"],
+        "target": "ally",
+        "effects": [
+          { "type": "heal", "value": 1, "target": "target", "removeBleed": true }
+        ]
+      },
+      {
+        "id": "rr6",
+        "label": "Cobertura",
+        "kind": "block",
+        "value": 1,
+        "tags": ["aoe"],
+        "target": "ally",
+        "effects": [
+          { "type": "block", "value": 1, "target": "all_allies" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_bg_guia_local",
+    "label": "Instinto da Trilha",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "gl1",
+        "label": "HEAL 2",
+        "kind": "heal",
+        "value": 2,
+        "tags": ["heal"],
+        "target": "ally",
+        "effects": [
+          { "type": "heal", "value": 2, "target": "target", "removeBleed": true }
+        ]
+      },
+      {
+        "id": "gl2",
+        "label": "MARK+ATK",
+        "kind": "attack",
+        "value": 1,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 1, "target": "target" },
+          { "type": "damage", "value": 1, "range": "ranged", "target": "target" }
+        ]
+      },
+      {
+        "id": "gl3",
+        "label": "Rede",
+        "kind": "special",
+        "value": 1,
+        "tags": ["control"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "fear", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "gl4",
+        "label": "Puxao",
+        "kind": "special",
+        "value": 1,
+        "tags": ["control"],
+        "target": "enemy",
+        "effects": [
+          { "type": "pull_front" }
+        ]
+      },
+      {
+        "id": "gl5",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": ["guard"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 2, "target": "self" }
+        ]
+      },
+      {
+        "id": "gl6",
+        "label": "Caca",
+        "kind": "special",
+        "value": 1,
+        "tags": ["resource"],
+        "target": "self",
+        "effects": [
+          { "type": "post_combat", "resource": "supplies", "value": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_bg_colecionador_selos",
+    "label": "Maleta de Negocios",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "cs1",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "cs2",
+        "label": "Suborno",
+        "kind": "special",
+        "value": 1,
+        "tags": ["control"],
+        "target": "enemy",
+        "effects": [
+          { "type": "suppress_special", "value": 1 }
+        ]
+      },
+      {
+        "id": "cs3",
+        "label": "MARK 1",
+        "kind": "mark",
+        "value": 1,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "cs4",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": ["guard"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 2, "target": "self" }
+        ]
+      },
+      {
+        "id": "cs5",
+        "label": "Ouro",
+        "kind": "special",
+        "value": 1,
+        "tags": ["gold"],
+        "target": "self",
+        "effects": [
+          { "type": "post_combat", "resource": "gold", "value": 1 }
+        ]
+      },
+      {
+        "id": "cs6",
+        "label": "HEAL+BLK",
+        "kind": "heal",
+        "value": 1,
+        "tags": ["support"],
+        "target": "ally",
+        "effects": [
+          { "type": "heal", "value": 1, "target": "target", "removeBleed": true },
+          { "type": "block", "value": 1, "target": "target" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_bg_ex_combatente",
+    "label": "Veterano de Guerra",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "ec1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["melee"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 2, "range": "melee", "target": "target" }
+        ]
+      },
+      {
+        "id": "ec2",
+        "label": "BLK 3",
+        "kind": "block",
+        "value": 3,
+        "tags": ["defense"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 3, "target": "self" }
+        ]
+      },
+      {
+        "id": "ec3",
+        "label": "Granada",
+        "kind": "attack",
+        "value": 1,
+        "tags": ["aoe"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 1, "range": "ranged", "target": "enemy_front_all" }
+        ]
+      },
+      {
+        "id": "ec4",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "ec5",
+        "label": "MARK 2",
+        "kind": "mark",
+        "value": 2,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 2, "target": "target" }
+        ]
+      },
+      {
+        "id": "ec6",
+        "label": "Adrenalina",
+        "kind": "attack",
+        "value": 4,
+        "tags": ["risk"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 4, "range": "melee", "target": "target" },
+          { "type": "status", "statusId": "bleed", "value": 1, "target": "self" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_growth_aviadora",
+    "label": "Voo de Ataque",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "gav1",
+        "label": "ATK 3",
+        "kind": "attack",
+        "value": 3,
+        "tags": ["ranged"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 3, "range": "ranged", "target": "target" }
+        ]
+      },
+      {
+        "id": "gav2",
+        "label": "Rajada 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["aoe"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 2, "range": "ranged", "target": "enemy_front_all" }
+        ]
+      },
+      {
+        "id": "gav3",
+        "label": "SWAP+BLK2",
+        "kind": "swap",
+        "value": 2,
+        "tags": ["maneuver"],
+        "target": "ally",
+        "effects": [
+          { "type": "swap" },
+          { "type": "block", "value": 2, "target": "self" }
+        ]
+      },
+      {
+        "id": "gav4",
+        "label": "FOCO+MARK",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "enemy",
+        "effects": [
+          { "type": "focus", "value": 1 },
+          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "gav5",
+        "label": "CLEANSE+BLK2",
+        "kind": "cleanse",
+        "value": 2,
+        "tags": ["utility"],
+        "target": "ally",
+        "effects": [
+          { "type": "cleanse", "value": 1, "target": "target" },
+          { "type": "block", "value": 2, "target": "target" }
+        ]
+      },
+      {
+        "id": "gav6",
+        "label": "ATK+DODGE",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["tempo"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 2, "range": "ranged", "target": "target" },
+          { "type": "status", "statusId": "dodge", "value": 1, "target": "self" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_growth_ocultista",
+    "label": "Ritual Profundo",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "goc1",
+        "label": "ATK 3+VEN",
+        "kind": "attack",
+        "value": 3,
+        "tags": ["poison"],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "poison",
+            "applyStatusStacks": 1
+          }
+        ]
+      },
+      {
+        "id": "goc2",
+        "label": "MARK 3",
+        "kind": "mark",
+        "value": 3,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "mark", "value": 3, "target": "target" }
+        ]
+      },
+      {
+        "id": "goc3",
+        "label": "MEDO 2",
+        "kind": "special",
+        "value": 2,
+        "tags": ["fear"],
+        "target": "enemy",
+        "effects": [
+          { "type": "status", "statusId": "fear", "value": 2, "target": "target" },
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "goc4",
+        "label": "Escudo 4",
+        "kind": "block",
+        "value": 4,
+        "tags": ["block"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 4, "target": "self" }
+        ]
+      },
+      {
+        "id": "goc5",
+        "label": "Carregar",
+        "kind": "special",
+        "value": 2,
+        "tags": ["charge"],
+        "target": "self",
+        "effects": [
+          { "type": "status", "statusId": "charged", "value": 1, "target": "self" },
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "goc6",
+        "label": "Quebra 2",
+        "kind": "special",
+        "value": 2,
+        "tags": ["shred"],
+        "target": "enemy",
+        "effects": [
+          { "type": "shred_armor", "value": 2, "target": "target" },
+          { "type": "damage", "value": 2, "range": "ranged", "target": "target" }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_growth_cacador",
+    "label": "Mira Fatal",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "gca1",
+        "label": "ATK 3",
+        "kind": "attack",
+        "value": 3,
+        "tags": ["ranged"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 3, "range": "ranged", "target": "target" }
+        ]
+      },
+      {
+        "id": "gca2",
+        "label": "ATK+BLEED2",
+        "kind": "attack",
+        "value": 2,
+        "tags": ["bleed"],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "bleed",
+            "applyStatusStacks": 2
+          }
+        ]
+      },
+      {
+        "id": "gca3",
+        "label": "STUN",
+        "kind": "stun",
+        "value": 1,
+        "tags": ["control"],
+        "target": "enemy",
+        "condition": { "requiresTargetFront": true },
+        "effects": [
+          { "type": "status", "statusId": "stun", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "gca4",
+        "label": "Mirar+FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["setup"],
+        "target": "self",
+        "effects": [
+          { "type": "lock_die", "value": 1 },
+          { "type": "focus", "value": 1 }
+        ]
+      },
+      {
+        "id": "gca5",
+        "label": "HEAL 2",
+        "kind": "heal",
+        "value": 2,
+        "tags": ["utility"],
+        "target": "ally",
+        "effects": [
+          { "type": "heal", "value": 2, "target": "target", "removeBleed": true },
+          { "type": "cleanse", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "gca6",
+        "label": "Certeiro+",
+        "kind": "attack",
+        "value": 4,
+        "tags": ["mark"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 4, "range": "ranged", "target": "target", "consumeMark": false },
+          { "type": "damage", "value": 1, "range": "ranged", "target": "target", "requiresMarked": true, "consumeMark": true }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "die_growth_mecanico",
+    "label": "Blindagem Tatica",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "gme1",
+        "label": "ATK 3",
+        "kind": "attack",
+        "value": 3,
+        "tags": ["melee"],
+        "target": "enemy",
+        "effects": [
+          { "type": "damage", "value": 3, "range": "melee", "target": "target" }
+        ]
+      },
+      {
+        "id": "gme2",
+        "label": "BLK 4",
+        "kind": "block",
+        "value": 4,
+        "tags": ["tank"],
+        "target": "self",
+        "effects": [
+          { "type": "block", "value": 4, "target": "self" }
+        ]
+      },
+      {
+        "id": "gme3",
+        "label": "Reparar+",
+        "kind": "heal",
+        "value": 3,
+        "tags": ["repair"],
+        "target": "ally",
+        "effects": [
+          { "type": "heal", "value": 3, "target": "target", "removeBleed": true },
+          { "type": "cleanse", "value": 1, "target": "target" }
+        ]
+      },
+      {
+        "id": "gme4",
+        "label": "Placas 3",
+        "kind": "block",
+        "value": 3,
+        "tags": ["support"],
+        "target": "ally",
+        "effects": [
+          { "type": "block", "value": 3, "target": "target" }
+        ]
+      },
+      {
+        "id": "gme5",
+        "label": "FOCO+BLK2",
+        "kind": "focus",
+        "value": 1,
+        "tags": ["focus"],
+        "target": "self",
+        "effects": [
+          { "type": "focus", "value": 1 },
+          { "type": "block", "value": 2, "target": "self" }
+        ]
+      },
+      {
+        "id": "gme6",
+        "label": "Torreta 3",
+        "kind": "special",
+        "value": 3,
+        "tags": ["turret"],
+        "target": "self",
+        "effects": [
+          { "type": "turret", "value": 3 }
+        ]
+      }
+    ]
+  }
+]

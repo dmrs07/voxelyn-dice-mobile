@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "name": "voxelyn-dice-mobile",
+  "paths": {
+    "assets": "assets",
+    "scenes": "scenes",
+    "worlds": "worlds",
+    "generated": "assets/generated",
+    "ai": "ai",
+    "build": "build",
+    "content": "content"
+  }
+}

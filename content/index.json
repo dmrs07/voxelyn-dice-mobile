@@ -1,0 +1,21 @@
+{
+  "classes": [
+    "classes/core-classes.json"
+  ],
+  "backgrounds": [
+    "backgrounds/core-backgrounds.json"
+  ],
+  "dice": [
+    "dice/core-dice.json"
+  ],
+  "enemies": [
+    "enemies/core-enemies.json"
+  ],
+  "events": [
+    "events/core-events.json"
+  ],
+  "relics": [
+    "relics/core-relics.json"
+  ],
+  "biome": "biome-amazonia-nuvens.json"
+}

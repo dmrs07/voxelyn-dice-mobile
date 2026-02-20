@@ -1,0 +1,331 @@
+[
+  {
+    "id": "saqueador_rio",
+    "name": "Saqueador do Rio",
+    "hp": 10,
+    "armor": 0,
+    "isBoss": false,
+    "tags": ["human"],
+    "intents": [
+      {
+        "id": "golpe_curto",
+        "label": "Golpe Curto",
+        "kind": "attack",
+        "min": 2,
+        "max": 3,
+        "target": "front",
+        "range": "melee",
+        "aoe": "single",
+        "weight": 4
+      },
+      {
+        "id": "proteger",
+        "label": "Proteger-se",
+        "kind": "defend",
+        "min": 1,
+        "max": 2,
+        "target": "any",
+        "weight": 2
+      }
+    ]
+  },
+  {
+    "id": "besta_do_cipo",
+    "name": "Besta do Cipo",
+    "hp": 11,
+    "armor": 0,
+    "isBoss": false,
+    "tags": ["beast"],
+    "intents": [
+      {
+        "id": "mordida",
+        "label": "Mordida",
+        "kind": "attack",
+        "min": 3,
+        "max": 4,
+        "target": "front",
+        "range": "melee",
+        "aoe": "single",
+        "onHitStatusId": "bleed",
+        "onHitStatusStacks": 1,
+        "weight": 4
+      },
+      {
+        "id": "bote",
+        "label": "Bote Rapido",
+        "kind": "attack",
+        "min": 2,
+        "max": 3,
+        "target": "any",
+        "range": "melee",
+        "aoe": "single",
+        "weight": 3
+      }
+    ]
+  },
+  {
+    "id": "atirador_fantasma",
+    "name": "Atirador Fantasma",
+    "hp": 9,
+    "armor": 1,
+    "isBoss": false,
+    "tags": ["human"],
+    "intents": [
+      {
+        "id": "tiro_longo",
+        "label": "Tiro Longo",
+        "kind": "attack",
+        "min": 2,
+        "max": 3,
+        "target": "back",
+        "range": "ranged",
+        "aoe": "single",
+        "weight": 4
+      },
+      {
+        "id": "mirar_alvo",
+        "label": "Marcar Alvo",
+        "kind": "status",
+        "min": 0,
+        "max": 0,
+        "target": "any",
+        "statusId": "mark",
+        "statusStacks": 1,
+        "weight": 3
+      }
+    ]
+  },
+  {
+    "id": "bruxo_gramofone",
+    "name": "Bruxo do Gramofone",
+    "hp": 10,
+    "armor": 0,
+    "isBoss": false,
+    "tags": ["cult"],
+    "intents": [
+      {
+        "id": "suspiro",
+        "label": "Suspiro de Medo",
+        "kind": "status",
+        "min": 0,
+        "max": 0,
+        "target": "any",
+        "statusId": "fear",
+        "statusStacks": 1,
+        "weight": 4
+      },
+      {
+        "id": "estouro",
+        "label": "Estouro Sonoro",
+        "kind": "attack",
+        "min": 2,
+        "max": 3,
+        "target": "any",
+        "range": "ranged",
+        "aoe": "single",
+        "weight": 3
+      }
+    ]
+  },
+  {
+    "id": "capataz_alfandega",
+    "name": "Capataz da Alfandega",
+    "hp": 13,
+    "armor": 1,
+    "isBoss": false,
+    "tags": ["human"],
+    "intents": [
+      {
+        "id": "investida_curta",
+        "label": "Investida Curta",
+        "kind": "attack",
+        "min": 2,
+        "max": 4,
+        "target": "front",
+        "range": "melee",
+        "aoe": "single",
+        "weight": 4
+      },
+      {
+        "id": "escudo",
+        "label": "Escudo Improvisado",
+        "kind": "defend",
+        "min": 2,
+        "max": 3,
+        "target": "any",
+        "weight": 2
+      }
+    ]
+  },
+  {
+    "id": "sentinela_nevoa",
+    "name": "Sentinela da Nevoa",
+    "hp": 12,
+    "armor": 2,
+    "isBoss": false,
+    "tags": ["construct"],
+    "intents": [
+      {
+        "id": "varredura",
+        "label": "Varredura",
+        "kind": "attack",
+        "min": 1,
+        "max": 2,
+        "target": "front",
+        "range": "melee",
+        "aoe": "front_all",
+        "weight": 4
+      },
+      {
+        "id": "sobrecarga",
+        "label": "Sobrecarga",
+        "kind": "attack",
+        "min": 3,
+        "max": 4,
+        "target": "any",
+        "range": "ranged",
+        "aoe": "single",
+        "weight": 2
+      }
+    ]
+  },
+  {
+    "id": "jaguar_lunar",
+    "name": "Jaguar Lunar",
+    "hp": 11,
+    "armor": 0,
+    "isBoss": false,
+    "tags": ["beast"],
+    "intents": [
+      {
+        "id": "salto",
+        "label": "Salto",
+        "kind": "attack",
+        "min": 3,
+        "max": 4,
+        "target": "any",
+        "range": "melee",
+        "aoe": "single",
+        "weight": 4
+      },
+      {
+        "id": "camuflagem",
+        "label": "Camuflagem",
+        "kind": "special",
+        "min": 0,
+        "max": 0,
+        "target": "any",
+        "grantStatusId": "dodge",
+        "grantStatusStacks": 1,
+        "weight": 2
+      }
+    ]
+  },
+  {
+    "id": "capanga_vesper",
+    "name": "Capanga do Vesper",
+    "hp": 6,
+    "armor": 0,
+    "isBoss": false,
+    "tags": ["human", "summon_only"],
+    "intents": [
+      {
+        "id": "lamina_curta",
+        "label": "Lamina Curta",
+        "kind": "attack",
+        "min": 2,
+        "max": 2,
+        "target": "front",
+        "range": "melee",
+        "aoe": "single",
+        "weight": 1
+      }
+    ]
+  },
+  {
+    "id": "capitao_vesper",
+    "name": "Capitao Vesper e o Zepelim Fantasma",
+    "hp": 26,
+    "armor": 2,
+    "isBoss": true,
+    "tags": ["boss", "airship"],
+    "intentMode": "cycle",
+    "intentCycle": [
+      "bombardeio",
+      "investida",
+      "fumaca_recuo",
+      "lamina_cerimonial",
+      "recarga_veneno"
+    ],
+    "phase2Hp": 13,
+    "intents": [
+      {
+        "id": "bombardeio",
+        "label": "Bombardeio",
+        "kind": "attack",
+        "min": 2,
+        "max": 2,
+        "phase2Min": 3,
+        "phase2Max": 3,
+        "target": "back",
+        "range": "ranged",
+        "aoe": "back_all",
+        "onHitStatusId": "fear",
+        "onHitStatusStacks": 1,
+        "weight": 1
+      },
+      {
+        "id": "investida",
+        "label": "Investida",
+        "kind": "attack",
+        "min": 4,
+        "max": 4,
+        "target": "front",
+        "range": "melee",
+        "aoe": "single",
+        "phase2StatusId": "bleed",
+        "phase2StatusStacks": 1,
+        "weight": 1
+      },
+      {
+        "id": "fumaca_recuo",
+        "label": "Fumaca e Recuo",
+        "kind": "special",
+        "min": 0,
+        "max": 0,
+        "target": "any",
+        "grantStatusId": "dodge",
+        "grantStatusStacks": 1,
+        "summonEnemyId": "capanga_vesper",
+        "isSpecial": true,
+        "weight": 1
+      },
+      {
+        "id": "lamina_cerimonial",
+        "label": "Lamina Cerimonial",
+        "kind": "attack",
+        "min": 5,
+        "max": 5,
+        "target": "any",
+        "range": "ranged",
+        "aoe": "single",
+        "weight": 1
+      },
+      {
+        "id": "recarga_veneno",
+        "label": "Recarga",
+        "kind": "attack",
+        "min": 0,
+        "max": 0,
+        "target": "any",
+        "range": "ranged",
+        "aoe": "single",
+        "grantStatusId": "block",
+        "grantStatusStacks": 3,
+        "onHitStatusId": "poison",
+        "onHitStatusStacks": 2,
+        "weight": 1
+      }
+    ]
+  }
+]

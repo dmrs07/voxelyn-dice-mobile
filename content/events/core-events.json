@@ -1,0 +1,812 @@
+[
+  {
+    "id": "telegrama_molhado",
+    "biome": "amazonia_nuvens",
+    "weight": 3,
+    "title": "Telegrama Molhado",
+    "body": "Uma fita de telegrama encharcada traz um aviso quase ilegivel.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "decifrar_agora",
+        "text": "Decifrar agora",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "focus",
+          "anyOfKinds": [
+            "special"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "relic",
+            "poolTag": "sociedade"
+          },
+          {
+            "kind": "log",
+            "text": "A fita apontava para uma rota de colecionadores."
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "status",
+            "statusId": "fear",
+            "stacks": 1,
+            "target": "party"
+          }
+        ]
+      },
+      {
+        "id": "ignorar",
+        "text": "Ignorar",
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": -1
+          }
+        ],
+        "onFail": []
+      }
+    ]
+  },
+  {
+    "id": "o_clube_do_gramofone",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "O Clube do Gramofone",
+    "body": "Um salao improvisado toca jazz antigo no meio da selva suspensa.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "negociar_entrada",
+        "text": "Negociar entrada",
+        "check": {
+          "kind": "face_value_min",
+          "minValue": 3,
+          "bonusPerTag": "negocio"
+        },
+        "onSuccess": [
+          {
+            "kind": "state",
+            "flag": "spawn_shop_next",
+            "value": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "morale",
+            "delta": -1
+          }
+        ]
+      },
+      {
+        "id": "fundos",
+        "text": "Entrar pelos fundos",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "swap",
+          "anyOfKinds": [
+            "stun",
+            "special"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "consumables",
+            "delta": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "injuries",
+            "delta": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ponte_de_cipos",
+    "biome": "amazonia_nuvens",
+    "weight": 3,
+    "title": "Ponte de Cipos",
+    "body": "Uma ponte de cipos vibra com cada passo sobre o vale.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "atravessar_rapido",
+        "text": "Atravessar rapido",
+        "check": {
+          "kind": "face_value_min",
+          "minValue": 2
+        },
+        "onSuccess": [
+          {
+            "kind": "log",
+            "text": "A trip cruzou antes do vento piorar."
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "supplies",
+            "delta": -1
+          }
+        ]
+      },
+      {
+        "id": "reforcar_placas",
+        "text": "Reforcar com placas",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "block",
+          "autoSuccessTag": "mecanico"
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": -1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "supplies",
+            "delta": -1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "estatua_com_olhos_de_vidro",
+    "biome": "amazonia_nuvens",
+    "weight": 3,
+    "title": "Estatua com Olhos de Vidro",
+    "body": "A estatua parece seguir os movimentos da trip, apesar do musgo.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "examinar",
+        "text": "Examinar",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "special",
+          "anyOfKinds": [
+            "stun"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "relic",
+            "poolTag": "ritual"
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "status",
+            "statusId": "poison",
+            "stacks": 2,
+            "target": "party"
+          }
+        ]
+      },
+      {
+        "id": "quebrar",
+        "text": "Quebrar",
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": 2
+          },
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": 1
+          }
+        ],
+        "onFail": []
+      }
+    ]
+  },
+  {
+    "id": "zepelim_caido",
+    "biome": "amazonia_nuvens",
+    "weight": 3,
+    "title": "Zepelim Caido",
+    "body": "Restos de um dirigivel antigo ainda guardam caixas lacradas.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "vasculhar",
+        "text": "Vasculhar",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "block",
+          "anyOfKinds": [
+            "heal"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "relic",
+            "poolTag": "tecnico"
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "status",
+            "statusId": "bleed",
+            "stacks": 1,
+            "target": "party"
+          }
+        ]
+      },
+      {
+        "id": "deixar_quieto",
+        "text": "Deixar quieto",
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": -1
+          }
+        ],
+        "onFail": []
+      }
+    ]
+  },
+  {
+    "id": "mercador_de_mapas_falsos",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "Mercador de Mapas Falsos",
+    "body": "Um comerciante promete atalhos impossiveis por preco baixo demais.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "confrontar",
+        "text": "Confrontar",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "mark",
+          "anyOfKinds": [
+            "attack"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "state",
+            "flag": "reveal_nodes",
+            "value": 2
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": -1
+          }
+        ]
+      },
+      {
+        "id": "comprar",
+        "text": "Comprar",
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": -1
+          },
+          {
+            "kind": "state",
+            "flag": "spawn_shop_next",
+            "value": 1
+          }
+        ],
+        "onFail": []
+      }
+    ]
+  },
+  {
+    "id": "acampamento_de_sinais",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "Acampamento de Sinais",
+    "body": "Antenas de radio improvisadas tremem com interferencia no ar.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "sintonizar",
+        "text": "Sintonizar o radio",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "focus",
+          "autoSuccessTag": "reporter_radio"
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "morale",
+            "delta": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "state",
+            "flag": "force_elite_next",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "dormir",
+        "text": "Dormir cedo",
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "injuries",
+            "delta": -1
+          },
+          {
+            "kind": "heal",
+            "amount": 2,
+            "target": "random_party"
+          }
+        ],
+        "onFail": []
+      }
+    ]
+  },
+  {
+    "id": "ruina_com_portas_simetricas",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "Ruina com Portas Simetricas",
+    "body": "Duas portas identicas exibem simbolos opostos gravados em metal.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "esquerda",
+        "text": "Esquerda",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "stun",
+          "anyOfKinds": [
+            "swap",
+            "special"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "consumables",
+            "delta": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "state",
+            "flag": "force_elite_next",
+            "value": 1
+          }
+        ]
+      },
+      {
+        "id": "direita",
+        "text": "Direita",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "block"
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "supplies",
+            "delta": 2
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "morale",
+            "delta": -1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "o_contrabandista_do_rio",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "O Contrabandista do Rio",
+    "body": "Barcos baixos escondem mercadoria em compartimentos secretos.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "trocar",
+        "text": "Trocar",
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "consumables",
+            "delta": 2
+          },
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": 1
+          }
+        ],
+        "onFail": []
+      },
+      {
+        "id": "prender",
+        "text": "Prender",
+        "check": {
+          "kind": "face_value_min",
+          "minValue": 3
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": 2
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "injuries",
+            "delta": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "a_fera_observa_de_cima",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "A Fera Observa de Cima",
+    "body": "Um predador colossal acompanha a trip do alto das rochas.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "afugentar",
+        "text": "Afugentar",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "attack",
+          "anyOfKinds": [
+            "special"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": -2
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "status",
+            "statusId": "fear",
+            "stacks": 1,
+            "target": "party"
+          }
+        ]
+      },
+      {
+        "id": "armadilha",
+        "text": "Armadilha",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "stun",
+          "anyOfKinds": [
+            "special"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "relic",
+            "poolTag": "fauna"
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "carimbo_de_alfandega",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "Carimbo de Alfandega",
+    "body": "Um posto velho ainda registra passagem em papel oficial.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "passar_limpo",
+        "text": "Passar limpo",
+        "check": {
+          "kind": "face_value_min",
+          "minValue": 1,
+          "autoSuccessTag": "colecionador_selos"
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": 1
+          },
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": -1
+          }
+        ],
+        "onFail": []
+      },
+      {
+        "id": "forjar",
+        "text": "Forjar",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "focus"
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": -1
+          },
+          {
+            "kind": "resource",
+            "resource": "morale",
+            "delta": -1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "biblioteca_carbonizada",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "Biblioteca Carbonizada",
+    "body": "Estantes queimadas escondem paginas intactas no meio das cinzas.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "resgatar_tomo",
+        "text": "Resgatar tomo",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "special"
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "morale",
+            "delta": 1
+          },
+          {
+            "kind": "state",
+            "flag": "reveal_nodes",
+            "value": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "status",
+            "statusId": "fear",
+            "stacks": 2,
+            "target": "party"
+          }
+        ]
+      },
+      {
+        "id": "procurar_mapas",
+        "text": "Procurar mapas",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "focus",
+          "anyOfKinds": [
+            "cleanse"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "state",
+            "flag": "reveal_nodes",
+            "value": 2
+          },
+          {
+            "kind": "resource",
+            "resource": "gold",
+            "delta": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "o_idolo_que_sussurra_nomes",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "O Idolo que Sussurra Nomes",
+    "body": "A pedra vibra e pronuncia nomes da trip em voz baixa.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "oferecer_sangue",
+        "text": "Oferecer sangue",
+        "onSuccess": [
+          {
+            "kind": "relic",
+            "poolTag": "ritual"
+          },
+          {
+            "kind": "status",
+            "statusId": "bleed",
+            "stacks": 1,
+            "target": "party"
+          }
+        ],
+        "onFail": []
+      },
+      {
+        "id": "selar",
+        "text": "Selar",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "special",
+          "autoSuccessTag": "ocultista"
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": -2
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "state",
+            "flag": "force_elite_next",
+            "value": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pista_de_pouso_improvisada",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "Pista de Pouso Improvisada",
+    "body": "Restos de trilhos e lataria sugerem decolagens arriscadas.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "decolar",
+        "text": "Decolar",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "swap",
+          "autoSuccessTag": "aviadora"
+        },
+        "onSuccess": [
+          {
+            "kind": "state",
+            "flag": "skip_danger_nodes",
+            "value": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "threat",
+            "delta": 2
+          }
+        ]
+      },
+      {
+        "id": "reparar_motor",
+        "text": "Reparar motor",
+        "check": {
+          "kind": "face_kind",
+          "faceKind": "heal",
+          "anyOfKinds": [
+            "block"
+          ]
+        },
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "consumables",
+            "delta": 1
+          },
+          {
+            "kind": "state",
+            "flag": "reveal_nodes",
+            "value": 1
+          }
+        ],
+        "onFail": [
+          {
+            "kind": "resource",
+            "resource": "supplies",
+            "delta": -1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sociedade_do_sol_negro_convite",
+    "biome": "amazonia_nuvens",
+    "weight": 2,
+    "title": "Sociedade do Sol Negro (Convite)",
+    "body": "Um convite selado promete influencia em troca de favores perigosos.",
+    "requiredTags": [],
+    "choices": [
+      {
+        "id": "aceitar",
+        "text": "Aceitar",
+        "onSuccess": [
+          {
+            "kind": "relic",
+            "poolTag": "sociedade"
+          },
+          {
+            "kind": "state",
+            "flag": "force_elite_next",
+            "value": 1
+          }
+        ],
+        "onFail": []
+      },
+      {
+        "id": "recusar",
+        "text": "Recusar",
+        "onSuccess": [
+          {
+            "kind": "resource",
+            "resource": "morale",
+            "delta": 1
+          }
+        ],
+        "onFail": []
+      }
+    ]
+  }
+]
