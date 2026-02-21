@@ -1,0 +1,31 @@
+{
+  "frames": {
+    "neutro_idle_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "neutro_walk_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "neutro_attack_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "neutro_cast_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "neutro_hit_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 120 },
+    "neutro_die_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 220 },
+
+    "ferido_idle_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "ferido_walk_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "ferido_attack_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "ferido_cast_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "ferido_hit_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 120 },
+    "ferido_die_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 220 },
+
+    "buffado_idle_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "buffado_walk_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "buffado_attack_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "buffado_cast_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "buffado_hit_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 120 },
+    "buffado_die_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 220 },
+
+    "amaldicoado_idle_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "amaldicoado_walk_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 180 },
+    "amaldicoado_attack_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "amaldicoado_cast_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 140 },
+    "amaldicoado_hit_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 120 },
+    "amaldicoado_die_0.png": { "frame": { "x": 0, "y": 0, "w": 128, "h": 128 }, "duration": 220 }
+  }
+}

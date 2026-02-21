@@ -1,4 +1,5 @@
 import { SeededRng } from '../../core/rng';
+import { materializeDieFace } from '../shared/dice-face-utils';
 import { applyRunResourceDelta } from './resource-system';
 import type {
   CharacterState,
@@ -54,7 +55,7 @@ const rollFaceForEvent = (
     return null;
   }
 
-  const rolledFace = die.faces[rng.nextInt(6)] ?? die.faces[0];
+  const rolledFace = materializeDieFace(die, rng.nextInt(6));
   return {
     kind: rolledFace.kind,
     value: rolledFace.value,

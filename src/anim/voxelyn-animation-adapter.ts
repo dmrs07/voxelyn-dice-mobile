@@ -9,6 +9,8 @@ import {
   loadCombatantAnimationSet,
   resolveCombatantFallbackStyle,
 } from '../render/pixel/asset-loader';
+import { COMBATANT_INTERNAL_PX } from '../render/pixel/constants';
+import type { CombatantEmotionState } from '../render/pixel/types';
 
 export interface CombatantRegistrationOptions {
   visualKey: string;
@@ -17,6 +19,7 @@ export interface CombatantRegistrationOptions {
   height?: number;
   seedHint?: string;
   facing?: AnimationFacing;
+  state?: CombatantEmotionState;
 }
 
 export interface AnimationDriver {
@@ -86,6 +89,7 @@ type CombatantMotion = {
   facing: AnimationFacing;
   width: number;
   height: number;
+  state: CombatantEmotionState;
   desiredIntent: AnimationIntent;
   intentUntilMs: number;
   stickyIntent: AnimationIntent | null;
@@ -605,11 +609,12 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
     },
 
     registerCombatant(entityId: string, canvas: HTMLCanvasElement, options: CombatantRegistrationOptions): void {
-      const width = Math.max(16, Math.floor(options.width ?? 32));
-      const height = Math.max(16, Math.floor(options.height ?? 32));
+      const width = Math.max(16, Math.floor(options.width ?? COMBATANT_INTERNAL_PX));
+      const height = Math.max(16, Math.floor(options.height ?? COMBATANT_INTERNAL_PX));
       const isEnemy = options.isEnemy ?? false;
       const facing = options.facing ?? (isEnemy ? 'dl' : 'dr');
-      const seedHint = options.seedHint ?? options.visualKey;
+      const state = options.state ?? 'neutro';
+      const seedHint = options.seedHint ?? `${options.visualKey}:${state}`;
 
       const ctx = canvas.getContext('2d', { alpha: true });
       if (!ctx) {
@@ -640,6 +645,7 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
         facing: isValidFacing(facing) ? facing : 'dr',
         width,
         height,
+        state,
         desiredIntent: 'idle',
         intentUntilMs: 0,
         stickyIntent: null,
@@ -653,6 +659,7 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
         isEnemy,
         width,
         height,
+        state,
       }).then((resolved) => {
         if (!resolved) {
           return;
@@ -667,7 +674,9 @@ export const createVoxelynAnimationDriver = (): AnimationDriver => {
           set: resolved.set,
           width: resolved.width,
           height: resolved.height,
-          seed: hashString(`${entityId}:${options.visualKey}:${resolved.styleHint ?? 'clip'}`),
+          seed: hashString(
+            `${entityId}:${options.visualKey}:${state}:${resolved.styleHint ?? 'clip'}`,
+          ),
         });
         current.facing = resolved.facing;
         current.canvas.width = resolved.width;

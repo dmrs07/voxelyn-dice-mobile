@@ -1,0 +1,1845 @@
+[
+  {
+    "id": "die_class_aviadora",
+    "label": "Asas de Manobra",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "av1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "ranged"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: arma simples (ranged = tiro; melee = corte), bem legivel. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "av2",
+        "label": "ATK+MARK",
+        "kind": "attack",
+        "value": 1,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target"
+          },
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: arma simples + alvo bullseye pequeno (dano + marca). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "av3",
+        "label": "SWAP+BLK",
+        "kind": "swap",
+        "value": 1,
+        "tags": [
+          "maneuver"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "swap"
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: setas cruzadas (swap) + escudo pequeno. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "av4",
+        "label": "Rajada",
+        "kind": "attack",
+        "value": 1,
+        "tags": [
+          "aoe"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "enemy_front_all"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: 2-3 linhas de rajada atingindo dois silhouettes (AoE frente). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "av5",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: faisca/raio art deco (FOCO), simples. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "av6",
+        "label": "CLEANSE+BLK",
+        "kind": "cleanse",
+        "value": 1,
+        "tags": [
+          "utility"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa com seta pequena apontando para fora (BLK em aliado). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_class_ocultista",
+    "label": "Cifras do Vazio",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "oc1",
+        "label": "ATK+VENENO",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "poison"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "poison",
+            "applyStatusStacks": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: projetil/tiro + gota verde (ATK + VENENO). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "oc2",
+        "label": "MARK 2",
+        "kind": "mark",
+        "value": 2,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 2,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: alvo bullseye grande (marca), com contorno grosso. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "oc3",
+        "label": "MEDO+FOCO",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "fear"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: mascara/olho assombrado + faisca/raio pequeno (medo + foco). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "oc4",
+        "label": "Escudo Arcano",
+        "kind": "block",
+        "value": 3,
+        "tags": [
+          "shield"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 3,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "oc5",
+        "label": "Ritual",
+        "kind": "special",
+        "value": 2,
+        "tags": [
+          "charge"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "charged",
+            "value": 1,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: circulo runico geometrico art deco (carregar/ritual), sem texto. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "oc6",
+        "label": "Quebra-Selo",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "shred"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "shred_armor",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo rachado + projetil/tiro pequeno (shred + dano). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_class_cacador",
+    "label": "Mira de Precisao",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "ca1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "ranged"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: arma simples (ranged = tiro; melee = corte), bem legivel. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ca2",
+        "label": "ATK+BLEED",
+        "kind": "attack",
+        "value": 1,
+        "tags": [
+          "bleed"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "bleed",
+            "applyStatusStacks": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: lamina/corte + gota vermelha (ATK + BLEED). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ca3",
+        "label": "Armadilha",
+        "kind": "stun",
+        "value": 1,
+        "tags": [
+          "control"
+        ],
+        "target": "enemy",
+        "condition": {
+          "requiresTargetFront": true
+        },
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "stun",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: armadilha ou estrela de impacto (STUN), bem legivel. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ca4",
+        "label": "Mirar",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "setup"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "lock_die",
+            "value": 1
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: mira (crosshair) + cadeado + faisca pequena (lock + foco). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ca5",
+        "label": "HEAL+CLEANSE",
+        "kind": "heal",
+        "value": 1,
+        "tags": [
+          "utility"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: cruz/frasco + brilho (HEAL + CLEANSE). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ca6",
+        "label": "Tiro Certeiro",
+        "kind": "attack",
+        "value": 3,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target",
+            "consumeMark": false
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target",
+            "requiresMarked": true,
+            "consumeMark": true
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: arma simples + alvo bullseye pequeno (dano + marca). Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_class_mecanico",
+    "label": "Ferramentas de Campo",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "me1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "melee"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "melee",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: chave inglesa/golpe mecanico simples, bem legivel. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini punho (melee). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "me2",
+        "label": "BLK 3",
+        "kind": "block",
+        "value": 3,
+        "tags": [
+          "tank"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 3,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "me3",
+        "label": "Reparar",
+        "kind": "heal",
+        "value": 2,
+        "tags": [
+          "repair"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "heal",
+            "value": 2,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: cruz/frasco + brilho (HEAL + CLEANSE). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "me4",
+        "label": "Placas",
+        "kind": "block",
+        "value": 2,
+        "tags": [
+          "support"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "block",
+            "value": 2,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa com seta pequena apontando para fora (BLK em aliado). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "me5",
+        "label": "FOCO+BLK",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "me6",
+        "label": "Torreta 2",
+        "kind": "special",
+        "value": 2,
+        "tags": [
+          "turret"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "turret",
+            "value": 2
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: mini torreta/canhao pixel art, robusto e legivel. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_bg_ex_correio_aereo",
+    "label": "Bolsa Aerea",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "ea1",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: faisca/raio art deco (FOCO), simples. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ea2",
+        "label": "SWAP+ATK",
+        "kind": "swap",
+        "value": 1,
+        "tags": [
+          "mobility"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "swap"
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "enemy_random"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: setas cruzadas (swap) + projetil/tiro pequeno. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ea3",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": [
+          "guard"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ea4",
+        "label": "Sinalizador",
+        "kind": "mark",
+        "value": 1,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "enemy_front_all"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: sinalizador/flare + dois silhouettes (marca em area/frente). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ea5",
+        "label": "CLEANSE",
+        "kind": "cleanse",
+        "value": 1,
+        "tags": [
+          "cleanse"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: gota + brilho (CLEANSE), minimalista e claro. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ea6",
+        "label": "Contrabando",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "contrabando"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "post_combat",
+            "resource": "consumables",
+            "value": 1,
+            "threatDelta": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: caixote + frasco pequeno; mini seta para cima discreta indicando ameaca. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_bg_cartografo_posteres",
+    "label": "Prancheta de Rotas",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "cp1",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: faisca/raio art deco (FOCO), simples. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cp2",
+        "label": "MARK 1",
+        "kind": "mark",
+        "value": 1,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: alvo bullseye grande (marca), com contorno grosso. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cp3",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": [
+          "defense"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cp4",
+        "label": "SWAP",
+        "kind": "swap",
+        "value": 1,
+        "tags": [
+          "swap"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "swap"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: setas cruzadas (swap) centralizadas, sem texto. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cp5",
+        "label": "Terreno",
+        "kind": "block",
+        "value": 1,
+        "tags": [
+          "aoe"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "block",
+            "value": 1,
+            "target": "all_allies"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo + aura envolvendo 3 silhouettes (BLK em todos aliados). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cp6",
+        "label": "CLEANSE+HEAL",
+        "kind": "cleanse",
+        "value": 1,
+        "tags": [
+          "utility"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: cruz/frasco + brilho (HEAL + CLEANSE). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_bg_reporter_radio",
+    "label": "Microfone de Campo",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "rr1",
+        "label": "Inspirar",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "buff"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "inspired",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: microfone vintage + estrela (inspirar), art deco simples. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "rr2",
+        "label": "MEDO 1",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "fear"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: mascara/olho assombrado (medo), simples e forte. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "rr3",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: faisca/raio art deco (FOCO), simples. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "rr4",
+        "label": "MARK 2",
+        "kind": "mark",
+        "value": 2,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 2,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: alvo bullseye grande (marca), com contorno grosso. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "rr5",
+        "label": "HEAL 1",
+        "kind": "heal",
+        "value": 1,
+        "tags": [
+          "heal"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: cruz/frasco de cura simples, alto contraste. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "rr6",
+        "label": "Cobertura",
+        "kind": "block",
+        "value": 1,
+        "tags": [
+          "aoe"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "block",
+            "value": 1,
+            "target": "all_allies"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo + aura envolvendo 3 silhouettes (BLK em todos aliados). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_bg_guia_local",
+    "label": "Instinto da Trilha",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "gl1",
+        "label": "HEAL 2",
+        "kind": "heal",
+        "value": 2,
+        "tags": [
+          "heal"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "heal",
+            "value": 2,
+            "target": "target",
+            "removeBleed": true
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: cruz/frasco de cura simples, alto contraste. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gl2",
+        "label": "MARK+ATK",
+        "kind": "attack",
+        "value": 1,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: arma simples + alvo bullseye pequeno (dano + marca). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gl3",
+        "label": "Rede",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "control"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: mascara/olho assombrado (medo), simples e forte. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gl4",
+        "label": "Puxao",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "control"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "pull_front"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: gancho com seta puxando para frente, sem texto. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gl5",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": [
+          "guard"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gl6",
+        "label": "Caca",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "resource"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "post_combat",
+            "resource": "supplies",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: caixa de suprimentos com folhagem + mini +1. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_bg_colecionador_selos",
+    "label": "Maleta de Negocios",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "cs1",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: faisca/raio art deco (FOCO), simples. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cs2",
+        "label": "Suborno",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "control"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "suppress_special",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: moeda + X sobre uma estrela (cancelar especial), legivel em 16x16. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cs3",
+        "label": "MARK 1",
+        "kind": "mark",
+        "value": 1,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: alvo bullseye grande (marca), com contorno grosso. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cs4",
+        "label": "BLK 2",
+        "kind": "block",
+        "value": 2,
+        "tags": [
+          "guard"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cs5",
+        "label": "Ouro",
+        "kind": "special",
+        "value": 1,
+        "tags": [
+          "gold"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "post_combat",
+            "resource": "gold",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: moeda art deco (ouro) + mini +1. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "cs6",
+        "label": "HEAL+BLK",
+        "kind": "heal",
+        "value": 1,
+        "tags": [
+          "support"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa com seta pequena apontando para fora (BLK em aliado). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_bg_ex_combatente",
+    "label": "Veterano de Guerra",
+    "rarity": "common",
+    "faces": [
+      {
+        "id": "ec1",
+        "label": "ATK 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "melee"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "melee",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: arma simples (ranged = tiro; melee = corte), bem legivel. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini punho (melee). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ec2",
+        "label": "BLK 3",
+        "kind": "block",
+        "value": 3,
+        "tags": [
+          "defense"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 3,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ec3",
+        "label": "Granada",
+        "kind": "attack",
+        "value": 1,
+        "tags": [
+          "aoe"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "enemy_front_all"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: 2-3 linhas de rajada atingindo dois silhouettes (AoE frente). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ec4",
+        "label": "FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: faisca/raio art deco (FOCO), simples. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ec5",
+        "label": "MARK 2",
+        "kind": "mark",
+        "value": 2,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 2,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: alvo bullseye grande (marca), com contorno grosso. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "ec6",
+        "label": "Adrenalina",
+        "kind": "attack",
+        "value": 4,
+        "tags": [
+          "risk"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 4,
+            "range": "melee",
+            "target": "target"
+          },
+          {
+            "type": "status",
+            "statusId": "bleed",
+            "value": 1,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material comum: marfim/metal escuro, sem brilho extra, sem gradiente. Icone: golpe pesado + gota vermelha com mini seta para self (risco). Badge numerico \"4\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini punho (melee). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": "die_growth_aviadora",
+    "label": "Voo de Ataque",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "gav1",
+        "label": "ATK 3",
+        "kind": "attack",
+        "value": 3,
+        "tags": [
+          "ranged"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: arma simples (ranged = tiro; melee = corte), bem legivel. Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gav2",
+        "label": "Rajada 2",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "aoe"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "enemy_front_all"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: 2-3 linhas de rajada atingindo dois silhouettes (AoE frente). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gav3",
+        "label": "SWAP+BLK2",
+        "kind": "swap",
+        "value": 2,
+        "tags": [
+          "maneuver"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "swap"
+          },
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: setas cruzadas (swap) + escudo pequeno. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gav4",
+        "label": "FOCO+MARK",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          },
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: alvo bullseye grande (marca), com contorno grosso. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gav5",
+        "label": "CLEANSE+BLK2",
+        "kind": "cleanse",
+        "value": 2,
+        "tags": [
+          "utility"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "block",
+            "value": 2,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: escudo/placa com seta pequena apontando para fora (BLK em aliado). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gav6",
+        "label": "ATK+DODGE",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "tempo"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          },
+          {
+            "type": "status",
+            "statusId": "dodge",
+            "value": 1,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: projetil/tiro + asa/pena (ATK + DODGE). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      5
+    ]
+  },
+  {
+    "id": "die_growth_ocultista",
+    "label": "Ritual Profundo",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "goc1",
+        "label": "ATK 3+VEN",
+        "kind": "attack",
+        "value": 3,
+        "tags": [
+          "poison"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "poison",
+            "applyStatusStacks": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: projetil/tiro + gota verde (ATK + VENENO). Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "goc2",
+        "label": "MARK 3",
+        "kind": "mark",
+        "value": 3,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 3,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: alvo bullseye grande (marca), com contorno grosso. Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "goc3",
+        "label": "MEDO 2",
+        "kind": "special",
+        "value": 2,
+        "tags": [
+          "fear"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 2,
+            "target": "target"
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: mascara/olho assombrado + faisca/raio pequeno (medo + foco). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "goc4",
+        "label": "Escudo 4",
+        "kind": "block",
+        "value": 4,
+        "tags": [
+          "block"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 4,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"4\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "goc5",
+        "label": "Carregar",
+        "kind": "special",
+        "value": 2,
+        "tags": [
+          "charge"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "charged",
+            "value": 1,
+            "target": "self"
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: circulo runico geometrico art deco (carregar/ritual), sem texto. Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "goc6",
+        "label": "Quebra 2",
+        "kind": "special",
+        "value": 2,
+        "tags": [
+          "shred"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "shred_armor",
+            "value": 2,
+            "target": "target"
+          },
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: escudo rachado + projetil/tiro pequeno (shred + dano). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      5
+    ]
+  },
+  {
+    "id": "die_growth_cacador",
+    "label": "Mira Fatal",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "gca1",
+        "label": "ATK 3",
+        "kind": "attack",
+        "value": 3,
+        "tags": [
+          "ranged"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: arma simples (ranged = tiro; melee = corte), bem legivel. Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gca2",
+        "label": "ATK+BLEED2",
+        "kind": "attack",
+        "value": 2,
+        "tags": [
+          "bleed"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target",
+            "applyStatusId": "bleed",
+            "applyStatusStacks": 2
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: lamina/corte + gota vermelha (ATK + BLEED). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gca3",
+        "label": "STUN",
+        "kind": "stun",
+        "value": 1,
+        "tags": [
+          "control"
+        ],
+        "target": "enemy",
+        "condition": {
+          "requiresTargetFront": true
+        },
+        "effects": [
+          {
+            "type": "status",
+            "statusId": "stun",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: armadilha ou estrela de impacto (STUN), bem legivel. Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gca4",
+        "label": "Mirar+FOCO",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "setup"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "lock_die",
+            "value": 1
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: mira (crosshair) + cadeado + faisca pequena (lock + foco). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gca5",
+        "label": "HEAL 2",
+        "kind": "heal",
+        "value": 2,
+        "tags": [
+          "utility"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "heal",
+            "value": 2,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: cruz/frasco + brilho (HEAL + CLEANSE). Badge numerico \"2\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gca6",
+        "label": "Certeiro+",
+        "kind": "attack",
+        "value": 4,
+        "tags": [
+          "mark"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 4,
+            "range": "ranged",
+            "target": "target",
+            "consumeMark": false
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target",
+            "requiresMarked": true,
+            "consumeMark": true
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: arma simples + alvo bullseye pequeno (dano + marca). Badge numerico \"4\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini seta (ranged). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      5
+    ]
+  },
+  {
+    "id": "die_growth_mecanico",
+    "label": "Blindagem Tatica",
+    "rarity": "rare",
+    "faces": [
+      {
+        "id": "gme1",
+        "label": "ATK 3",
+        "kind": "attack",
+        "value": 3,
+        "tags": [
+          "melee"
+        ],
+        "target": "enemy",
+        "effects": [
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "melee",
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: chave inglesa/golpe mecanico simples, bem legivel. Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Marcador pequeno de alcance: mini punho (melee). Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gme2",
+        "label": "BLK 4",
+        "kind": "block",
+        "value": 4,
+        "tags": [
+          "tank"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "block",
+            "value": 4,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"4\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gme3",
+        "label": "Reparar+",
+        "kind": "heal",
+        "value": 3,
+        "tags": [
+          "repair"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "heal",
+            "value": 3,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: cruz/frasco + brilho (HEAL + CLEANSE). Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gme4",
+        "label": "Placas 3",
+        "kind": "block",
+        "value": 3,
+        "tags": [
+          "support"
+        ],
+        "target": "ally",
+        "effects": [
+          {
+            "type": "block",
+            "value": 3,
+            "target": "target"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: escudo/placa com seta pequena apontando para fora (BLK em aliado). Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gme5",
+        "label": "FOCO+BLK2",
+        "kind": "focus",
+        "value": 1,
+        "tags": [
+          "focus"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "focus",
+            "value": 1
+          },
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: escudo/placa art deco (BLK proprio). Badge numerico \"1\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      },
+      {
+        "id": "gme6",
+        "label": "Torreta 3",
+        "kind": "special",
+        "value": 3,
+        "tags": [
+          "turret"
+        ],
+        "target": "self",
+        "effects": [
+          {
+            "type": "turret",
+            "value": 3
+          }
+        ],
+        "prompt": "Pixel art FULL, texture de face de dado 1:1 64x64 (ou 48x48), icone central ocupando 60% do quadro, moldura/bevel do dado em pixels com detalhe art deco simples, contorno escuro definido, shading em 2-3 niveis solidos, alto contraste, iluminacao topo-esquerda, fundo solido preenchido (nao transparente), paleta limitada a 8-12 cores, sem blur, sem anti-aliasing, pixel perfeito, legivel em mobile, estilo roguelike tipo Slice & Dice, ideal para atlas. Material raro: inlay azul-petroleo + filete dourado sutil, 1 brilho pequeno (1-2 pixels), sem gradiente. Icone: mini torreta/canhao pixel art, robusto e legivel. Badge numerico \"3\" em fonte pixel pequena no canto inferior direito. Sem texto (exceto badge numerico), composicao limpa, sem cenario complexo."
+      }
+    ],
+    "emptyFaceIndices": [
+      5
+    ]
+  }
+]

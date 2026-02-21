@@ -10,7 +10,9 @@ import type {
   CombatIntent,
   CombatState,
   CombatantState,
+  DiceFaceDef,
   EnemyDef,
+  EnemyDieTier,
   EnemyIntentDef,
   GameContent,
 } from '../shared/types';
@@ -84,9 +86,19 @@ const intentToRuntime = (
     onHitStatusId?: EnemyIntentDef['onHitStatusId'];
     onHitStatusStacks: number;
   },
+  options?: {
+    rollId?: string;
+    tier?: EnemyDieTier;
+    faceIndex?: number;
+    face?: DiceFaceDef;
+  },
 ): CombatIntent => ({
   enemyId: enemy.id,
   intentId: intent.id,
+  enemyRollId: options?.rollId,
+  enemyDieTier: options?.tier,
+  enemyFaceIndex: options?.faceIndex,
+  enemyFace: options?.face,
   label: intent.label,
   kind: intent.kind,
   value: rolled.value,
@@ -103,12 +115,103 @@ const intentToRuntime = (
   summonEnemyId: intent.summonEnemyId,
 });
 
+const tierDiceCount = (tier: EnemyDieTier): number => {
+  if (tier === 'boss') {
+    return 3;
+  }
+  if (tier === 'elite') {
+    return 2;
+  }
+  return 1;
+};
+
+const inferEnemyTier = (combat: CombatState, blueprint: EnemyDef): EnemyDieTier => {
+  if (blueprint.isBoss || combat.nodeType === 'boss') {
+    return 'boss';
+  }
+  if (combat.nodeType === 'elite') {
+    return 'elite';
+  }
+  return 'common';
+};
+
+const mapIntentKindToFaceKind = (kind: EnemyIntentDef['kind']): DiceFaceDef['kind'] => {
+  if (kind === 'attack') return 'attack';
+  if (kind === 'defend') return 'block';
+  if (kind === 'heal') return 'heal';
+  return 'special';
+};
+
+const mapIntentTargetToFaceTarget = (
+  target: EnemyIntentDef['target'],
+): DiceFaceDef['target'] => {
+  if (target === 'any') {
+    return 'any';
+  }
+  return 'enemy';
+};
+
+const makeEnemyIntentFace = (
+  blueprintId: string,
+  enemyId: string,
+  intent: EnemyIntentDef,
+  value: number,
+  faceIndex: number,
+): DiceFaceDef => ({
+  id: `${enemyId}:${intent.id}:${faceIndex}`,
+  label: intent.label,
+  kind: mapIntentKindToFaceKind(intent.kind),
+  value: Math.max(0, value),
+  tags: [
+    'enemy_intent',
+    intent.kind,
+    intent.range ?? 'melee',
+    intent.target,
+    intent.aoe ?? 'single',
+    blueprintId,
+  ],
+  target: mapIntentTargetToFaceTarget(intent.target),
+  effects: [],
+});
+
+export const deriveEnemyDieFacesFromIntents = (blueprint: EnemyDef): DiceFaceDef[] => {
+  if (blueprint.intents.length === 0) {
+    return [];
+  }
+
+  const weighted: EnemyIntentDef[] = [];
+  for (const intent of blueprint.intents) {
+    const weight = Math.max(1, Math.floor(intent.weight));
+    for (let i = 0; i < weight; i += 1) {
+      weighted.push(intent);
+    }
+  }
+
+  const source = weighted.length > 0 ? weighted : blueprint.intents;
+  const faces: DiceFaceDef[] = [];
+  for (let index = 0; index < 6; index += 1) {
+    const intent = source[index % source.length] as EnemyIntentDef;
+    const value = Math.max(0, Math.floor((intent.min + intent.max) / 2));
+    faces.push(
+      makeEnemyIntentFace(
+        blueprint.id,
+        blueprint.id,
+        intent,
+        value,
+        index,
+      ),
+    );
+  }
+  return faces;
+};
+
 export const buildEnemyIntents = (
   combat: CombatState,
   content: GameContent,
   rng: SeededRng,
 ): CombatIntent[] => {
   const intents: CombatIntent[] = [];
+  const snapshot: NonNullable<CombatState['enemyRollSnapshot']> = [];
 
   for (let index = 0; index < combat.enemies.length; index += 1) {
     const enemy = combat.enemies[index] as CombatantState;
@@ -122,15 +225,62 @@ export const buildEnemyIntents = (
       continue;
     }
 
-    const pickedIntent = pickIntent(combat, enemy, blueprint, rng);
-    if (!pickedIntent) {
-      continue;
-    }
+    const tier = inferEnemyTier(combat, blueprint);
+    const dieCount = tierDiceCount(tier);
+    const dieFaces = deriveEnemyDieFacesFromIntents(blueprint);
 
-    const rolled = rollIntentValue(pickedIntent, blueprint, enemy, rng);
-    intents.push(intentToRuntime(pickedIntent, enemy, rolled));
+    for (let dieIndex = 0; dieIndex < dieCount; dieIndex += 1) {
+      const pickedIntent = pickIntent(combat, enemy, blueprint, rng);
+      if (!pickedIntent) {
+        continue;
+      }
+
+      const rolled = rollIntentValue(pickedIntent, blueprint, enemy, rng);
+      const faceIndex = rng.nextInt(6);
+      const fallbackFace = dieFaces[faceIndex] ?? makeEnemyIntentFace(
+        blueprint.id,
+        enemy.id,
+        pickedIntent,
+        rolled.value,
+        faceIndex,
+      );
+      const face = {
+        ...fallbackFace,
+        id: `${enemy.id}:${pickedIntent.id}:${combat.turn}:${dieIndex}`,
+        label: pickedIntent.label,
+        kind: mapIntentKindToFaceKind(pickedIntent.kind),
+        value: rolled.value,
+        target: mapIntentTargetToFaceTarget(pickedIntent.target),
+        tags: [
+          ...fallbackFace.tags.filter((tag) => tag !== 'enemy_intent'),
+          'enemy_intent',
+        ],
+      } satisfies DiceFaceDef;
+      const rollId = `enemy_${enemy.id}_${combat.turn}_${dieIndex}`;
+      intents.push(
+        intentToRuntime(pickedIntent, enemy, rolled, {
+          rollId,
+          tier,
+          faceIndex,
+          face,
+        }),
+      );
+      snapshot.push({
+        enemyId: enemy.id,
+        tier,
+        rollId,
+        intentId: pickedIntent.id,
+        label: pickedIntent.label,
+        kind: pickedIntent.kind,
+        target: pickedIntent.target,
+        range: pickedIntent.range ?? 'melee',
+        value: rolled.value,
+        faceIndex,
+      });
+    }
   }
 
+  combat.enemyRollSnapshot = snapshot;
   return intents;
 };
 
@@ -188,7 +338,8 @@ export const resolveEnemyTurn = (
   const logs: string[] = [];
   const events: CombatFxEvent[] = [];
 
-  for (const intent of combat.intents) {
+  for (let index = 0; index < combat.intents.length; index += 1) {
+    const intent = combat.intents[index] as CombatIntent;
     const enemy = combat.enemies.find((entry) => entry.id === intent.enemyId);
     if (!enemy || !enemy.alive) {
       continue;
@@ -198,6 +349,58 @@ export const resolveEnemyTurn = (
       logs.push(`${enemy.name} esta STUN e perde a acao.`);
       continue;
     }
+
+    const enemyRollId = intent.enemyRollId ?? `enemy_${intent.enemyId}_${combat.turn}_${index}`;
+    const enemyFaceIndex = intent.enemyFaceIndex ?? (index % 6);
+    const enemyFace =
+      intent.enemyFace ??
+      makeEnemyIntentFace('enemy', enemy.id, {
+        id: intent.intentId,
+        label: intent.label,
+        kind: intent.kind,
+        min: intent.value,
+        max: intent.value,
+        target: intent.target,
+        range: intent.range,
+        aoe: intent.aoe,
+        weight: 1,
+      }, intent.value, enemyFaceIndex);
+
+    events.push({
+      type: 'die_roll',
+      rollId: enemyRollId,
+      ownerId: enemy.id,
+      durationMs: 280,
+      face: enemyFace,
+      faceIndex: enemyFaceIndex,
+      dieId: `enemy_die_${enemy.id}`,
+      transient: true,
+      selectable: false,
+      expiresAfterMs: 1450,
+    });
+    events.push({
+      type: 'die_settle',
+      rollId: enemyRollId,
+      ownerId: enemy.id,
+      faceId: enemyFace.id,
+      durationMs: 360,
+      face: enemyFace,
+      faceIndex: enemyFaceIndex,
+      dieId: `enemy_die_${enemy.id}`,
+      transient: true,
+      selectable: false,
+      expiresAfterMs: 1450,
+    });
+    events.push({
+      type: 'intent_telegraph',
+      ownerId: enemy.id,
+      intentKind: intent.kind,
+      value: intent.value,
+      durationMs: 280,
+      label: intent.label,
+      targetHint: intent.target,
+    });
+    logs.push(`${enemy.name} rolou ${intent.label} (${intent.value}).`);
 
     if (intent.summonEnemyId && intent.kind === 'special') {
       if (intent.grantStatusId && (intent.grantStatusStacks ?? 0) > 0) {

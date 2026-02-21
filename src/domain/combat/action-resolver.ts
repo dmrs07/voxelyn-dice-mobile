@@ -322,6 +322,83 @@ export interface ActionResolutionResult {
   events: CombatFxEvent[];
 }
 
+const canResolveRollTargetWithoutMutating = (
+  combat: CombatState,
+  roll: RolledDie,
+  actorTeam: 'party' | 'enemy',
+  targetTeam: 'party' | 'enemy',
+  targetId: string,
+): boolean => {
+  const actor = findCombatant(combat, actorTeam, roll.ownerId);
+  const target = findCombatant(combat, targetTeam, targetId);
+  if (!actor || !target || !actor.alive || !target.alive) {
+    return false;
+  }
+
+  const face = roll.face;
+  if (face.kind === 'empty') {
+    return false;
+  }
+
+  if (face.condition?.requiresTag && !actor.tags.includes(face.condition.requiresTag)) {
+    return false;
+  }
+  if (face.condition?.requiresMarked && (target.statuses.mark ?? 0) <= 0) {
+    return false;
+  }
+  if (face.condition?.requiresTargetFront && target.row !== 'front') {
+    return false;
+  }
+
+  if (face.target === 'self' && actor.id !== target.id) {
+    return false;
+  }
+  if (face.target === 'ally' && actorTeam !== targetTeam) {
+    return false;
+  }
+  if (face.target === 'enemy' && actorTeam === targetTeam) {
+    return false;
+  }
+
+  for (const effect of face.effects) {
+    if (effect.type !== 'damage') {
+      continue;
+    }
+
+    const targets = resolveTargetsForEffect(
+      combat,
+      actor,
+      actorTeam,
+      targetTeam,
+      target,
+      effect.target,
+    );
+    const range = effect.range ?? 'melee';
+    const opponentTeam = enemyTeamFor(actorTeam);
+
+    for (const current of targets) {
+      if (!canHitTargetWithRange(combat, actorTeam, opponentTeam, current, range)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
+export const canUsePlayerDieOnTarget = (
+  combat: CombatState,
+  rollId: string,
+  targetTeam: 'party' | 'enemy',
+  targetId: string,
+): boolean => {
+  const roll = combat.diceRolls.find((entry) => entry.rollId === rollId);
+  if (!roll || roll.used || roll.locked) {
+    return false;
+  }
+  return canResolveRollTargetWithoutMutating(combat, roll, 'party', targetTeam, targetId);
+};
+
 export const resolveRolledDieAction = (
   combat: CombatState,
   roll: RolledDie,
@@ -338,6 +415,14 @@ export const resolveRolledDieAction = (
   }
 
   const face: DiceFaceDef = roll.face;
+
+  if (face.kind === 'empty') {
+    return {
+      ok: true,
+      log: `${actor.name} rolou lado vazio.`,
+      events,
+    };
+  }
 
   if (face.condition?.requiresTag && !actor.tags.includes(face.condition.requiresTag)) {
     return { ok: false, log: 'Condicao de tag nao atendida.', events };
@@ -770,12 +855,25 @@ export const resolveEnemyAttackTargets = (
   const front = partyAlive.filter((entry) => entry.row === 'front');
   const back = partyAlive.filter((entry) => entry.row === 'back');
 
+  const selectByPreferredRow = (
+    preferred: 'front' | 'back',
+  ): CombatantState[] => {
+    if (preferred === 'front') {
+      return front.length > 0 ? front : (back.length > 0 ? back : partyAlive);
+    }
+    return back.length > 0 ? back : (front.length > 0 ? front : partyAlive);
+  };
+
   const baseTargets = (() => {
     if (intent.target === 'front') {
       return front.length > 0 ? front : partyAlive;
     }
     if (intent.target === 'back') {
       return back.length > 0 ? back : partyAlive;
+    }
+    if (intent.target === 'any') {
+      const preferredRow = intent.range === 'ranged' ? 'back' : 'front';
+      return selectByPreferredRow(preferredRow);
     }
     return partyAlive;
   })();

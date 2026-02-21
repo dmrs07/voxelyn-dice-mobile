@@ -1,0 +1,3 @@
+export const COMBATANT_INTERNAL_PX = 128;
+export const MAP_MINIATURE_INTERNAL_PX = 128;
+export const BASE_MINIATURE_PX = 64;

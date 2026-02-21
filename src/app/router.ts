@@ -5,10 +5,12 @@ import {
   createCombatState,
   discardDieForGuard,
   nextCombatTurn,
+  rollCombatDice,
   rerollOneDieWithFocus,
   syncCombatToRun,
   usePlayerDie,
 } from '../domain/combat/combat-reducer';
+import { canUsePlayerDieOnTarget } from '../domain/combat/action-resolver';
 import {
   pickEventForRun,
   resolveEventChoice as resolveEventChoiceRoll,
@@ -64,6 +66,10 @@ const clamp = (value: number, min: number, max: number): number => Math.max(min,
 
 const formatMessage = (parts: string[]): string => parts.filter(Boolean).join(' ');
 
+const START_HIRING_GOLD = 7;
+const hireCostForClass = (classId: string, state: GameState): number =>
+  Math.max(0, state.content.byId.classes[classId]?.hireCost ?? 2);
+
 export class GameRouter {
   private state: GameState;
 
@@ -75,7 +81,19 @@ export class GameRouter {
 
   private draftParty: PartySelectionItem[];
 
+  private selectedDraftSlot = 0;
+
+  private metaFaceTooltipKey: string | null = null;
+
   private selectedRollId: string | null = null;
+
+  private combatFaceTooltipRollId: string | null = null;
+
+  private combatFaceTooltipPosition: { x: number; y: number } | null = null;
+
+  private selectedTargetId: string | null = null;
+
+  private combatLogCollapsed = true;
 
   private readonly animationDriver: AnimationDriver;
 
@@ -90,42 +108,86 @@ export class GameRouter {
     this.state = initialState;
     this.animationDriver = createVoxelynAnimationDriver();
     this.combatFxController = new CombatFxController(this.animationDriver);
+    this.combatFxController.setDiceDefinitions(initialState.content.byId.dice);
     this.startAnimationLoop();
 
     const defaultClass = this.state.profile.unlocks.classes[0] ?? this.state.content.classes[0]?.id;
     const defaultBackground =
       this.state.profile.unlocks.backgrounds[0] ?? this.state.content.backgrounds[0]?.id;
 
+    const secondClass =
+      this.state.profile.unlocks.classes.find((entry) => entry !== defaultClass) ??
+      this.state.content.classes.find((entry) => entry.id !== defaultClass)?.id ??
+      defaultClass;
+
     this.draftParty =
       defaultClass && defaultBackground
         ? [
             { classId: defaultClass, backgroundId: defaultBackground, row: 'front' },
-            { classId: defaultClass, backgroundId: defaultBackground, row: 'back' },
+            { classId: secondClass ?? defaultClass, backgroundId: defaultBackground, row: 'back' },
           ]
         : [];
+
+    this.draftParty = this.ensureDraftValidity(this.draftParty);
+    this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, this.draftParty.length - 1);
   }
 
   public render(): void {
     this.applyBiomeTheme();
+    document.body.dataset.phase = this.state.phase;
     const message = this.state.message;
 
     if (this.state.phase === 'meta') {
+      const sanitizedDraft = this.ensureDraftValidity(this.draftParty);
+      if (sanitizedDraft.length !== this.draftParty.length) {
+        this.draftParty = sanitizedDraft;
+      }
+      const hiringSpent = this.calculateHiringSpent(this.draftParty);
+      const hiringRemaining = Math.max(0, START_HIRING_GOLD - hiringSpent);
+
       renderMetaScreen(
         this.root,
         {
           content: this.state.content,
           profile: this.state.profile,
           draftParty: this.draftParty,
+          selectedSlotIndex: this.selectedDraftSlot,
+          openFaceTooltipKey: this.metaFaceTooltipKey,
           seed: this.draftSeed,
+          hiringBudget: START_HIRING_GOLD,
+          hiringSpent,
+          hiringRemaining,
           message,
         },
         {
-          onStartRun: (seed, party) => {
-            this.startRun(seed, party);
+          onStartRun: (seed) => {
+            this.startRun(seed);
+          },
+          onSetSeed: (seed) => {
+            this.draftSeed = seed;
+            this.render();
           },
           onDraftPartyChange: (party) => {
-            this.draftParty = party;
-            this.state = withMessage(this.state, 'Draft atualizado.');
+            const sanitized = this.ensureDraftValidity(party);
+            const hadDuplicateClass = new Set(party.map((entry) => entry.classId)).size !== party.length;
+            this.draftParty = sanitized;
+            this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, this.draftParty.length - 1);
+            this.metaFaceTooltipKey = null;
+            this.state = withMessage(
+              this.state,
+              hadDuplicateClass
+                ? 'Classe duplicada removida do roster.'
+                : 'Draft atualizado.',
+            );
+            this.render();
+          },
+          onSelectSlot: (slotIndex) => {
+            this.selectedDraftSlot = clamp(slotIndex, 0, this.draftParty.length - 1);
+            this.metaFaceTooltipKey = null;
+            this.render();
+          },
+          onToggleFaceTooltip: (faceKey) => {
+            this.metaFaceTooltipKey = faceKey;
             this.render();
           },
           onResetProfile: () => {
@@ -175,40 +237,148 @@ export class GameRouter {
     }
 
     if (this.state.phase === 'combat' && this.state.combat) {
+      const dieLabels = Object.fromEntries(
+        Object.entries(this.state.content.byId.dice).map(([dieId, die]) => [dieId, die.label]),
+      );
+      const validTargetIds = this.buildValidTargetIds(this.state.combat, this.selectedRollId);
+
       renderCombatScreen(
         this.root,
         {
           combat: this.state.combat,
           message,
           selectedRollId: this.selectedRollId,
+          openFaceTooltipRollId: this.combatFaceTooltipRollId,
+          trayTooltipPosition: this.combatFaceTooltipPosition,
+          combatLogCollapsed: this.combatLogCollapsed,
+          validTargetIds,
+          selectedTargetId: this.selectedTargetId,
+          biomeId: this.state.run?.map.biomeId ?? this.state.content.biome.id,
+          phaseBucket: this.combatPhaseBucket(this.state.combat.turn),
+          dieLabels,
+          trayDiagnostics: this.combatFxController.getDiceTrayDiagnostics(),
+          showDevTrayDebug: Boolean(import.meta.env?.DEV),
         },
         {
-          onDropDie: (rollId, team, targetId) => {
+          onSelectDie: (rollId) => {
+            const combat = this.state.combat;
+            if (!combat || !rollId) {
+              this.clearCombatSelection(true);
+              return;
+            }
+            const roll = combat.diceRolls.find(
+              (entry) => entry.rollId === rollId && !entry.used && !entry.locked,
+            );
+            if (!roll) {
+              return;
+            }
+            if (this.selectedRollId === rollId) {
+              if (roll.face.kind === 'empty') {
+                this.selectedRollId = null;
+                this.selectedTargetId = null;
+                this.combatFaceTooltipRollId = null;
+                this.combatFaceTooltipPosition = null;
+                this.useEmptyDie(rollId);
+                return;
+              }
+              this.clearCombatSelection(true);
+              return;
+            }
+            this.selectedRollId = rollId;
+            this.selectedTargetId = null;
+            this.combatFaceTooltipRollId = null;
+            this.combatFaceTooltipPosition = null;
+          },
+          onClearSelection: () => this.clearCombatSelection(true),
+          onTapTarget: (team, targetId) => {
+            if (!this.selectedRollId) {
+              return;
+            }
+            const combat = this.state.combat;
+            if (!combat) {
+              return;
+            }
+            const rollId = this.selectedRollId;
+            const roll = combat.diceRolls.find((entry) => entry.rollId === rollId);
+            if (!roll || roll.used || roll.locked) {
+              this.clearCombatSelection(true);
+              return;
+            }
+            if (roll.face.kind === 'empty') {
+              this.selectedRollId = null;
+              this.selectedTargetId = null;
+              this.combatFaceTooltipRollId = null;
+              this.combatFaceTooltipPosition = null;
+              this.useEmptyDie(rollId);
+              return;
+            }
+            if (!canUsePlayerDieOnTarget(combat, rollId, team, targetId)) {
+              this.state = withMessage(this.state, 'Alvo invalido para este dado.');
+              this.render();
+              return;
+            }
             this.selectedRollId = null;
+            this.selectedTargetId = targetId;
+            this.combatFaceTooltipRollId = null;
+            this.combatFaceTooltipPosition = null;
             this.applyDieToTarget(rollId, team, targetId);
           },
-          onDiscardDie: (rollId) => {
-            this.selectedRollId = null;
-            this.discardDie(rollId);
-          },
-          onSelectDie: (rollId) => {
-            this.selectedRollId = rollId;
-            this.render();
-          },
-          onTapTarget: (team, targetId) => {
+          onDiscardSelectedDie: () => {
             if (!this.selectedRollId) {
               return;
             }
             const rollId = this.selectedRollId;
             this.selectedRollId = null;
-            this.applyDieToTarget(rollId, team, targetId);
+            this.selectedTargetId = null;
+            this.combatFaceTooltipRollId = null;
+            this.combatFaceTooltipPosition = null;
+            this.discardDie(rollId);
+          },
+          onUseEmptySelectedDie: () => {
+            const combat = this.state.combat;
+            if (!combat || !this.selectedRollId) {
+              return;
+            }
+            const roll = combat.diceRolls.find((entry) => entry.rollId === this.selectedRollId);
+            if (!roll || roll.face.kind !== 'empty') {
+              this.state = withMessage(this.state, 'Selecione um lado vazio para usar.');
+              this.render();
+              return;
+            }
+            const rollId = this.selectedRollId;
+            this.selectedRollId = null;
+            this.selectedTargetId = null;
+            this.combatFaceTooltipRollId = null;
+            this.combatFaceTooltipPosition = null;
+            this.useEmptyDie(rollId);
           },
           onReroll: () => this.rerollDice(),
-          onEndTurn: () => this.endTurn(),
+          onRoll: () => this.rollCurrentTurnDice(),
+          onEndTurn: () => this.handleEndTurnAction(),
+          onToggleFaceTooltip: (rollId, position) => {
+            const nextPosition = rollId ? (position ?? this.combatFaceTooltipPosition) : null;
+            const sameRoll = this.combatFaceTooltipRollId === rollId;
+            const samePosition =
+              (this.combatFaceTooltipPosition?.x ?? -1) === (nextPosition?.x ?? -1) &&
+              (this.combatFaceTooltipPosition?.y ?? -1) === (nextPosition?.y ?? -1);
+            if (sameRoll && samePosition) {
+              return;
+            }
+            this.combatFaceTooltipRollId = rollId;
+            this.combatFaceTooltipPosition = nextPosition;
+            this.render();
+          },
+          onToggleCombatLog: () => {
+            this.combatLogCollapsed = !this.combatLogCollapsed;
+            this.render();
+          },
         },
       );
       this.combatFxController.attach(this.root);
+      this.combatFxController.setDiceDefinitions(this.state.content.byId.dice);
       this.combatFxController.syncCombatants(this.state.combat);
+      this.combatFxController.setDiceTrayQualityPreset('performance');
+      this.combatFxController.syncUiSelection(this.selectedRollId);
       return;
     }
 
@@ -249,6 +419,13 @@ export class GameRouter {
               rewardSource: null,
               message: 'Meta pronto para nova run.',
             };
+            this.selectedRollId = null;
+            this.combatFaceTooltipRollId = null;
+            this.combatFaceTooltipPosition = null;
+            this.selectedTargetId = null;
+            this.combatLogCollapsed = true;
+            this.metaFaceTooltipKey = null;
+            this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, Math.max(0, this.draftParty.length - 1));
             this.render();
           },
         },
@@ -392,20 +569,29 @@ export class GameRouter {
     const backgroundFallback =
       this.state.profile.unlocks.backgrounds[0] ?? this.state.content.backgrounds[0]?.id;
 
-    const next = party
-      .slice(0, 4)
-      .map((entry) => ({
-        classId:
-          unlockedClasses.has(entry.classId) || !classFallback
-            ? entry.classId
-            : classFallback,
-        backgroundId:
-          unlockedBackgrounds.has(entry.backgroundId) || !backgroundFallback
-            ? entry.backgroundId
-            : backgroundFallback,
-        row: entry.row,
-      }))
-      .filter((entry) => Boolean(entry.classId) && Boolean(entry.backgroundId));
+    const next: PartySelectionItem[] = [];
+    const usedClasses = new Set<string>();
+
+    for (const raw of party.slice(0, 4)) {
+      const classId =
+        unlockedClasses.has(raw.classId) || !classFallback ? raw.classId : classFallback;
+      const backgroundId =
+        unlockedBackgrounds.has(raw.backgroundId) || !backgroundFallback
+          ? raw.backgroundId
+          : backgroundFallback;
+      if (!classId || !backgroundId) {
+        continue;
+      }
+      if (usedClasses.has(classId)) {
+        continue;
+      }
+      usedClasses.add(classId);
+      next.push({
+        classId,
+        backgroundId,
+        row: raw.row === 'back' ? 'back' : 'front',
+      });
+    }
 
     if (next.length === 0 && classFallback && backgroundFallback) {
       next.push({ classId: classFallback, backgroundId: backgroundFallback, row: 'front' });
@@ -436,8 +622,17 @@ export class GameRouter {
     return next;
   }
 
-  private startRun(seed: number, partyDraft: PartySelectionItem[]): void {
-    const sanitizedParty = this.ensureDraftValidity(partyDraft);
+  private calculateHiringSpent(partyDraft: PartySelectionItem[]): number {
+    let spent = 0;
+    for (let i = 1; i < partyDraft.length; i += 1) {
+      const entry = partyDraft[i] as PartySelectionItem;
+      spent += hireCostForClass(entry.classId, this.state);
+    }
+    return Math.max(0, spent);
+  }
+
+  private startRun(seed: number): void {
+    const sanitizedParty = this.ensureDraftValidity(this.draftParty);
 
     if (sanitizedParty.length < 1 || sanitizedParty.length > 4) {
       this.state = withMessage(this.state, 'A trip precisa ter entre 1 e 4 integrantes.');
@@ -445,7 +640,15 @@ export class GameRouter {
       return;
     }
 
+    const hiringSpent = this.calculateHiringSpent(sanitizedParty);
+    if (hiringSpent > START_HIRING_GOLD) {
+      this.state = withMessage(this.state, `Orcamento insuficiente para hiring (${hiringSpent}/${START_HIRING_GOLD}).`);
+      this.render();
+      return;
+    }
+
     this.draftParty = sanitizedParty;
+    this.selectedDraftSlot = Math.min(this.selectedDraftSlot, this.draftParty.length - 1);
     this.draftSeed = seed;
     this.runRng = new SeededRng(seed);
 
@@ -496,7 +699,7 @@ export class GameRouter {
       morale: 5,
       threat: 10,
       injuries: 0,
-      gold: 3,
+      gold: Math.max(0, START_HIRING_GOLD - hiringSpent),
       consumables: 0,
       relicIds: [],
       runLog: ['Run iniciada.'],
@@ -770,9 +973,13 @@ export class GameRouter {
       ...this.state,
       phase: 'combat',
       combat,
-      message: 'Arraste dados para agir. Toque tambem funciona.',
+      message: 'Toque ROLL para iniciar o turno.',
     };
     this.selectedRollId = null;
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
+    this.selectedTargetId = null;
+    this.combatLogCollapsed = true;
     this.combatFxController.setCombatId(combat.id);
 
     const idleEvents: CombatFxEvent[] = [
@@ -792,6 +999,54 @@ export class GameRouter {
     this.render();
   }
 
+  private clearCombatSelection(renderAfter = false): void {
+    const changed =
+      this.selectedRollId !== null ||
+      this.selectedTargetId !== null ||
+      this.combatFaceTooltipRollId !== null ||
+      this.combatFaceTooltipPosition !== null;
+    this.selectedRollId = null;
+    this.selectedTargetId = null;
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
+    if (renderAfter && changed) {
+      this.render();
+    }
+  }
+
+  private combatPhaseBucket(turn: number): 'opening' | 'mid' | 'climax' {
+    if (turn <= 2) {
+      return 'opening';
+    }
+    if (turn <= 5) {
+      return 'mid';
+    }
+    return 'climax';
+  }
+
+  private buildValidTargetIds(combat: NonNullable<GameState['combat']>, rollId: string | null): Set<string> {
+    if (!rollId) {
+      return new Set<string>();
+    }
+    const roll = combat.diceRolls.find((entry) => entry.rollId === rollId);
+    if (!roll || roll.used || roll.locked || roll.face.kind === 'empty') {
+      return new Set<string>();
+    }
+
+    const valid = new Set<string>();
+    for (const target of combat.party) {
+      if (canUsePlayerDieOnTarget(combat, rollId, 'party', target.id)) {
+        valid.add(target.id);
+      }
+    }
+    for (const target of combat.enemies) {
+      if (canUsePlayerDieOnTarget(combat, rollId, 'enemy', target.id)) {
+        valid.add(target.id);
+      }
+    }
+    return valid;
+  }
+
   private applyDieToTarget(rollId: string, targetTeam: 'party' | 'enemy', targetId: string): void {
     const combat = this.state.combat;
     if (!combat || !this.state.run) {
@@ -804,7 +1059,31 @@ export class GameRouter {
 
     syncCombatToRun(this.state.run, combat);
     this.state = withMessage(this.state, result.message);
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
 
+    this.handleCombatProgress();
+  }
+
+  private useEmptyDie(rollId: string): void {
+    const combat = this.state.combat;
+    if (!combat || !this.state.run) {
+      return;
+    }
+    const roll = combat.diceRolls.find((entry) => entry.rollId === rollId);
+    if (!roll) {
+      this.state = withMessage(this.state, 'Dado vazio invalido.');
+      this.render();
+      return;
+    }
+
+    const result = usePlayerDie(combat, rollId, 'party', roll.ownerId);
+    combat.log.unshift(result.message);
+    this.enqueueCombatFx(result.events);
+    syncCombatToRun(this.state.run, combat);
+    this.state = withMessage(this.state, result.message);
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
     this.handleCombatProgress();
   }
 
@@ -820,6 +1099,8 @@ export class GameRouter {
 
     syncCombatToRun(this.state.run, combat);
     this.state = withMessage(this.state, result.message);
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
     this.handleCombatProgress();
   }
 
@@ -828,17 +1109,99 @@ export class GameRouter {
     if (!combat) {
       return;
     }
+    if (combat.awaitingRoll) {
+      this.state = withMessage(this.state, 'Role os dados antes de rerrolar.');
+      this.render();
+      return;
+    }
+
+    if (!this.combatFxController.getDiceTrayDiagnostics().interactionReady) {
+      this.state = withMessage(this.state, 'Aguarde os dados assentarem para rerrolar.');
+      this.render();
+      return;
+    }
+
+    if (!this.selectedRollId) {
+      this.state = withMessage(this.state, 'Selecione um dado valido para rerrolar.');
+      this.render();
+      return;
+    }
+
+    if (combat.focus <= 0) {
+      this.state = withMessage(this.state, 'Sem FOCO para rerrolar.');
+      this.render();
+      return;
+    }
+
+    const selectedRoll = combat.diceRolls.find((entry) => entry.rollId === this.selectedRollId);
+    if (!selectedRoll || selectedRoll.used || selectedRoll.locked) {
+      this.state = withMessage(this.state, 'Selecione um dado valido para rerrolar.');
+      this.clearCombatSelection(false);
+      this.render();
+      return;
+    }
 
     const result = rerollOneDieWithFocus(
       combat,
       this.state.content,
       this.runRng,
-      this.selectedRollId ?? undefined,
+      this.selectedRollId,
     );
     combat.log.unshift(result.message);
     this.enqueueCombatFx(result.events);
     this.state = withMessage(this.state, result.message);
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
     this.render();
+  }
+
+  private rollCurrentTurnDice(): void {
+    const combat = this.state.combat;
+    const run = this.state.run;
+    if (!combat || !run) {
+      return;
+    }
+    if (!combat.awaitingRoll) {
+      this.state = withMessage(this.state, 'Os dados deste turno ja foram rolados.');
+      this.render();
+      return;
+    }
+
+    const tray = this.combatFxController.getDiceTrayDiagnostics();
+    if (tray.diceCount > 0 && !tray.interactionReady) {
+      this.state = withMessage(this.state, 'Aguarde a animacao inimiga terminar.');
+      this.render();
+      return;
+    }
+
+    const result = rollCombatDice(combat, run, this.state.content, this.runRng);
+    combat.log.unshift(result.message);
+    this.enqueueCombatFx(result.events);
+    this.state = withMessage(this.state, result.message);
+    this.clearCombatSelection(false);
+    this.render();
+  }
+
+  private handleEndTurnAction(): void {
+    const combat = this.state.combat;
+    if (!combat) {
+      return;
+    }
+
+    if (combat.awaitingRoll) {
+      return;
+    }
+
+    const hasUnused = combat.diceRolls.some((entry) => !entry.used);
+    if (hasUnused) {
+      const canAsk = typeof window !== 'undefined' && typeof window.confirm === 'function';
+      const ok = canAsk ? window.confirm('Encerrar turno com dados nao usados?') : true;
+      if (!ok) {
+        return;
+      }
+    }
+
+    this.endTurn();
   }
 
   private endTurn(): void {
@@ -847,6 +1210,7 @@ export class GameRouter {
     if (!combat || !run) {
       return;
     }
+    this.clearCombatSelection(false);
 
     const result = nextCombatTurn(combat, run, this.state.content, this.runRng);
     for (const entry of result.logs.slice().reverse()) {
@@ -890,6 +1254,7 @@ export class GameRouter {
     }
 
     syncCombatToRun(run, combat);
+    this.selectedTargetId = null;
 
     if (combat.outcome === 'victory') {
       run.wins += 1;
@@ -921,6 +1286,9 @@ export class GameRouter {
         message: rewardSource === 'boss' ? 'Boss derrotado. Recompensa final.' : 'Escolha sua recompensa.',
       };
       this.selectedRollId = null;
+      this.combatFaceTooltipRollId = null;
+      this.combatFaceTooltipPosition = null;
+      this.combatLogCollapsed = true;
       this.render();
       return;
     }
@@ -1113,6 +1481,8 @@ export class GameRouter {
     this.combatFxController.setCombatId(null);
     if (!run) {
       this.state = setPhase(this.state, 'meta', message);
+      this.clearCombatSelection(false);
+      this.combatLogCollapsed = true;
       this.render();
       return;
     }
@@ -1133,6 +1503,11 @@ export class GameRouter {
       rewardSource: null,
       message,
     };
+    this.selectedRollId = null;
+    this.selectedTargetId = null;
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
+    this.combatLogCollapsed = true;
 
     void saveProfile(nextProfile);
     this.render();
@@ -1156,6 +1531,13 @@ export class GameRouter {
 
     this.draftSeed = makeSeed();
     this.draftParty = this.ensureDraftValidity(this.draftParty);
+    this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, this.draftParty.length - 1);
+    this.metaFaceTooltipKey = null;
+    this.selectedRollId = null;
+    this.selectedTargetId = null;
+    this.combatFaceTooltipRollId = null;
+    this.combatFaceTooltipPosition = null;
+    this.combatLogCollapsed = true;
 
     await saveProfile(next);
     this.render();

@@ -1,5 +1,8 @@
 import type { AnimationDriver } from '../../anim/voxelyn-animation-adapter';
-import type { CombatFxEvent, CombatState, CombatantState } from '../../domain/shared/types';
+import type { CombatFxEvent, CombatState, CombatantState, DieDef } from '../../domain/shared/types';
+import { COMBATANT_INTERNAL_PX } from '../pixel/constants';
+import type { CombatantEmotionState } from '../pixel/types';
+import { DiceCubeRuntime, type DiceCubeDiagnostics } from '../voxelyn/dice-cube-runtime';
 
 type RollFxState = {
   rollId: string;
@@ -35,10 +38,35 @@ type CombatantBinding = {
   canvas: HTMLCanvasElement;
   visualKey: string;
   isEnemy: boolean;
+  state: CombatantEmotionState;
 };
 
 const positiveStatuses = new Set(['block', 'dodge', 'inspired', 'charged', 'turret']);
 const heavyDebuffStatuses = new Set(['stun', 'poison', 'bleed', 'fear']);
+const cursedStatuses = new Set(['stun', 'fear', 'poison', 'bleed']);
+const statusCount = (combatant: CombatantState, statusId: string): number =>
+  (combatant.statuses as Record<string, number>)[statusId] ?? 0;
+
+const deriveEmotionState = (combatant: CombatantState): CombatantEmotionState => {
+  for (const statusId of cursedStatuses) {
+    if (statusCount(combatant, statusId) > 0) {
+      return 'amaldicoado';
+    }
+  }
+
+  for (const statusId of positiveStatuses) {
+    if (statusCount(combatant, statusId) > 0) {
+      return 'buffado';
+    }
+  }
+
+  const hpRatio = combatant.maxHp > 0 ? combatant.hp / combatant.maxHp : 0;
+  if (hpRatio <= 0.35) {
+    return 'ferido';
+  }
+
+  return 'neutro';
+};
 
 const pulseDuration = (kind: PulseKind, flavor: PulseFlavor, amount: number): number => {
   const base = kind === 'hit' ? 250 : 290;
@@ -105,6 +133,8 @@ const deriveVisualKey = (combatant: CombatantState): string => {
 export class CombatFxController {
   private readonly driver: AnimationDriver;
 
+  private readonly diceCubeRuntime: DiceCubeRuntime;
+
   private combatId: string | null = null;
 
   private root: HTMLElement | null = null;
@@ -123,14 +153,20 @@ export class CombatFxController {
 
   private idleBindings = new Map<string, HTMLElement>();
 
-  private combatantVisuals = new Map<string, { visualKey: string; isEnemy: boolean; alive: boolean }>();
+  private combatantVisuals = new Map<
+    string,
+    { visualKey: string; isEnemy: boolean; alive: boolean; state: CombatantEmotionState }
+  >();
 
   private combatantBindings = new Map<string, CombatantBinding>();
 
   private pulseSerial = 0;
 
+  private enemyVisualLockMs = 0;
+
   public constructor(driver: AnimationDriver) {
     this.driver = driver;
+    this.diceCubeRuntime = new DiceCubeRuntime();
   }
 
   public setCombatId(combatId: string | null): void {
@@ -140,11 +176,13 @@ export class CombatFxController {
 
     this.resetInternalState();
     this.combatId = combatId;
+    this.diceCubeRuntime.setCombatId(combatId);
   }
 
   public attach(root: HTMLElement): void {
     this.root = root;
     this.rebuildElementIndex();
+    this.diceCubeRuntime.attach(root);
     this.rebindCombatants();
     this.rebindIdle();
     this.rebindRolls();
@@ -156,13 +194,17 @@ export class CombatFxController {
       return;
     }
 
-    const next = new Map<string, { visualKey: string; isEnemy: boolean; alive: boolean }>();
+    const next = new Map<
+      string,
+      { visualKey: string; isEnemy: boolean; alive: boolean; state: CombatantEmotionState }
+    >();
 
     for (const entry of combat.party) {
       next.set(entry.id, {
         visualKey: deriveVisualKey(entry),
         isEnemy: false,
         alive: entry.alive,
+        state: deriveEmotionState(entry),
       });
     }
 
@@ -171,6 +213,7 @@ export class CombatFxController {
         visualKey: deriveVisualKey(entry),
         isEnemy: true,
         alive: entry.alive,
+        state: deriveEmotionState(entry),
       });
     }
 
@@ -183,6 +226,7 @@ export class CombatFxController {
 
     this.combatantVisuals = next;
     this.rebindCombatants();
+    this.diceCubeRuntime.syncCombat(combat);
 
     for (const [entityId, descriptor] of this.combatantVisuals) {
       if (descriptor.alive) {
@@ -193,13 +237,39 @@ export class CombatFxController {
     }
   }
 
+  public syncUiSelection(selectedRollId: string | null): void {
+    this.diceCubeRuntime.setSelectedRollId(selectedRollId);
+  }
+
+  public setDiceTrayQualityPreset(preset: 'performance' | 'quality'): void {
+    this.diceCubeRuntime.setQualityPreset(preset);
+  }
+
+  public setDiceDefinitions(diceById: Record<string, DieDef>): void {
+    this.diceCubeRuntime.setDieDefinitions(diceById);
+  }
+
+  public getDiceTrayDiagnostics(): DiceCubeDiagnostics {
+    return this.diceCubeRuntime.getDiagnostics();
+  }
+
   public enqueue(events: CombatFxEvent[]): void {
     if (!this.combatId || events.length === 0) {
       return;
     }
+    this.diceCubeRuntime.enqueue(events);
 
     for (const event of events) {
       if (event.type === 'die_roll') {
+        if (event.transient) {
+          this.enemyVisualLockMs = Math.max(
+            this.enemyVisualLockMs,
+            Math.max(200, event.durationMs + 220),
+          );
+          this.diceCubeRuntime.setInteractionSuspended(true);
+          this.driver.setCombatantIntent(event.ownerId, 'cast', event.durationMs);
+          continue;
+        }
         this.rollStates.set(event.rollId, {
           rollId: event.rollId,
           ownerId: event.ownerId,
@@ -214,6 +284,15 @@ export class CombatFxController {
       }
 
       if (event.type === 'die_settle') {
+        if (event.transient) {
+          this.enemyVisualLockMs = Math.max(
+            this.enemyVisualLockMs,
+            Math.max(220, event.durationMs + 240),
+          );
+          this.diceCubeRuntime.setInteractionSuspended(true);
+          this.driver.setCombatantIntent(event.ownerId, 'attack', event.durationMs);
+          continue;
+        }
         const existing = this.rollStates.get(event.rollId);
         if (existing && existing.phase === 'roll' && existing.remainingMs > 0) {
           existing.queuedSettle = {
@@ -232,6 +311,20 @@ export class CombatFxController {
           });
         }
         this.driver.setCombatantIntent(event.ownerId, 'attack', event.durationMs);
+        continue;
+      }
+
+      if (event.type === 'intent_telegraph') {
+        this.enemyVisualLockMs = Math.max(
+          this.enemyVisualLockMs,
+          Math.max(220, event.durationMs + 180),
+        );
+        this.diceCubeRuntime.setInteractionSuspended(true);
+        if (event.intentKind === 'attack') {
+          this.driver.setCombatantIntent(event.ownerId, 'attack', event.durationMs);
+        } else {
+          this.driver.setCombatantIntent(event.ownerId, 'cast', event.durationMs);
+        }
         continue;
       }
 
@@ -301,6 +394,10 @@ export class CombatFxController {
     }
 
     const frameDt = Math.max(0, Math.min(80, dtMs));
+    if (this.enemyVisualLockMs > 0) {
+      this.enemyVisualLockMs = Math.max(0, this.enemyVisualLockMs - frameDt);
+      this.diceCubeRuntime.setInteractionSuspended(this.enemyVisualLockMs > 0);
+    }
 
     for (const [rollId, state] of this.rollStates) {
       state.remainingMs -= frameDt;
@@ -334,6 +431,7 @@ export class CombatFxController {
     this.rebindRolls();
     this.rebindPulses();
     this.rebindIdle();
+    this.diceCubeRuntime.tick(frameDt);
   }
 
   private resetInternalState(): void {
@@ -355,6 +453,10 @@ export class CombatFxController {
     this.idleBindings.clear();
     this.combatantVisuals.clear();
     this.combatantBindings.clear();
+    this.enemyVisualLockMs = 0;
+    this.diceCubeRuntime.setInteractionSuspended(false);
+    this.diceCubeRuntime.setCombatId(null);
+    this.diceCubeRuntime.setSelectedRollId(null);
   }
 
   private rebuildElementIndex(): void {
@@ -400,7 +502,8 @@ export class CombatFxController {
         bound &&
         bound.canvas === canvas &&
         bound.visualKey === descriptor.visualKey &&
-        bound.isEnemy === descriptor.isEnemy
+        bound.isEnemy === descriptor.isEnemy &&
+        bound.state === descriptor.state
       ) {
         continue;
       }
@@ -408,15 +511,17 @@ export class CombatFxController {
       this.driver.registerCombatant(entityId, canvas, {
         visualKey: descriptor.visualKey,
         isEnemy: descriptor.isEnemy,
-        width: 32,
-        height: 32,
+        width: COMBATANT_INTERNAL_PX,
+        height: COMBATANT_INTERNAL_PX,
         facing: descriptor.isEnemy ? 'dl' : 'dr',
+        state: descriptor.state,
       });
 
       this.combatantBindings.set(entityId, {
         canvas,
         visualKey: descriptor.visualKey,
         isEnemy: descriptor.isEnemy,
+        state: descriptor.state,
       });
     }
 

@@ -6,6 +6,7 @@ import {
   presentToCanvas,
   projectIso,
 } from '@voxelyn/core';
+import { BASE_MINIATURE_PX, MAP_MINIATURE_INTERNAL_PX } from '../pixel/constants';
 
 export interface MiniatureRenderOptions {
   key: string;
@@ -53,8 +54,9 @@ const shade = (
 });
 
 export const renderVoxelMiniature = (options: MiniatureRenderOptions): HTMLCanvasElement => {
-  const width = options.width ?? 64;
-  const height = options.height ?? 64;
+  const width = options.width ?? MAP_MINIATURE_INTERNAL_PX;
+  const height = options.height ?? MAP_MINIATURE_INTERNAL_PX;
+  const scale = Math.max(1, Math.floor(Math.min(width, height) / BASE_MINIATURE_PX));
   const surface = createSurface2D(width, height);
   clearSurface(surface, packRGBA(0, 0, 0, 0));
 
@@ -74,13 +76,13 @@ export const renderVoxelMiniature = (options: MiniatureRenderOptions): HTMLCanva
     for (let y = 0; y < gridSize; y += 1) {
       const noise = ((seed >> ((x + y) % 16)) & 0x7) + 1;
       const z = Math.max(1, noise % 4);
-      const point = projectIso(x - 1.5, y - 1.5, z, 10, 6, 4);
+      const point = projectIso(x - 1.5, y - 1.5, z, 10 * scale, 6 * scale, 4 * scale);
       const screenX = Math.round(width / 2 + point.sx);
       const screenY = Math.round(height / 2 + point.sy);
 
-      fillRect(surface, screenX - 5, screenY - 6, 10, 4, topPacked);
-      fillRect(surface, screenX - 5, screenY - 2, 5, 6, leftPacked);
-      fillRect(surface, screenX, screenY - 2, 5, 6, rightPacked);
+      fillRect(surface, screenX - (5 * scale), screenY - (6 * scale), 10 * scale, 4 * scale, topPacked);
+      fillRect(surface, screenX - (5 * scale), screenY - (2 * scale), 5 * scale, 6 * scale, leftPacked);
+      fillRect(surface, screenX, screenY - (2 * scale), 5 * scale, 6 * scale, rightPacked);
     }
   }
 

@@ -1,6 +1,8 @@
 import type { AnimationFacing, ProceduralCharacterDef } from '@voxelyn/animation';
 
 export type ProceduralStyle = NonNullable<ProceduralCharacterDef['style']>;
+export type CombatantEmotionState = 'neutro' | 'ferido' | 'buffado' | 'amaldicoado';
+export type CombatantFramePattern = 'state_clip_index' | 'legacy';
 
 export interface AtlasFrameRect {
   x: number;
@@ -29,6 +31,10 @@ export interface ClipBindingDef {
   style?: ProceduralStyle;
   facing?: AnimationFacing;
   seedHint?: string;
+  supportedStates?: CombatantEmotionState[];
+  defaultState?: CombatantEmotionState;
+  paletteId?: string;
+  framePattern?: CombatantFramePattern;
 }
 
 export interface UiIconDef {
@@ -52,9 +58,23 @@ export interface BiomeThemeDef {
   uiFrame: string;
 }
 
+export interface PixelArtDirectionDef {
+  version: string;
+  combatantInternalPx: number;
+  mapMiniatureInternalPx: number;
+  anchorX: number;
+  anchorY: number;
+  shadingLevelsMin: number;
+  shadingLevelsMax: number;
+  antiAliasing: boolean;
+  blur: boolean;
+  contrast: 'high';
+}
+
 export interface PixelAssetManifest {
   version: number;
   generatedAt: string;
+  artDirection?: PixelArtDirectionDef;
   atlases: AtlasEntry[];
   combatants: ClipBindingDef[];
   uiIcons: UiIconDef[];

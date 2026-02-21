@@ -5,9 +5,14 @@
     "role": "striker",
     "verb": "Manobra",
     "passive": "1x por turno, ao usar SWAP, ganha DODGE 1.",
-    "starterDiceIds": ["die_class_aviadora"],
-    "growthPoolDiceIds": ["die_growth_aviadora"],
-    "maxHp": 17
+    "starterDiceIds": [
+      "die_class_aviadora"
+    ],
+    "growthPoolDiceIds": [
+      "die_growth_aviadora"
+    ],
+    "maxHp": 17,
+    "hireCost": 2
   },
   {
     "id": "ocultista",
@@ -15,9 +20,14 @@
     "role": "control",
     "verb": "Sussurros",
     "passive": "Sempre que aplicar MARK, ganha BLK 1.",
-    "starterDiceIds": ["die_class_ocultista"],
-    "growthPoolDiceIds": ["die_growth_ocultista"],
-    "maxHp": 16
+    "starterDiceIds": [
+      "die_class_ocultista"
+    ],
+    "growthPoolDiceIds": [
+      "die_growth_ocultista"
+    ],
+    "maxHp": 16,
+    "hireCost": 2
   },
   {
     "id": "cacador",
@@ -25,9 +35,14 @@
     "role": "striker",
     "verb": "Alvo Fixado",
     "passive": "Causar dano em inimigo MARKADO da +1 de dano.",
-    "starterDiceIds": ["die_class_cacador"],
-    "growthPoolDiceIds": ["die_growth_cacador"],
-    "maxHp": 18
+    "starterDiceIds": [
+      "die_class_cacador"
+    ],
+    "growthPoolDiceIds": [
+      "die_growth_cacador"
+    ],
+    "maxHp": 18,
+    "hireCost": 2
   },
   {
     "id": "mecanico",
@@ -35,8 +50,13 @@
     "role": "tank",
     "verb": "Placas",
     "passive": "No comeco do combate, ganha BLK 1.",
-    "starterDiceIds": ["die_class_mecanico"],
-    "growthPoolDiceIds": ["die_growth_mecanico"],
-    "maxHp": 21
+    "starterDiceIds": [
+      "die_class_mecanico"
+    ],
+    "growthPoolDiceIds": [
+      "die_growth_mecanico"
+    ],
+    "maxHp": 21,
+    "hireCost": 3
   }
 ]

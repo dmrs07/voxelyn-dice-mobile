@@ -1,4 +1,5 @@
 export const FACE_KINDS = [
+  'empty',
   'attack',
   'block',
   'heal',

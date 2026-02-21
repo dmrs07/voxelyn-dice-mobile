@@ -1,111 +1,537 @@
 {
   "version": 1,
-  "generatedAt": "2026-02-20T06:20:19.054Z",
-  "atlases": [],
+  "generatedAt": "2026-02-21T04:19:40.577Z",
+  "artDirection": {
+    "version": "1.0.0",
+    "combatantInternalPx": 128,
+    "mapMiniatureInternalPx": 128,
+    "anchorX": 0.5,
+    "anchorY": 1,
+    "shadingLevelsMin": 2,
+    "shadingLevelsMax": 3,
+    "antiAliasing": false,
+    "blur": false,
+    "contrast": "high"
+  },
+  "atlases": [
+    {
+      "id": "demo.aviadora",
+      "path": "assets/generated/pixel/atlas/aviadora.png",
+      "width": 128,
+      "height": 128,
+      "domain": "ui"
+    },
+    {
+      "id": "demo.cacador",
+      "path": "assets/generated/pixel/atlas/cacador.png",
+      "width": 128,
+      "height": 128,
+      "domain": "ui"
+    },
+    {
+      "id": "demo.ocultista",
+      "path": "assets/generated/pixel/atlas/ocultista.png",
+      "width": 128,
+      "height": 128,
+      "domain": "ui"
+    },
+    {
+      "id": "enemy.saqueador_rio",
+      "path": "atlas/saqueador_rio.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.besta_do_cipo",
+      "path": "atlas/besta_do_cipo.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.atirador_fantasma",
+      "path": "atlas/atirador_fantasma.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.bruxo_gramofone",
+      "path": "atlas/bruxo_gramofone.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.capataz_alfandega",
+      "path": "atlas/capataz_alfandega.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.sentinela_nevoa",
+      "path": "atlas/sentinela_nevoa.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.jaguar_lunar",
+      "path": "atlas/jaguar_lunar.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.capitao_vesper",
+      "path": "atlas/capitao_vesper.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    },
+    {
+      "id": "enemy.capanga_vesper",
+      "path": "atlas/capanga_vesper.png",
+      "width": 128,
+      "height": 128,
+      "domain": "combat"
+    }
+  ],
   "combatants": [
     {
       "visualKey": "party:aviadora",
-      "source": "procedural",
+      "source": "texturepacker",
+      "atlasId": "demo.aviadora",
+      "metaPath": "meta/aviadora.json",
       "style": "player",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "aviadora",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "party:ocultista",
-      "source": "procedural",
+      "source": "texturepacker",
       "style": "guardian",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "atlasId": "demo.ocultista",
+      "metaPath": "meta/ocultista.json",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "ocultista",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "party:cacador",
-      "source": "procedural",
+      "source": "texturepacker",
       "style": "player",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "atlasId": "demo.cacador",
+      "metaPath": "meta/cacador.json",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "cacador",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "party:mecanico",
       "source": "procedural",
       "style": "bruiser",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "mecanico",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:beast",
       "source": "procedural",
       "style": "stalker",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "beast",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:cult",
       "source": "procedural",
       "style": "spitter",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "cult",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:machine",
       "source": "procedural",
       "style": "guardian",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "machine",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:default",
       "source": "procedural",
       "style": "stalker",
-      "width": 32,
-      "height": 32
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "default",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:human",
       "source": "procedural",
       "style": "stalker",
-      "width": 32,
-      "height": 32,
+      "width": 128,
+      "height": 128,
       "anchorX": 0.5,
-      "anchorY": 1
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "human",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:construct",
       "source": "procedural",
       "style": "stalker",
-      "width": 32,
-      "height": 32,
+      "width": 128,
+      "height": 128,
       "anchorX": 0.5,
-      "anchorY": 1
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "construct",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:summon_only",
       "source": "procedural",
       "style": "stalker",
-      "width": 32,
-      "height": 32,
+      "width": 128,
+      "height": 128,
       "anchorX": 0.5,
-      "anchorY": 1
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "summon_only",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:boss",
       "source": "procedural",
       "style": "stalker",
-      "width": 32,
-      "height": 32,
+      "width": 128,
+      "height": 128,
       "anchorX": 0.5,
-      "anchorY": 1
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "boss",
+      "framePattern": "state_clip_index"
     },
     {
       "visualKey": "enemy:airship",
       "source": "procedural",
       "style": "stalker",
-      "width": 32,
-      "height": 32,
+      "width": 128,
+      "height": 128,
       "anchorX": 0.5,
-      "anchorY": 1
+      "anchorY": 1,
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "airship",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:saqueador_rio",
+      "source": "texturepacker",
+      "atlasId": "enemy.saqueador_rio",
+      "metaPath": "meta/saqueador_rio.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "stalker",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "saqueador_rio",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:besta_do_cipo",
+      "source": "texturepacker",
+      "atlasId": "enemy.besta_do_cipo",
+      "metaPath": "meta/besta_do_cipo.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "stalker",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "besta_do_cipo",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:atirador_fantasma",
+      "source": "texturepacker",
+      "atlasId": "enemy.atirador_fantasma",
+      "metaPath": "meta/atirador_fantasma.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "stalker",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "atirador_fantasma",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:bruxo_gramofone",
+      "source": "texturepacker",
+      "atlasId": "enemy.bruxo_gramofone",
+      "metaPath": "meta/bruxo_gramofone.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "spitter",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "bruxo_gramofone",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:capataz_alfandega",
+      "source": "texturepacker",
+      "atlasId": "enemy.capataz_alfandega",
+      "metaPath": "meta/capataz_alfandega.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "stalker",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "capataz_alfandega",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:sentinela_nevoa",
+      "source": "texturepacker",
+      "atlasId": "enemy.sentinela_nevoa",
+      "metaPath": "meta/sentinela_nevoa.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "guardian",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "sentinela_nevoa",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:jaguar_lunar",
+      "source": "texturepacker",
+      "atlasId": "enemy.jaguar_lunar",
+      "metaPath": "meta/jaguar_lunar.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "stalker",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "jaguar_lunar",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:capitao_vesper",
+      "source": "texturepacker",
+      "atlasId": "enemy.capitao_vesper",
+      "metaPath": "meta/capitao_vesper.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "stalker",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "capitao_vesper",
+      "framePattern": "state_clip_index"
+    },
+    {
+      "visualKey": "enemy:capanga_vesper",
+      "source": "texturepacker",
+      "atlasId": "enemy.capanga_vesper",
+      "metaPath": "meta/capanga_vesper.json",
+      "width": 128,
+      "height": 128,
+      "anchorX": 0.5,
+      "anchorY": 1,
+      "style": "stalker",
+      "supportedStates": [
+        "neutro",
+        "ferido",
+        "buffado",
+        "amaldicoado"
+      ],
+      "defaultState": "neutro",
+      "paletteId": "capanga_vesper",
+      "framePattern": "state_clip_index"
     }
   ],
   "uiIcons": [
+    {
+      "id": "portrait.aviadora",
+      "atlasId": "demo.aviadora",
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 128,
+        "h": 128
+      }
+    },
     {
       "id": "face.attack",
       "fallbackKind": "attack",

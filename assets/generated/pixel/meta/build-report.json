@@ -1,7 +1,20 @@
 {
-  "generatedAt": "2026-02-20T06:20:19.054Z",
+  "generatedAt": "2026-02-21T04:19:40.577Z",
+  "strictMode": false,
   "asepriteFileCount": 0,
+  "combatantCount": 22,
   "namingIssues": [],
   "metadataIssues": [],
-  "combatantCount": 13
+  "errors": [],
+  "warnings": [
+    "Combatant enemy:saqueador_rio (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:besta_do_cipo (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:atirador_fantasma (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:bruxo_gramofone (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:capataz_alfandega (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:sentinela_nevoa (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:jaguar_lunar (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:capitao_vesper (legado) sem clips: walk, attack, cast, hit, die.",
+    "Combatant enemy:capanga_vesper (legado) sem clips: walk, attack, cast, hit, die."
+  ]
 }

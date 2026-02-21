@@ -9,10 +9,17 @@
         "label": "ATK 2",
         "kind": "attack",
         "value": 2,
-        "tags": ["ranged"],
+        "tags": [
+          "ranged"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 2, "range": "ranged", "target": "target" }
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          }
         ]
       },
       {
@@ -20,11 +27,23 @@
         "label": "ATK+MARK",
         "kind": "attack",
         "value": 1,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 1, "range": "ranged", "target": "target" },
-          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target"
+          },
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -32,11 +51,19 @@
         "label": "SWAP+BLK",
         "kind": "swap",
         "value": 1,
-        "tags": ["maneuver"],
+        "tags": [
+          "maneuver"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "swap" },
-          { "type": "block", "value": 1, "target": "self" }
+          {
+            "type": "swap"
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "self"
+          }
         ]
       },
       {
@@ -44,10 +71,17 @@
         "label": "Rajada",
         "kind": "attack",
         "value": 1,
-        "tags": ["aoe"],
+        "tags": [
+          "aoe"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 1, "range": "ranged", "target": "enemy_front_all" }
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "enemy_front_all"
+          }
         ]
       },
       {
@@ -55,10 +89,15 @@
         "label": "FOCO",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 }
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -66,13 +105,27 @@
         "label": "CLEANSE+BLK",
         "kind": "cleanse",
         "value": 1,
-        "tags": ["utility"],
+        "tags": [
+          "utility"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "cleanse", "value": 1, "target": "target" },
-          { "type": "block", "value": 1, "target": "target" }
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "target"
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -85,7 +138,9 @@
         "label": "ATK+VENENO",
         "kind": "attack",
         "value": 2,
-        "tags": ["poison"],
+        "tags": [
+          "poison"
+        ],
         "target": "enemy",
         "effects": [
           {
@@ -103,10 +158,17 @@
         "label": "MARK 2",
         "kind": "mark",
         "value": 2,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 2, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 2,
+            "target": "target"
+          }
         ]
       },
       {
@@ -114,11 +176,21 @@
         "label": "MEDO+FOCO",
         "kind": "special",
         "value": 1,
-        "tags": ["fear"],
+        "tags": [
+          "fear"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "fear", "value": 1, "target": "target" },
-          { "type": "focus", "value": 1 }
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -126,10 +198,16 @@
         "label": "Escudo Arcano",
         "kind": "block",
         "value": 3,
-        "tags": ["shield"],
+        "tags": [
+          "shield"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 3, "target": "self" }
+          {
+            "type": "block",
+            "value": 3,
+            "target": "self"
+          }
         ]
       },
       {
@@ -137,10 +215,17 @@
         "label": "Ritual",
         "kind": "special",
         "value": 2,
-        "tags": ["charge"],
+        "tags": [
+          "charge"
+        ],
         "target": "self",
         "effects": [
-          { "type": "status", "statusId": "charged", "value": 1, "target": "self" }
+          {
+            "type": "status",
+            "statusId": "charged",
+            "value": 1,
+            "target": "self"
+          }
         ]
       },
       {
@@ -148,13 +233,28 @@
         "label": "Quebra-Selo",
         "kind": "special",
         "value": 1,
-        "tags": ["shred"],
+        "tags": [
+          "shred"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "shred_armor", "value": 1, "target": "target" },
-          { "type": "damage", "value": 1, "range": "ranged", "target": "target" }
+          {
+            "type": "shred_armor",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target"
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -167,10 +267,17 @@
         "label": "ATK 2",
         "kind": "attack",
         "value": 2,
-        "tags": ["ranged"],
+        "tags": [
+          "ranged"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 2, "range": "ranged", "target": "target" }
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          }
         ]
       },
       {
@@ -178,7 +285,9 @@
         "label": "ATK+BLEED",
         "kind": "attack",
         "value": 1,
-        "tags": ["bleed"],
+        "tags": [
+          "bleed"
+        ],
         "target": "enemy",
         "effects": [
           {
@@ -196,11 +305,20 @@
         "label": "Armadilha",
         "kind": "stun",
         "value": 1,
-        "tags": ["control"],
+        "tags": [
+          "control"
+        ],
         "target": "enemy",
-        "condition": { "requiresTargetFront": true },
+        "condition": {
+          "requiresTargetFront": true
+        },
         "effects": [
-          { "type": "status", "statusId": "stun", "value": 1, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "stun",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -208,11 +326,19 @@
         "label": "Mirar",
         "kind": "focus",
         "value": 1,
-        "tags": ["setup"],
+        "tags": [
+          "setup"
+        ],
         "target": "self",
         "effects": [
-          { "type": "lock_die", "value": 1 },
-          { "type": "focus", "value": 1 }
+          {
+            "type": "lock_die",
+            "value": 1
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -220,11 +346,22 @@
         "label": "HEAL+CLEANSE",
         "kind": "heal",
         "value": 1,
-        "tags": ["utility"],
+        "tags": [
+          "utility"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "heal", "value": 1, "target": "target", "removeBleed": true },
-          { "type": "cleanse", "value": 1, "target": "target" }
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -232,13 +369,32 @@
         "label": "Tiro Certeiro",
         "kind": "attack",
         "value": 3,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 3, "range": "ranged", "target": "target", "consumeMark": false },
-          { "type": "damage", "value": 1, "range": "ranged", "target": "target", "requiresMarked": true, "consumeMark": true }
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target",
+            "consumeMark": false
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target",
+            "requiresMarked": true,
+            "consumeMark": true
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -251,10 +407,17 @@
         "label": "ATK 2",
         "kind": "attack",
         "value": 2,
-        "tags": ["melee"],
+        "tags": [
+          "melee"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 2, "range": "melee", "target": "target" }
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "melee",
+            "target": "target"
+          }
         ]
       },
       {
@@ -262,10 +425,16 @@
         "label": "BLK 3",
         "kind": "block",
         "value": 3,
-        "tags": ["tank"],
+        "tags": [
+          "tank"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 3, "target": "self" }
+          {
+            "type": "block",
+            "value": 3,
+            "target": "self"
+          }
         ]
       },
       {
@@ -273,11 +442,22 @@
         "label": "Reparar",
         "kind": "heal",
         "value": 2,
-        "tags": ["repair"],
+        "tags": [
+          "repair"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "heal", "value": 2, "target": "target", "removeBleed": true },
-          { "type": "cleanse", "value": 1, "target": "target" }
+          {
+            "type": "heal",
+            "value": 2,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -285,10 +465,16 @@
         "label": "Placas",
         "kind": "block",
         "value": 2,
-        "tags": ["support"],
+        "tags": [
+          "support"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "block", "value": 2, "target": "target" }
+          {
+            "type": "block",
+            "value": 2,
+            "target": "target"
+          }
         ]
       },
       {
@@ -296,11 +482,20 @@
         "label": "FOCO+BLK",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 },
-          { "type": "block", "value": 1, "target": "self" }
+          {
+            "type": "focus",
+            "value": 1
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "self"
+          }
         ]
       },
       {
@@ -308,12 +503,21 @@
         "label": "Torreta 2",
         "kind": "special",
         "value": 2,
-        "tags": ["turret"],
+        "tags": [
+          "turret"
+        ],
         "target": "self",
         "effects": [
-          { "type": "turret", "value": 2 }
+          {
+            "type": "turret",
+            "value": 2
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -326,10 +530,15 @@
         "label": "FOCO",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 }
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -337,11 +546,20 @@
         "label": "SWAP+ATK",
         "kind": "swap",
         "value": 1,
-        "tags": ["mobility"],
+        "tags": [
+          "mobility"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "swap" },
-          { "type": "damage", "value": 1, "range": "ranged", "target": "enemy_random" }
+          {
+            "type": "swap"
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "enemy_random"
+          }
         ]
       },
       {
@@ -349,10 +567,16 @@
         "label": "BLK 2",
         "kind": "block",
         "value": 2,
-        "tags": ["guard"],
+        "tags": [
+          "guard"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 2, "target": "self" }
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
         ]
       },
       {
@@ -360,10 +584,17 @@
         "label": "Sinalizador",
         "kind": "mark",
         "value": 1,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 1, "target": "enemy_front_all" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "enemy_front_all"
+          }
         ]
       },
       {
@@ -371,10 +602,16 @@
         "label": "CLEANSE",
         "kind": "cleanse",
         "value": 1,
-        "tags": ["cleanse"],
+        "tags": [
+          "cleanse"
+        ],
         "target": "self",
         "effects": [
-          { "type": "cleanse", "value": 1, "target": "self" }
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "self"
+          }
         ]
       },
       {
@@ -382,12 +619,23 @@
         "label": "Contrabando",
         "kind": "special",
         "value": 1,
-        "tags": ["contrabando"],
+        "tags": [
+          "contrabando"
+        ],
         "target": "self",
         "effects": [
-          { "type": "post_combat", "resource": "consumables", "value": 1, "threatDelta": 1 }
+          {
+            "type": "post_combat",
+            "resource": "consumables",
+            "value": 1,
+            "threatDelta": 1
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -400,10 +648,15 @@
         "label": "FOCO",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 }
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -411,10 +664,17 @@
         "label": "MARK 1",
         "kind": "mark",
         "value": 1,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -422,10 +682,16 @@
         "label": "BLK 2",
         "kind": "block",
         "value": 2,
-        "tags": ["defense"],
+        "tags": [
+          "defense"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 2, "target": "self" }
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
         ]
       },
       {
@@ -433,10 +699,14 @@
         "label": "SWAP",
         "kind": "swap",
         "value": 1,
-        "tags": ["swap"],
+        "tags": [
+          "swap"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "swap" }
+          {
+            "type": "swap"
+          }
         ]
       },
       {
@@ -444,10 +714,16 @@
         "label": "Terreno",
         "kind": "block",
         "value": 1,
-        "tags": ["aoe"],
+        "tags": [
+          "aoe"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "block", "value": 1, "target": "all_allies" }
+          {
+            "type": "block",
+            "value": 1,
+            "target": "all_allies"
+          }
         ]
       },
       {
@@ -455,13 +731,28 @@
         "label": "CLEANSE+HEAL",
         "kind": "cleanse",
         "value": 1,
-        "tags": ["utility"],
+        "tags": [
+          "utility"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "cleanse", "value": 1, "target": "target" },
-          { "type": "heal", "value": 1, "target": "target", "removeBleed": true }
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -474,10 +765,17 @@
         "label": "Inspirar",
         "kind": "special",
         "value": 1,
-        "tags": ["buff"],
+        "tags": [
+          "buff"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "status", "statusId": "inspired", "value": 1, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "inspired",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -485,10 +783,17 @@
         "label": "MEDO 1",
         "kind": "special",
         "value": 1,
-        "tags": ["fear"],
+        "tags": [
+          "fear"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "fear", "value": 1, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -496,10 +801,15 @@
         "label": "FOCO",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 }
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -507,10 +817,17 @@
         "label": "MARK 2",
         "kind": "mark",
         "value": 2,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 2, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 2,
+            "target": "target"
+          }
         ]
       },
       {
@@ -518,10 +835,17 @@
         "label": "HEAL 1",
         "kind": "heal",
         "value": 1,
-        "tags": ["heal"],
+        "tags": [
+          "heal"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "heal", "value": 1, "target": "target", "removeBleed": true }
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          }
         ]
       },
       {
@@ -529,12 +853,22 @@
         "label": "Cobertura",
         "kind": "block",
         "value": 1,
-        "tags": ["aoe"],
+        "tags": [
+          "aoe"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "block", "value": 1, "target": "all_allies" }
+          {
+            "type": "block",
+            "value": 1,
+            "target": "all_allies"
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -547,10 +881,17 @@
         "label": "HEAL 2",
         "kind": "heal",
         "value": 2,
-        "tags": ["heal"],
+        "tags": [
+          "heal"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "heal", "value": 2, "target": "target", "removeBleed": true }
+          {
+            "type": "heal",
+            "value": 2,
+            "target": "target",
+            "removeBleed": true
+          }
         ]
       },
       {
@@ -558,11 +899,23 @@
         "label": "MARK+ATK",
         "kind": "attack",
         "value": 1,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 1, "target": "target" },
-          { "type": "damage", "value": 1, "range": "ranged", "target": "target" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target"
+          }
         ]
       },
       {
@@ -570,10 +923,17 @@
         "label": "Rede",
         "kind": "special",
         "value": 1,
-        "tags": ["control"],
+        "tags": [
+          "control"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "fear", "value": 1, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -581,10 +941,14 @@
         "label": "Puxao",
         "kind": "special",
         "value": 1,
-        "tags": ["control"],
+        "tags": [
+          "control"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "pull_front" }
+          {
+            "type": "pull_front"
+          }
         ]
       },
       {
@@ -592,10 +956,16 @@
         "label": "BLK 2",
         "kind": "block",
         "value": 2,
-        "tags": ["guard"],
+        "tags": [
+          "guard"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 2, "target": "self" }
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
         ]
       },
       {
@@ -603,12 +973,22 @@
         "label": "Caca",
         "kind": "special",
         "value": 1,
-        "tags": ["resource"],
+        "tags": [
+          "resource"
+        ],
         "target": "self",
         "effects": [
-          { "type": "post_combat", "resource": "supplies", "value": 1 }
+          {
+            "type": "post_combat",
+            "resource": "supplies",
+            "value": 1
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -621,10 +1001,15 @@
         "label": "FOCO",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 }
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -632,10 +1017,15 @@
         "label": "Suborno",
         "kind": "special",
         "value": 1,
-        "tags": ["control"],
+        "tags": [
+          "control"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "suppress_special", "value": 1 }
+          {
+            "type": "suppress_special",
+            "value": 1
+          }
         ]
       },
       {
@@ -643,10 +1033,17 @@
         "label": "MARK 1",
         "kind": "mark",
         "value": 1,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -654,10 +1051,16 @@
         "label": "BLK 2",
         "kind": "block",
         "value": 2,
-        "tags": ["guard"],
+        "tags": [
+          "guard"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 2, "target": "self" }
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
         ]
       },
       {
@@ -665,10 +1068,16 @@
         "label": "Ouro",
         "kind": "special",
         "value": 1,
-        "tags": ["gold"],
+        "tags": [
+          "gold"
+        ],
         "target": "self",
         "effects": [
-          { "type": "post_combat", "resource": "gold", "value": 1 }
+          {
+            "type": "post_combat",
+            "resource": "gold",
+            "value": 1
+          }
         ]
       },
       {
@@ -676,13 +1085,28 @@
         "label": "HEAL+BLK",
         "kind": "heal",
         "value": 1,
-        "tags": ["support"],
+        "tags": [
+          "support"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "heal", "value": 1, "target": "target", "removeBleed": true },
-          { "type": "block", "value": 1, "target": "target" }
+          {
+            "type": "heal",
+            "value": 1,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "block",
+            "value": 1,
+            "target": "target"
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -695,10 +1119,17 @@
         "label": "ATK 2",
         "kind": "attack",
         "value": 2,
-        "tags": ["melee"],
+        "tags": [
+          "melee"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 2, "range": "melee", "target": "target" }
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "melee",
+            "target": "target"
+          }
         ]
       },
       {
@@ -706,10 +1137,16 @@
         "label": "BLK 3",
         "kind": "block",
         "value": 3,
-        "tags": ["defense"],
+        "tags": [
+          "defense"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 3, "target": "self" }
+          {
+            "type": "block",
+            "value": 3,
+            "target": "self"
+          }
         ]
       },
       {
@@ -717,10 +1154,17 @@
         "label": "Granada",
         "kind": "attack",
         "value": 1,
-        "tags": ["aoe"],
+        "tags": [
+          "aoe"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 1, "range": "ranged", "target": "enemy_front_all" }
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "enemy_front_all"
+          }
         ]
       },
       {
@@ -728,10 +1172,15 @@
         "label": "FOCO",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 }
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -739,10 +1188,17 @@
         "label": "MARK 2",
         "kind": "mark",
         "value": 2,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 2, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 2,
+            "target": "target"
+          }
         ]
       },
       {
@@ -750,13 +1206,29 @@
         "label": "Adrenalina",
         "kind": "attack",
         "value": 4,
-        "tags": ["risk"],
+        "tags": [
+          "risk"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 4, "range": "melee", "target": "target" },
-          { "type": "status", "statusId": "bleed", "value": 1, "target": "self" }
+          {
+            "type": "damage",
+            "value": 4,
+            "range": "melee",
+            "target": "target"
+          },
+          {
+            "type": "status",
+            "statusId": "bleed",
+            "value": 1,
+            "target": "self"
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      4,
+      5
     ]
   },
   {
@@ -769,10 +1241,17 @@
         "label": "ATK 3",
         "kind": "attack",
         "value": 3,
-        "tags": ["ranged"],
+        "tags": [
+          "ranged"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 3, "range": "ranged", "target": "target" }
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target"
+          }
         ]
       },
       {
@@ -780,10 +1259,17 @@
         "label": "Rajada 2",
         "kind": "attack",
         "value": 2,
-        "tags": ["aoe"],
+        "tags": [
+          "aoe"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 2, "range": "ranged", "target": "enemy_front_all" }
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "enemy_front_all"
+          }
         ]
       },
       {
@@ -791,11 +1277,19 @@
         "label": "SWAP+BLK2",
         "kind": "swap",
         "value": 2,
-        "tags": ["maneuver"],
+        "tags": [
+          "maneuver"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "swap" },
-          { "type": "block", "value": 2, "target": "self" }
+          {
+            "type": "swap"
+          },
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
         ]
       },
       {
@@ -803,11 +1297,21 @@
         "label": "FOCO+MARK",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "focus", "value": 1 },
-          { "type": "status", "statusId": "mark", "value": 1, "target": "target" }
+          {
+            "type": "focus",
+            "value": 1
+          },
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -815,11 +1319,21 @@
         "label": "CLEANSE+BLK2",
         "kind": "cleanse",
         "value": 2,
-        "tags": ["utility"],
+        "tags": [
+          "utility"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "cleanse", "value": 1, "target": "target" },
-          { "type": "block", "value": 2, "target": "target" }
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          },
+          {
+            "type": "block",
+            "value": 2,
+            "target": "target"
+          }
         ]
       },
       {
@@ -827,13 +1341,28 @@
         "label": "ATK+DODGE",
         "kind": "attack",
         "value": 2,
-        "tags": ["tempo"],
+        "tags": [
+          "tempo"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 2, "range": "ranged", "target": "target" },
-          { "type": "status", "statusId": "dodge", "value": 1, "target": "self" }
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          },
+          {
+            "type": "status",
+            "statusId": "dodge",
+            "value": 1,
+            "target": "self"
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      5
     ]
   },
   {
@@ -846,7 +1375,9 @@
         "label": "ATK 3+VEN",
         "kind": "attack",
         "value": 3,
-        "tags": ["poison"],
+        "tags": [
+          "poison"
+        ],
         "target": "enemy",
         "effects": [
           {
@@ -864,10 +1395,17 @@
         "label": "MARK 3",
         "kind": "mark",
         "value": 3,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "mark", "value": 3, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "mark",
+            "value": 3,
+            "target": "target"
+          }
         ]
       },
       {
@@ -875,11 +1413,21 @@
         "label": "MEDO 2",
         "kind": "special",
         "value": 2,
-        "tags": ["fear"],
+        "tags": [
+          "fear"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "status", "statusId": "fear", "value": 2, "target": "target" },
-          { "type": "focus", "value": 1 }
+          {
+            "type": "status",
+            "statusId": "fear",
+            "value": 2,
+            "target": "target"
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -887,10 +1435,16 @@
         "label": "Escudo 4",
         "kind": "block",
         "value": 4,
-        "tags": ["block"],
+        "tags": [
+          "block"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 4, "target": "self" }
+          {
+            "type": "block",
+            "value": 4,
+            "target": "self"
+          }
         ]
       },
       {
@@ -898,11 +1452,21 @@
         "label": "Carregar",
         "kind": "special",
         "value": 2,
-        "tags": ["charge"],
+        "tags": [
+          "charge"
+        ],
         "target": "self",
         "effects": [
-          { "type": "status", "statusId": "charged", "value": 1, "target": "self" },
-          { "type": "focus", "value": 1 }
+          {
+            "type": "status",
+            "statusId": "charged",
+            "value": 1,
+            "target": "self"
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -910,13 +1474,27 @@
         "label": "Quebra 2",
         "kind": "special",
         "value": 2,
-        "tags": ["shred"],
+        "tags": [
+          "shred"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "shred_armor", "value": 2, "target": "target" },
-          { "type": "damage", "value": 2, "range": "ranged", "target": "target" }
+          {
+            "type": "shred_armor",
+            "value": 2,
+            "target": "target"
+          },
+          {
+            "type": "damage",
+            "value": 2,
+            "range": "ranged",
+            "target": "target"
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      5
     ]
   },
   {
@@ -929,10 +1507,17 @@
         "label": "ATK 3",
         "kind": "attack",
         "value": 3,
-        "tags": ["ranged"],
+        "tags": [
+          "ranged"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 3, "range": "ranged", "target": "target" }
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "ranged",
+            "target": "target"
+          }
         ]
       },
       {
@@ -940,7 +1525,9 @@
         "label": "ATK+BLEED2",
         "kind": "attack",
         "value": 2,
-        "tags": ["bleed"],
+        "tags": [
+          "bleed"
+        ],
         "target": "enemy",
         "effects": [
           {
@@ -958,11 +1545,20 @@
         "label": "STUN",
         "kind": "stun",
         "value": 1,
-        "tags": ["control"],
+        "tags": [
+          "control"
+        ],
         "target": "enemy",
-        "condition": { "requiresTargetFront": true },
+        "condition": {
+          "requiresTargetFront": true
+        },
         "effects": [
-          { "type": "status", "statusId": "stun", "value": 1, "target": "target" }
+          {
+            "type": "status",
+            "statusId": "stun",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -970,11 +1566,19 @@
         "label": "Mirar+FOCO",
         "kind": "focus",
         "value": 1,
-        "tags": ["setup"],
+        "tags": [
+          "setup"
+        ],
         "target": "self",
         "effects": [
-          { "type": "lock_die", "value": 1 },
-          { "type": "focus", "value": 1 }
+          {
+            "type": "lock_die",
+            "value": 1
+          },
+          {
+            "type": "focus",
+            "value": 1
+          }
         ]
       },
       {
@@ -982,11 +1586,22 @@
         "label": "HEAL 2",
         "kind": "heal",
         "value": 2,
-        "tags": ["utility"],
+        "tags": [
+          "utility"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "heal", "value": 2, "target": "target", "removeBleed": true },
-          { "type": "cleanse", "value": 1, "target": "target" }
+          {
+            "type": "heal",
+            "value": 2,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -994,13 +1609,31 @@
         "label": "Certeiro+",
         "kind": "attack",
         "value": 4,
-        "tags": ["mark"],
+        "tags": [
+          "mark"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 4, "range": "ranged", "target": "target", "consumeMark": false },
-          { "type": "damage", "value": 1, "range": "ranged", "target": "target", "requiresMarked": true, "consumeMark": true }
+          {
+            "type": "damage",
+            "value": 4,
+            "range": "ranged",
+            "target": "target",
+            "consumeMark": false
+          },
+          {
+            "type": "damage",
+            "value": 1,
+            "range": "ranged",
+            "target": "target",
+            "requiresMarked": true,
+            "consumeMark": true
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      5
     ]
   },
   {
@@ -1013,10 +1646,17 @@
         "label": "ATK 3",
         "kind": "attack",
         "value": 3,
-        "tags": ["melee"],
+        "tags": [
+          "melee"
+        ],
         "target": "enemy",
         "effects": [
-          { "type": "damage", "value": 3, "range": "melee", "target": "target" }
+          {
+            "type": "damage",
+            "value": 3,
+            "range": "melee",
+            "target": "target"
+          }
         ]
       },
       {
@@ -1024,10 +1664,16 @@
         "label": "BLK 4",
         "kind": "block",
         "value": 4,
-        "tags": ["tank"],
+        "tags": [
+          "tank"
+        ],
         "target": "self",
         "effects": [
-          { "type": "block", "value": 4, "target": "self" }
+          {
+            "type": "block",
+            "value": 4,
+            "target": "self"
+          }
         ]
       },
       {
@@ -1035,11 +1681,22 @@
         "label": "Reparar+",
         "kind": "heal",
         "value": 3,
-        "tags": ["repair"],
+        "tags": [
+          "repair"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "heal", "value": 3, "target": "target", "removeBleed": true },
-          { "type": "cleanse", "value": 1, "target": "target" }
+          {
+            "type": "heal",
+            "value": 3,
+            "target": "target",
+            "removeBleed": true
+          },
+          {
+            "type": "cleanse",
+            "value": 1,
+            "target": "target"
+          }
         ]
       },
       {
@@ -1047,10 +1704,16 @@
         "label": "Placas 3",
         "kind": "block",
         "value": 3,
-        "tags": ["support"],
+        "tags": [
+          "support"
+        ],
         "target": "ally",
         "effects": [
-          { "type": "block", "value": 3, "target": "target" }
+          {
+            "type": "block",
+            "value": 3,
+            "target": "target"
+          }
         ]
       },
       {
@@ -1058,11 +1721,20 @@
         "label": "FOCO+BLK2",
         "kind": "focus",
         "value": 1,
-        "tags": ["focus"],
+        "tags": [
+          "focus"
+        ],
         "target": "self",
         "effects": [
-          { "type": "focus", "value": 1 },
-          { "type": "block", "value": 2, "target": "self" }
+          {
+            "type": "focus",
+            "value": 1
+          },
+          {
+            "type": "block",
+            "value": 2,
+            "target": "self"
+          }
         ]
       },
       {
@@ -1070,12 +1742,20 @@
         "label": "Torreta 3",
         "kind": "special",
         "value": 3,
-        "tags": ["turret"],
+        "tags": [
+          "turret"
+        ],
         "target": "self",
         "effects": [
-          { "type": "turret", "value": 3 }
+          {
+            "type": "turret",
+            "value": 3
+          }
         ]
       }
+    ],
+    "emptyFaceIndices": [
+      5
     ]
   }
 ]

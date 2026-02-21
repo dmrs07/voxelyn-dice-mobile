@@ -10,6 +10,9 @@
     "typecheck": "tsc --noEmit",
     "assets:build": "node scripts/build-pixel-assets.mjs",
     "assets:check": "node scripts/check-pixel-assets.mjs",
+    "assets:import:enemies": "node scripts/import-enemy-sprites.mjs",
+    "dice:prompts": "node scripts/add-face-prompts.mjs content/dice/core-dice.json content/dice/core-dice.with-prompts.json",
+    "dice:render:openai": "node scripts/render-faces-openai.mjs content/dice/core-dice.with-prompts.json assets/generated/pixel/dice-faces",
     "qa:pixel": "npm run assets:build && npm run assets:check && npm run typecheck && npm run build",
     "inspect:voxelyn": "node scripts/inspect-voxelyn.mjs",
     "inspect:animation": "node scripts/inspect-animation.mjs",
@@ -21,12 +24,15 @@
     "@capacitor/core": "^6.2.0",
     "@capacitor/haptics": "^6.0.3",
     "@capacitor/preferences": "^6.0.3",
+    "@dimforge/rapier3d-compat": "^0.17.3",
+    "three": "^0.172.0",
     "@voxelyn/animation": "^0.1.1",
     "@voxelyn/core": "^0.1.1"
   },
   "devDependencies": {
     "@capacitor/android": "^6.2.0",
     "@capacitor/cli": "^6.2.0",
+    "sharp": "^0.33.2",
     "typescript": "^5.6.3",
     "vite": "^5.4.0"
   }

@@ -1,4 +1,5 @@
 import { SeededRng } from '../../core/rng';
+import { materializeDieFace } from '../shared/dice-face-utils';
 import {
   resolveRolledDieAction,
   resolveTurretTicks,
@@ -170,7 +171,7 @@ const rollDice = (
         continue;
       }
       const faceIndex = rng.nextInt(6);
-      const face = die.faces[faceIndex] ?? die.faces[0];
+      const face = materializeDieFace(die, faceIndex);
       rolls.push({
         rollId: `${member.id}_${combat.turn}_${index}`,
         ownerId: member.id,
@@ -200,13 +201,8 @@ const mapEnemyToCombatant = (
   return {
     id: `${enemyId}_${uniqueSuffix}`,
     name: blueprint?.name ?? 'Inimigo',
-    visualKey: blueprint?.tags.includes('machine')
-      ? 'enemy:machine'
-      : blueprint?.tags.includes('cult')
-        ? 'enemy:cult'
-        : blueprint?.tags.includes('beast')
-          ? 'enemy:beast'
-          : 'enemy:default',
+    // Prefer per-enemy visuals when available; falls back to procedural if not bound.
+    visualKey: `enemy:${enemyId}`,
     hp: (blueprint?.hp ?? 10) + hpBonus + threatBonus,
     maxHp: (blueprint?.hp ?? 10) + hpBonus + threatBonus,
     armor: blueprint?.armor ?? 0,
@@ -294,6 +290,7 @@ export const createCombatState = (
     id: `combat_${run.seed}_${Date.now()}`,
     nodeType,
     turn: 1,
+    awaitingRoll: true,
     party,
     enemies,
     enemyBlueprintIds: [...scaledEncounter],
@@ -304,6 +301,7 @@ export const createCombatState = (
     log: ['Combate iniciado.'],
     enemyIntentCursor: {},
     classPassivesUsedThisTurn: {},
+    enemyRollSnapshot: [],
     postCombatRewards: {
       gold: 0,
       supplies: 0,
@@ -320,9 +318,53 @@ export const createCombatState = (
   }
 
   combat.intents = buildEnemyIntents(combat, content, rng);
-  combat.diceRolls = rollDice(combat, run, content, rng);
+  combat.diceRolls = [];
 
   return combat;
+};
+
+export const rollCombatDice = (
+  combat: CombatState,
+  run: RunState,
+  content: GameContent,
+  rng: SeededRng,
+): CombatActionResult => {
+  const events: CombatFxEvent[] = [];
+  if (combat.outcome !== 'ongoing') {
+    return { message: 'Combate encerrado.', events };
+  }
+
+  if (!combat.awaitingRoll) {
+    return { message: 'Os dados deste turno ja foram rolados.', events };
+  }
+
+  combat.diceRolls = rollDice(combat, run, content, rng);
+  combat.awaitingRoll = false;
+
+  for (const roll of combat.diceRolls) {
+    events.push({
+      type: 'die_roll',
+      rollId: roll.rollId,
+      ownerId: roll.ownerId,
+      durationMs: 520,
+    });
+    events.push({
+      type: 'die_settle',
+      rollId: roll.rollId,
+      ownerId: roll.ownerId,
+      faceId: roll.face.id,
+      durationMs: 680,
+    });
+  }
+
+  if (combat.diceRolls.length === 0) {
+    return { message: 'Nenhum dado disponivel neste turno.', events };
+  }
+
+  return {
+    message: `Dados rolados: ${combat.diceRolls.length}.`,
+    events,
+  };
 };
 
 export const rerollOneDieWithFocus = (
@@ -335,6 +377,10 @@ export const rerollOneDieWithFocus = (
 
   if (combat.outcome !== 'ongoing') {
     return { message: 'Combate encerrado.', events };
+  }
+
+  if (combat.awaitingRoll) {
+    return { message: 'Toque ROLL para gerar os dados do turno.', events };
   }
 
   if (combat.focus <= 0) {
@@ -364,17 +410,17 @@ export const rerollOneDieWithFocus = (
     type: 'die_roll',
     rollId: roll.rollId,
     ownerId: roll.ownerId,
-    durationMs: 300,
+    durationMs: 540,
   });
   roll.faceIndex = rng.nextInt(6);
-  roll.face = die.faces[roll.faceIndex] ?? die.faces[0];
+  roll.face = materializeDieFace(die, roll.faceIndex);
   combat.focus -= 1;
   events.push({
     type: 'die_settle',
     rollId: roll.rollId,
     ownerId: roll.ownerId,
     faceId: roll.face.id,
-    durationMs: 360,
+    durationMs: 700,
   });
   events.push({
     type: 'focus',
@@ -418,9 +464,18 @@ export const usePlayerDie = (
   targetId: string,
 ): CombatActionResult => {
   const events: CombatFxEvent[] = [];
+  if (combat.awaitingRoll) {
+    return { message: 'Toque ROLL para gerar os dados do turno.', events };
+  }
   const roll = combat.diceRolls.find((entry) => entry.rollId === rollId);
   if (!roll || roll.used) {
     return { message: 'Dado invalido.', events };
+  }
+
+  if (roll.face.kind === 'empty') {
+    roll.used = true;
+    const owner = combat.party.find((entry) => entry.id === roll.ownerId);
+    return { message: `${owner?.name ?? 'Trip'} caiu em um lado vazio.`, events };
   }
 
   const result = resolveRolledDieAction(combat, roll, 'party', targetTeam, targetId);
@@ -466,7 +521,8 @@ export const nextCombatTurn = (
   combat.classPassivesUsedThisTurn = {};
   applyTurnStartRelics(combat, run, content);
   combat.intents = buildEnemyIntents(combat, content, rng);
-  combat.diceRolls = rollDice(combat, run, content, rng);
+  combat.diceRolls = [];
+  combat.awaitingRoll = true;
 
   if (combat.turn % 3 === 0) {
     for (let i = 0; i < combat.enemies.length; i += 1) {
@@ -487,7 +543,7 @@ export const nextCombatTurn = (
 
   syncPartyBackToRun(run, combat);
 
-  return { logs: [...logs, `Turno ${combat.turn} iniciado.`], events };
+  return { logs: [...logs, `Turno ${combat.turn} pronto. Toque ROLL.`], events };
 };
 
 export const syncCombatToRun = (run: RunState, combat: CombatState): void => {

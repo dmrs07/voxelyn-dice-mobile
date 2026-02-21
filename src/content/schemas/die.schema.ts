@@ -153,7 +153,14 @@ const parseFace = (input: unknown, index: number): DiceFaceDef => {
     throw new Error(`Invalid die.faces[${index}]`);
   }
 
-  if (!Array.isArray(input.effects) || input.effects.length === 0) {
+  const kind = readFaceKind(input.kind, `die.faces[${index}].kind`);
+  if (!Array.isArray(input.effects)) {
+    throw new Error(`Invalid die.faces[${index}].effects: expected array`);
+  }
+  if (kind === 'empty' && input.effects.length > 0) {
+    throw new Error(`Invalid die.faces[${index}].effects: empty faces must not have effects`);
+  }
+  if (kind !== 'empty' && input.effects.length === 0) {
     throw new Error(`Invalid die.faces[${index}].effects: expected non-empty array`);
   }
 
@@ -178,7 +185,7 @@ const parseFace = (input: unknown, index: number): DiceFaceDef => {
   return {
     id: readString(input.id, `die.faces[${index}].id`),
     label: readString(input.label, `die.faces[${index}].label`),
-    kind: readFaceKind(input.kind, `die.faces[${index}].kind`),
+    kind,
     value: readInt(input.value, `die.faces[${index}].value`),
     tags: readStringArray(input.tags, `die.faces[${index}].tags`),
     target: readLiteral(input.target, `die.faces[${index}].target`, TARGETS),
@@ -198,10 +205,32 @@ export const parseDieDef = (input: unknown): DieDef => {
     throw new Error('Invalid die.faces: expected array with 6 entries');
   }
 
+  if (input.emptyFaceIndices === undefined) {
+    throw new Error('Invalid die.emptyFaceIndices: field is required');
+  }
+  if (!Array.isArray(input.emptyFaceIndices)) {
+    throw new Error('Invalid die.emptyFaceIndices: expected array of integers');
+  }
+
+  const dedup = new Set<number>();
+  for (let i = 0; i < input.emptyFaceIndices.length; i += 1) {
+    const raw = input.emptyFaceIndices[i];
+    const parsed = readInt(raw, `die.emptyFaceIndices[${i}]`);
+    if (parsed < 0 || parsed > 5) {
+      throw new Error('Invalid die.emptyFaceIndices: indexes must be between 0 and 5');
+    }
+    if (dedup.has(parsed)) {
+      throw new Error('Invalid die.emptyFaceIndices: duplicated index');
+    }
+    dedup.add(parsed);
+  }
+  const emptyFaceIndices = [...dedup];
+
   return {
     id: readString(input.id, 'die.id'),
     label: readString(input.label, 'die.label'),
     rarity: readOptionalLiteral(input.rarity, 'die.rarity', RARITIES) ?? 'common',
+    emptyFaceIndices,
     faces: [
       parseFace(input.faces[0], 0),
       parseFace(input.faces[1], 1),

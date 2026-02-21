@@ -15,15 +15,48 @@ export type AppPhase = (typeof APP_PHASES)[number];
 export type ResourceId = (typeof RESOURCE_IDS)[number];
 export type CombatantVisualKey = string;
 export type DiceFaceVisualKey = string;
+export type EnemyDieTier = 'common' | 'elite' | 'boss';
 
 export type CombatFxEvent =
-  | { type: 'die_roll'; rollId: string; ownerId: string; durationMs: number }
-  | { type: 'die_settle'; rollId: string; ownerId: string; faceId: string; durationMs: number }
+  | {
+      type: 'die_roll';
+      rollId: string;
+      ownerId: string;
+      durationMs: number;
+      face?: DiceFaceDef;
+      faceIndex?: number;
+      dieId?: string;
+      transient?: boolean;
+      selectable?: boolean;
+      expiresAfterMs?: number;
+    }
+  | {
+      type: 'die_settle';
+      rollId: string;
+      ownerId: string;
+      faceId: string;
+      durationMs: number;
+      face?: DiceFaceDef;
+      faceIndex?: number;
+      dieId?: string;
+      transient?: boolean;
+      selectable?: boolean;
+      expiresAfterMs?: number;
+    }
   | { type: 'hit'; targetId: string; amount: number; sourceId?: string }
   | { type: 'heal'; targetId: string; amount: number; sourceId?: string }
   | { type: 'status'; targetId: string; statusId: StatusId; stacks: number }
   | { type: 'swap'; aId: string; bId: string }
   | { type: 'focus'; ownerId: string; delta: number }
+  | {
+      type: 'intent_telegraph';
+      ownerId: string;
+      intentKind: EnemyIntentDef['kind'];
+      value: number;
+      durationMs: number;
+      label?: string;
+      targetHint?: EnemyIntentDef['target'];
+    }
   | { type: 'idle'; targetId: string; enabled: boolean };
 
 export type DieSource = 'class' | 'background';
@@ -129,6 +162,7 @@ export interface DieDef {
   id: string;
   label: string;
   rarity: 'common' | 'rare' | 'cursed';
+  emptyFaceIndices?: number[];
   faces: [
     DiceFaceDef,
     DiceFaceDef,
@@ -145,6 +179,7 @@ export interface ClassDef {
   role: 'tank' | 'striker' | 'support' | 'control';
   verb: string;
   passive: string;
+  hireCost?: number;
   starterDiceIds: string[];
   growthPoolDiceIds: string[];
   maxHp: number;
@@ -391,6 +426,10 @@ export interface RolledDie {
 export interface CombatIntent {
   enemyId: string;
   intentId: string;
+  enemyRollId?: string;
+  enemyDieTier?: EnemyDieTier;
+  enemyFaceIndex?: number;
+  enemyFace?: DiceFaceDef;
   label: string;
   kind: EnemyIntentDef['kind'];
   value: number;
@@ -427,6 +466,7 @@ export interface CombatState {
   id: string;
   nodeType: NodeType;
   turn: number;
+  awaitingRoll: boolean;
   party: CombatantState[];
   enemies: CombatantState[];
   enemyBlueprintIds: string[];
@@ -437,6 +477,18 @@ export interface CombatState {
   log: string[];
   enemyIntentCursor: Record<string, number>;
   classPassivesUsedThisTurn: Record<string, boolean>;
+  enemyRollSnapshot?: Array<{
+    enemyId: string;
+    tier: EnemyDieTier;
+    rollId: string;
+    intentId: string;
+    label: string;
+    kind: EnemyIntentDef['kind'];
+    target: EnemyIntentDef['target'];
+    range: RangeType;
+    value: number;
+    faceIndex: number;
+  }>;
   postCombatRewards: {
     gold: number;
     supplies: number;
