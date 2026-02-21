@@ -1,4 +1,5 @@
 import type {
+  CaptainPassiveId,
   CombatFxEvent,
   CombatIntent,
   CombatState,
@@ -212,6 +213,78 @@ const focusFromNumeric = (actor: CombatantState, base: number, consumedCharged: 
   return Math.max(1, value);
 };
 
+const isCaptainActor = (combat: CombatState, actor: CombatantState): boolean =>
+  Boolean(combat.captainConfig && !actor.isEnemy && actor.classId === combat.captainConfig.captainClassId);
+
+const captainPassiveFor = (
+  combat: CombatState,
+  actor: CombatantState,
+): CaptainPassiveId | null => {
+  if (!isCaptainActor(combat, actor)) {
+    return null;
+  }
+  return combat.captainConfig?.loadout.passiveId ?? null;
+};
+
+const markCaptainTurnFlag = (combat: CombatState, key: string): void => {
+  combat.captainRuntime.perTurnFlags[key] = true;
+};
+
+const hasCaptainTurnFlag = (combat: CombatState, key: string): boolean =>
+  Boolean(combat.captainRuntime.perTurnFlags[key]);
+
+const maybeApplyCaptainNumericBonus = (
+  combat: CombatState,
+  actor: CombatantState,
+  roll: RolledDie,
+  baseValue: number,
+  state: { consumed: boolean },
+): { value: number; log?: string } => {
+  if (state.consumed) {
+    return { value: baseValue };
+  }
+  const passiveId = captainPassiveFor(combat, actor);
+  if (!passiveId) {
+    return { value: baseValue };
+  }
+  if (passiveId === 'ocultista_ritual_curto' && combat.captainRuntime.ritualShortPending) {
+    combat.captainRuntime.ritualShortPending = false;
+    state.consumed = true;
+    return {
+      value: baseValue + 1,
+      log: `${actor.name} ativou Ritual Curto (+1).`,
+    };
+  }
+  if (passiveId === 'cacador_observador') {
+    const bonus = combat.captainRuntime.lockBonusByRollId[roll.rollId] ?? 0;
+    if (bonus > 0) {
+      delete combat.captainRuntime.lockBonusByRollId[roll.rollId];
+      state.consumed = true;
+      return {
+        value: baseValue + bonus,
+        log: `${actor.name} ativou Observador (+${bonus}).`,
+      };
+    }
+  }
+  return { value: baseValue };
+};
+
+const maybeGrantCaptainFocus = (
+  combat: CombatState,
+  actor: CombatantState,
+  events: CombatFxEvent[],
+  amount: number,
+  reason: string,
+): string => {
+  combat.focus += amount;
+  events.push({
+    type: 'focus',
+    ownerId: actor.id,
+    delta: amount,
+  });
+  return `${reason} FOCO +${amount}.`;
+};
+
 const applyAviadoraSwapPassive = (combat: CombatState, actor: CombatantState): string | null => {
   if (actor.classId !== 'aviadora') {
     return null;
@@ -242,8 +315,9 @@ const applyHunterMarkedBonus = (actor: CombatantState, target: CombatantState): 
   return (target.statuses.mark ?? 0) > 0 ? 1 : 0;
 };
 
-const lockDiceForActor = (combat: CombatState, actorId: string, count: number): number => {
+const lockDiceForActor = (combat: CombatState, actorId: string, count: number): string[] => {
   let locked = 0;
+  const lockedRollIds: string[] = [];
   for (const roll of combat.diceRolls) {
     if (locked >= count) {
       break;
@@ -253,8 +327,9 @@ const lockDiceForActor = (combat: CombatState, actorId: string, count: number): 
     }
     roll.locked = true;
     locked += 1;
+    lockedRollIds.push(roll.rollId);
   }
-  return locked;
+  return lockedRollIds;
 };
 
 const swapRows = (a: CombatantState, b: CombatantState): void => {
@@ -314,6 +389,55 @@ const applyPostCombatReward = (
   if (effect.threatDelta) {
     combat.postCombatRewards.threat += effect.threatDelta;
   }
+};
+
+const maybeTriggerCaptainEmergencyGear = (
+  combat: CombatState,
+  damagedAlly: CombatantState,
+  beforeHp: number,
+  logs: string[],
+  events: CombatFxEvent[],
+): void => {
+  if (!combat.captainConfig) {
+    return;
+  }
+  if (combat.captainRuntime.perCombatFlags.captain_mecanico_engrenagem_emergencia) {
+    return;
+  }
+  if (combat.captainConfig.loadout.passiveId !== 'mecanico_engrenagem_emergencia') {
+    return;
+  }
+  const captain = combat.party.find(
+    (entry) =>
+      entry.alive &&
+      entry.classId === combat.captainConfig?.captainClassId,
+  );
+  if (!captain) {
+    return;
+  }
+  if (damagedAlly.id === captain.id || !damagedAlly.alive) {
+    return;
+  }
+  const threshold = damagedAlly.maxHp * 0.5;
+  if (!(beforeHp > threshold && damagedAlly.hp <= threshold)) {
+    return;
+  }
+
+  combat.captainRuntime.perCombatFlags.captain_mecanico_engrenagem_emergencia = true;
+  damagedAlly.armor += 2;
+  combat.focus += 1;
+  logs.push(`${captain.name} ativou Engrenagem de Emergencia em ${damagedAlly.name}.`);
+  events.push({
+    type: 'status',
+    targetId: damagedAlly.id,
+    statusId: 'block',
+    stacks: 2,
+  });
+  events.push({
+    type: 'focus',
+    ownerId: captain.id,
+    delta: 1,
+  });
 };
 
 export interface ActionResolutionResult {
@@ -450,6 +574,8 @@ export const resolveRolledDieAction = (
 
   const logs: string[] = [];
   const consumedCharged = { value: false };
+  const captainNumericBonus = { consumed: false };
+  let captainScrapSpent = false;
 
   for (const effect of face.effects) {
     if (effect.type === 'damage') {
@@ -477,8 +603,52 @@ export const resolveRolledDieAction = (
         }
 
         const targetWasAlive = current.alive;
+        const wasMarkedBeforeHit = (current.statuses.mark ?? 0) > 0;
+        const passiveId = captainPassiveFor(combat, actor);
+        let value = focusFromNumeric(actor, effect.value, consumedCharged);
+        const captainNumeric = maybeApplyCaptainNumericBonus(
+          combat,
+          actor,
+          roll,
+          value,
+          captainNumericBonus,
+        );
+        value = captainNumeric.value;
+        if (captainNumeric.log) {
+          logs.push(captainNumeric.log);
+        }
+        if (
+          passiveId === 'aviadora_ataque_rasante' &&
+          range === 'ranged' &&
+          wasMarkedBeforeHit &&
+          !hasCaptainTurnFlag(combat, 'captain_aviadora_ataque_rasante')
+        ) {
+          value += 1;
+          markCaptainTurnFlag(combat, 'captain_aviadora_ataque_rasante');
+          logs.push(`${actor.name} ativou Ataque Rasante (+1 dano).`);
+        }
+        if (
+          passiveId === 'cacador_tiro_limpo' &&
+          range === 'ranged' &&
+          !hasCaptainTurnFlag(combat, 'captain_cacador_tiro_limpo')
+        ) {
+          markCaptainTurnFlag(combat, 'captain_cacador_tiro_limpo');
+          const removedArmor = Math.min(1, Math.max(0, current.armor));
+          if (removedArmor > 0) {
+            current.armor -= removedArmor;
+            logs.push(`${actor.name} ativou Tiro Limpo (ignora BLK 1).`);
+            events.push({
+              type: 'status',
+              targetId: current.id,
+              statusId: 'block',
+              stacks: -removedArmor,
+            });
+          } else {
+            logs.push(`${actor.name} ativou Tiro Limpo.`);
+          }
+        }
         const bonus = applyHunterMarkedBonus(actor, current);
-        const value = focusFromNumeric(actor, effect.value, consumedCharged) + bonus;
+        value += bonus;
         const damageResult = applyDamageToTarget(current, value, {
           consumeMark: effect.consumeMark ?? true,
           allowDodge: true,
@@ -497,6 +667,16 @@ export const resolveRolledDieAction = (
           pushIdleDisabledIfDead(current, targetWasAlive, events);
         }
 
+        if (
+          passiveId === 'cacador_de_marcas' &&
+          wasMarkedBeforeHit &&
+          damageResult.dealt > 0 &&
+          !hasCaptainTurnFlag(combat, 'captain_cacador_de_marcas')
+        ) {
+          markCaptainTurnFlag(combat, 'captain_cacador_de_marcas');
+          logs.push(maybeGrantCaptainFocus(combat, actor, events, 1, `${actor.name} ativou Cacador de Marcas.`));
+        }
+
         if (effect.applyStatusId && (effect.applyStatusStacks ?? 0) > 0) {
           addStatus(current, effect.applyStatusId, effect.applyStatusStacks ?? 0);
           logs.push(`${current.name} recebeu ${effect.applyStatusId} ${effect.applyStatusStacks}.`);
@@ -506,6 +686,24 @@ export const resolveRolledDieAction = (
             statusId: effect.applyStatusId,
             stacks: effect.applyStatusStacks ?? 0,
           });
+          if (
+            passiveId === 'ocultista_veneno_metodico' &&
+            effect.applyStatusId === 'poison' &&
+            !hasCaptainTurnFlag(combat, 'captain_ocultista_veneno_metodico')
+          ) {
+            const removedArmor = Math.min(1, Math.max(0, current.armor));
+            if (removedArmor > 0) {
+              current.armor -= removedArmor;
+              markCaptainTurnFlag(combat, 'captain_ocultista_veneno_metodico');
+              logs.push(`${actor.name} ativou Veneno Metodico e removeu BLK 1 de ${current.name}.`);
+              events.push({
+                type: 'status',
+                targetId: current.id,
+                statusId: 'block',
+                stacks: -removedArmor,
+              });
+            }
+          }
         }
       }
       continue;
@@ -520,15 +718,41 @@ export const resolveRolledDieAction = (
         target,
         effect.target,
       );
-      const value = focusFromNumeric(actor, effect.value, consumedCharged);
+      let value = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, value, captainNumericBonus);
+      value = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
+      const passiveId = captainPassiveFor(combat, actor);
       for (const current of targets) {
-        current.armor += value;
-        logs.push(`${current.name} ganhou BLK ${value}.`);
+        let resolvedValue = value;
+        if (
+          passiveId === 'mecanico_scrap' &&
+          !captainScrapSpent &&
+          combat.captainRuntime.scrap > 0
+        ) {
+          resolvedValue += 1;
+          combat.captainRuntime.scrap = Math.max(0, combat.captainRuntime.scrap - 1);
+          captainScrapSpent = true;
+          logs.push(`${actor.name} gastou Sucata (+1 BLK).`);
+        }
+        if (
+          passiveId === 'mecanico_oficina_campo' &&
+          current.id !== actor.id &&
+          !hasCaptainTurnFlag(combat, 'captain_mecanico_oficina_campo')
+        ) {
+          resolvedValue += 1;
+          markCaptainTurnFlag(combat, 'captain_mecanico_oficina_campo');
+          logs.push(`${actor.name} ativou Oficina de Campo (+1 BLK).`);
+        }
+        current.armor += resolvedValue;
+        logs.push(`${current.name} ganhou BLK ${resolvedValue}.`);
         events.push({
           type: 'status',
           targetId: current.id,
           statusId: 'block',
-          stacks: value,
+          stacks: resolvedValue,
         });
       }
       continue;
@@ -543,9 +767,26 @@ export const resolveRolledDieAction = (
         target,
         effect.target,
       );
-      const value = focusFromNumeric(actor, effect.value, consumedCharged);
+      let value = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, value, captainNumericBonus);
+      value = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
+      const passiveId = captainPassiveFor(combat, actor);
       for (const current of targets) {
-        const healed = applyHealingToTarget(current, value);
+        let resolvedValue = value;
+        if (
+          passiveId === 'mecanico_scrap' &&
+          !captainScrapSpent &&
+          combat.captainRuntime.scrap > 0
+        ) {
+          resolvedValue += 1;
+          combat.captainRuntime.scrap = Math.max(0, combat.captainRuntime.scrap - 1);
+          captainScrapSpent = true;
+          logs.push(`${actor.name} gastou Sucata (+1 HEAL).`);
+        }
+        const healed = applyHealingToTarget(current, resolvedValue);
         if (effect.removeBleed && (current.statuses.bleed ?? 0) > 0) {
           current.statuses.bleed -= 1;
         }
@@ -571,7 +812,13 @@ export const resolveRolledDieAction = (
         target,
         effect.target,
       );
-      const value = focusFromNumeric(actor, effect.value, consumedCharged);
+      let value = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, value, captainNumericBonus);
+      value = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
+      const passiveId = captainPassiveFor(combat, actor);
       for (const current of targets) {
         addStatus(current, effect.statusId, value);
         logs.push(`${current.name} recebeu ${effect.statusId} ${value}.`);
@@ -593,6 +840,19 @@ export const resolveRolledDieAction = (
               stacks: 1,
             });
           }
+          if (
+            (passiveId === 'aviadora_chefe_sinalizacao' || passiveId === 'ocultista_cifra_voraz') &&
+            !hasCaptainTurnFlag(combat, `captain_${passiveId}`)
+          ) {
+            markCaptainTurnFlag(combat, `captain_${passiveId}`);
+            logs.push(maybeGrantCaptainFocus(combat, actor, events, 1, `${actor.name} ativou ${passiveId === 'aviadora_chefe_sinalizacao' ? 'Chefe de Sinalizacao.' : 'Cifra Voraz.'}`));
+          }
+        }
+        if (effect.statusId === 'charged' && passiveId === 'ocultista_ritual_curto') {
+          if (!combat.captainRuntime.ritualShortPending) {
+            combat.captainRuntime.ritualShortPending = true;
+            logs.push(`${actor.name} preparou Ritual Curto (+1 no proximo dado).`);
+          }
         }
       }
       continue;
@@ -607,7 +867,12 @@ export const resolveRolledDieAction = (
         target,
         effect.target,
       );
-      const amount = focusFromNumeric(actor, effect.value, consumedCharged);
+      let amount = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, amount, captainNumericBonus);
+      amount = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
       for (const current of targets) {
         let removed = 0;
         for (let i = 0; i < amount; i += 1) {
@@ -631,7 +896,12 @@ export const resolveRolledDieAction = (
         target,
         effect.target,
       );
-      const value = focusFromNumeric(actor, effect.value, consumedCharged);
+      let value = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, value, captainNumericBonus);
+      value = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
       for (const current of targets) {
         const removed = Math.min(current.armor, value);
         current.armor -= removed;
@@ -665,11 +935,24 @@ export const resolveRolledDieAction = (
           stacks: 1,
         });
       }
+      if (
+        captainPassiveFor(combat, actor) === 'aviadora_corrente_ar' &&
+        !hasCaptainTurnFlag(combat, 'captain_aviadora_corrente_ar')
+      ) {
+        markCaptainTurnFlag(combat, 'captain_aviadora_corrente_ar');
+        combat.freeRerollCharges += 1;
+        logs.push(`${actor.name} ativou Corrente de Ar: rerrolagem gratuita disponivel.`);
+      }
       continue;
     }
 
     if (effect.type === 'focus') {
-      const amount = focusFromNumeric(actor, effect.value, consumedCharged);
+      let amount = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, amount, captainNumericBonus);
+      amount = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
       combat.focus += amount;
       logs.push(`FOCO +${amount}.`);
       events.push({
@@ -681,9 +964,25 @@ export const resolveRolledDieAction = (
     }
 
     if (effect.type === 'lock_die') {
-      const amount = focusFromNumeric(actor, effect.value, consumedCharged);
-      const locked = lockDiceForActor(combat, actor.id, amount);
-      logs.push(`${actor.name} travou ${locked} dado(s).`);
+      let amount = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, amount, captainNumericBonus);
+      amount = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
+      const lockedRollIds = lockDiceForActor(combat, actor.id, amount);
+      logs.push(`${actor.name} travou ${lockedRollIds.length} dado(s).`);
+      if (
+        captainPassiveFor(combat, actor) === 'cacador_observador' &&
+        lockedRollIds.length > 0 &&
+        !hasCaptainTurnFlag(combat, 'captain_cacador_observador')
+      ) {
+        markCaptainTurnFlag(combat, 'captain_cacador_observador');
+        for (const rollId of lockedRollIds) {
+          combat.captainRuntime.lockBonusByRollId[rollId] = 1;
+        }
+        logs.push(`${actor.name} ativou Observador (+1 no proximo uso do dado travado).`);
+      }
       continue;
     }
 
@@ -713,7 +1012,12 @@ export const resolveRolledDieAction = (
     }
 
     if (effect.type === 'turret') {
-      const value = focusFromNumeric(actor, effect.value, consumedCharged);
+      let value = focusFromNumeric(actor, effect.value, consumedCharged);
+      const captainNumeric = maybeApplyCaptainNumericBonus(combat, actor, roll, value, captainNumericBonus);
+      value = captainNumeric.value;
+      if (captainNumeric.log) {
+        logs.push(captainNumeric.log);
+      }
       addStatus(actor, 'turret', value);
       logs.push(`${actor.name} ativou TORRETA ${value}.`);
       events.push({
@@ -782,6 +1086,7 @@ export const resolveTurretTicks = (
 
 export const applyEndTurnStatusEffects = (
   combatant: CombatantState,
+  context?: { combat: CombatState; team: 'party' | 'enemy' },
 ): { logs: string[]; events: CombatFxEvent[] } => {
   if (!combatant.alive) {
     return { logs: [], events: [] };
@@ -795,6 +1100,7 @@ export const applyEndTurnStatusEffects = (
   const incoming = poison + bleed;
 
   if (incoming > 0) {
+    const hpBefore = combatant.hp;
     const wasAlive = combatant.alive;
     const dealt = applyDamageToTarget(combatant, incoming, {
       consumeMark: false,
@@ -807,6 +1113,9 @@ export const applyEndTurnStatusEffects = (
       amount: Math.max(1, dealt.dealt + dealt.absorbed),
     });
     pushIdleDisabledIfDead(combatant, wasAlive, events);
+    if (context?.team === 'party') {
+      maybeTriggerCaptainEmergencyGear(context.combat, combatant, hpBefore, logs, events);
+    }
   }
 
   if (poison > 0) {
@@ -988,6 +1297,7 @@ export const applyEnemyIntent = (
         kind: 'attack',
       });
       for (const target of targets) {
+        const hpBeforeHit = target.hp;
         const targetWasAlive = target.alive;
         const damage = applyDamageToTarget(target, intent.value, {
           consumeMark: true,
@@ -1007,6 +1317,7 @@ export const applyEnemyIntent = (
             });
           }
           pushIdleDisabledIfDead(target, targetWasAlive, events);
+          maybeTriggerCaptainEmergencyGear(combat, target, hpBeforeHit, logs, events);
         }
         if (intent.onHitStatusId && (intent.onHitStatusStacks ?? 0) > 0) {
           addStatus(target, intent.onHitStatusId, intent.onHitStatusStacks ?? 0);
@@ -1038,6 +1349,7 @@ export const applyEnemyIntent = (
   const targets = resolveEnemyAttackTargets(combat, intent);
   for (const target of targets) {
     const isRecarga = intent.intentId === 'recarga_veneno';
+    const hpBeforeHit = target.hp;
     const targetWasAlive = target.alive;
     const damage = applyDamageToTarget(target, intent.value, {
       consumeMark: !isRecarga,
@@ -1064,6 +1376,7 @@ export const applyEnemyIntent = (
       });
     }
     pushIdleDisabledIfDead(target, targetWasAlive, events);
+    maybeTriggerCaptainEmergencyGear(combat, target, hpBeforeHit, logs, events);
     if (intent.onHitStatusId && (intent.onHitStatusStacks ?? 0) > 0) {
       addStatus(target, intent.onHitStatusId, intent.onHitStatusStacks ?? 0);
       logs.push(`${target.name} recebeu ${intent.onHitStatusId} ${intent.onHitStatusStacks}.`);

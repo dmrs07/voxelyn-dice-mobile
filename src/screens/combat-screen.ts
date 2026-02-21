@@ -81,7 +81,7 @@ export const renderCombatScreen = (
   const selectedRollIsValid = Boolean(selectedRoll && !selectedRoll.used && !selectedRoll.locked);
   const canReroll =
     !state.combat.awaitingRoll &&
-    state.combat.focus > 0 &&
+    (state.combat.focus > 0 || state.combat.freeRerollCharges > 0) &&
     selectedRollIsValid &&
     state.trayDiagnostics.interactionReady;
   const tooltipRoll = state.openFaceTooltipRollId
@@ -246,6 +246,10 @@ export const renderCombatScreen = (
 
     combatRoot.addEventListener('dice-tray:clear', () => {
       handlers.onClearSelection();
+    });
+
+    combatRoot.addEventListener('dice-tray:tooltip-clear', () => {
+      handlers.onToggleFaceTooltip(null);
     });
 
     combatRoot.addEventListener('click', (event) => {

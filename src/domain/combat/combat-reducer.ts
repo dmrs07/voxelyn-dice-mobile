@@ -1,12 +1,14 @@
 import { SeededRng } from '../../core/rng';
-import { materializeDieFace } from '../shared/dice-face-utils';
+import { isEmptyFaceIndex, materializeDieFace } from '../shared/dice-face-utils';
 import {
   resolveRolledDieAction,
   resolveTurretTicks,
   consumeStunAtTurnStart,
 } from './action-resolver';
 import { buildEnemyIntents, resolveEnemyTurn } from './intent-system';
+import { getCaptainFaceDefinition } from './captain-loadouts';
 import type {
+  CaptainRuntimeState,
   CombatFxEvent,
   CharacterState,
   CombatState,
@@ -143,6 +145,81 @@ const applyClassAndBackgroundStartPassives = (combat: CombatState): void => {
   }
 };
 
+const makeCaptainRuntimeState = (): CaptainRuntimeState => ({
+  scrap: 0,
+  ritualShortPending: false,
+  perTurnFlags: {},
+  perCombatFlags: {},
+  lockBonusByRollId: {},
+});
+
+const isCaptainMember = (combat: CombatState, member: CombatantState): boolean => {
+  if (!combat.captainConfig) {
+    return false;
+  }
+  return member.classId === combat.captainConfig.captainClassId;
+};
+
+const maybeApplyCaptainFaceOverride = (
+  combat: CombatState,
+  member: CombatantState,
+  die: NonNullable<GameContent['byId']['dice'][string]>,
+  dieIndex: number,
+  faceIndex: number,
+): ReturnType<typeof materializeDieFace> => {
+  const baseFace = materializeDieFace(die, faceIndex);
+  const captainConfig = combat.captainConfig;
+  if (!captainConfig) {
+    return baseFace;
+  }
+  if (!isCaptainMember(combat, member)) {
+    return baseFace;
+  }
+  if (dieIndex !== 0) {
+    return baseFace;
+  }
+  if (member.classId !== captainConfig.captainClassId) {
+    return baseFace;
+  }
+  const emptyIndex = die.emptyFaceIndices?.[0];
+  if (emptyIndex === undefined || faceIndex !== emptyIndex || !isEmptyFaceIndex(die, faceIndex)) {
+    return baseFace;
+  }
+  const overrideFace = getCaptainFaceDefinition(captainConfig.loadout.faceId);
+  return overrideFace ?? baseFace;
+};
+
+const maybeGainCaptainScrapFromRoll = (
+  combat: CombatState,
+  member: CombatantState,
+  face: ReturnType<typeof materializeDieFace>,
+): string | null => {
+  if (!isCaptainMember(combat, member)) {
+    return null;
+  }
+  if (combat.captainConfig?.loadout.passiveId !== 'mecanico_scrap') {
+    return null;
+  }
+  if (face.kind !== 'empty') {
+    return null;
+  }
+  const before = combat.captainRuntime.scrap;
+  combat.captainRuntime.scrap = Math.min(2, before + 1);
+  if (combat.captainRuntime.scrap <= before) {
+    return null;
+  }
+  return `${member.name} coletou Sucata (${combat.captainRuntime.scrap}/2).`;
+};
+
+const readRollSlotIndex = (rollId: string): number => {
+  const match = /_(\d+)$/.exec(rollId);
+  if (!match) {
+    return 0;
+  }
+  const parsed = Number.parseInt(match[1] ?? '0', 10);
+  return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+};
+
 const rollDice = (
   combat: CombatState,
   run: RunState,
@@ -171,7 +248,7 @@ const rollDice = (
         continue;
       }
       const faceIndex = rng.nextInt(6);
-      const face = materializeDieFace(die, faceIndex);
+      const face = maybeApplyCaptainFaceOverride(combat, member, die, index, faceIndex);
       rolls.push({
         rollId: `${member.id}_${combat.turn}_${index}`,
         ownerId: member.id,
@@ -181,6 +258,10 @@ const rollDice = (
         used: false,
         locked: false,
       });
+      const scrapLog = maybeGainCaptainScrapFromRoll(combat, member, face);
+      if (scrapLog) {
+        combat.log.unshift(scrapLog);
+      }
     }
   }
 
@@ -301,6 +382,10 @@ export const createCombatState = (
     log: ['Combate iniciado.'],
     enemyIntentCursor: {},
     classPassivesUsedThisTurn: {},
+    captainConfig: run.captainConfig,
+    captainRuntime: makeCaptainRuntimeState(),
+    rerolledRollIdsThisTurn: {},
+    freeRerollCharges: 0,
     enemyRollSnapshot: [],
     postCombatRewards: {
       gold: 0,
@@ -383,7 +468,7 @@ export const rerollOneDieWithFocus = (
     return { message: 'Toque ROLL para gerar os dados do turno.', events };
   }
 
-  if (combat.focus <= 0) {
+  if (combat.focus <= 0 && combat.freeRerollCharges <= 0) {
     return { message: 'Sem FOCO para rerrolar.', events };
   }
 
@@ -391,7 +476,9 @@ export const rerollOneDieWithFocus = (
     (preferredRollId
       ? combat.diceRolls.find((entry) => entry.rollId === preferredRollId && !entry.used)
       : undefined) ??
-    combat.diceRolls.find((entry) => !entry.used && !entry.locked);
+    combat.diceRolls.find(
+      (entry) => !entry.used && !entry.locked && !combat.rerolledRollIdsThisTurn[entry.rollId],
+    );
 
   if (!roll) {
     return { message: 'Nenhum dado disponivel para rerrolar.', events };
@@ -399,6 +486,10 @@ export const rerollOneDieWithFocus = (
 
   if (roll.locked) {
     return { message: 'Esse dado esta travado por MIRAR.', events };
+  }
+
+  if (combat.rerolledRollIdsThisTurn[roll.rollId]) {
+    return { message: 'Cada dado pode ser rerrolado apenas 1x por turno.', events };
   }
 
   const die = content.byId.dice[roll.dieId];
@@ -413,8 +504,19 @@ export const rerollOneDieWithFocus = (
     durationMs: 540,
   });
   roll.faceIndex = rng.nextInt(6);
-  roll.face = materializeDieFace(die, roll.faceIndex);
-  combat.focus -= 1;
+  const dieSlotIndex = readRollSlotIndex(roll.rollId);
+  const owner = combat.party.find((entry) => entry.id === roll.ownerId);
+  roll.face = owner
+    ? maybeApplyCaptainFaceOverride(combat, owner, die, dieSlotIndex, roll.faceIndex)
+    : materializeDieFace(die, roll.faceIndex);
+  const scrapLog = owner ? maybeGainCaptainScrapFromRoll(combat, owner, roll.face) : null;
+  const usedFreeCharge = combat.freeRerollCharges > 0;
+  if (usedFreeCharge) {
+    combat.freeRerollCharges = Math.max(0, combat.freeRerollCharges - 1);
+  } else {
+    combat.focus -= 1;
+  }
+  combat.rerolledRollIdsThisTurn[roll.rollId] = true;
   events.push({
     type: 'die_settle',
     rollId: roll.rollId,
@@ -422,14 +524,18 @@ export const rerollOneDieWithFocus = (
     faceId: roll.face.id,
     durationMs: 700,
   });
-  events.push({
-    type: 'focus',
-    ownerId: roll.ownerId,
-    delta: -1,
-  });
+  if (!usedFreeCharge) {
+    events.push({
+      type: 'focus',
+      ownerId: roll.ownerId,
+      delta: -1,
+    });
+  }
 
   return {
-    message: `Rerrolagem aplicada em ${roll.face.label}. FOCO restante: ${combat.focus}.`,
+    message: usedFreeCharge
+      ? `Rerrolagem gratuita aplicada em ${roll.face.label}. Cargas restantes: ${combat.freeRerollCharges}.${scrapLog ? ` ${scrapLog}` : ''}`
+      : `Rerrolagem aplicada em ${roll.face.label}. FOCO restante: ${combat.focus}.${scrapLog ? ` ${scrapLog}` : ''}`,
     events,
   };
 };
@@ -519,6 +625,10 @@ export const nextCombatTurn = (
 
   combat.turn += 1;
   combat.classPassivesUsedThisTurn = {};
+  combat.rerolledRollIdsThisTurn = {};
+  combat.freeRerollCharges = 0;
+  combat.captainRuntime.perTurnFlags = {};
+  combat.captainRuntime.lockBonusByRollId = {};
   applyTurnStartRelics(combat, run, content);
   combat.intents = buildEnemyIntents(combat, content, rng);
   combat.diceRolls = [];

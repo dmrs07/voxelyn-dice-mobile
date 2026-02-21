@@ -434,13 +434,13 @@ export const resolveEnemyTurn = (
   }
 
   for (const member of combat.party) {
-    const result = applyEndTurnStatusEffects(member);
+    const result = applyEndTurnStatusEffects(member, { combat, team: 'party' });
     logs.push(...result.logs);
     events.push(...result.events);
   }
 
   for (const enemy of combat.enemies) {
-    const result = applyEndTurnStatusEffects(enemy);
+    const result = applyEndTurnStatusEffects(enemy, { combat, team: 'enemy' });
     logs.push(...result.logs);
     events.push(...result.events);
   }

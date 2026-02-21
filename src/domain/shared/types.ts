@@ -16,6 +16,46 @@ export type ResourceId = (typeof RESOURCE_IDS)[number];
 export type CombatantVisualKey = string;
 export type DiceFaceVisualKey = string;
 export type EnemyDieTier = 'common' | 'elite' | 'boss';
+export type CaptainPassiveId =
+  | 'mecanico_scrap'
+  | 'mecanico_oficina_campo'
+  | 'mecanico_engrenagem_emergencia'
+  | 'aviadora_corrente_ar'
+  | 'aviadora_ataque_rasante'
+  | 'aviadora_chefe_sinalizacao'
+  | 'ocultista_cifra_voraz'
+  | 'ocultista_veneno_metodico'
+  | 'ocultista_ritual_curto'
+  | 'cacador_observador'
+  | 'cacador_tiro_limpo'
+  | 'cacador_de_marcas';
+export type CaptainFaceId =
+  | 'face_rebites_rapidos'
+  | 'face_sucata_util'
+  | 'face_evasiva'
+  | 'face_rajada_tatica'
+  | 'face_selo_vazio'
+  | 'face_ritual_rapido'
+  | 'face_armadilha_perfeita'
+  | 'face_mira_fria';
+
+export interface CaptainLoadoutSelection {
+  passiveId: CaptainPassiveId;
+  faceId: CaptainFaceId;
+}
+
+export interface CaptainConfig {
+  captainClassId: string;
+  loadout: CaptainLoadoutSelection;
+}
+
+export interface CaptainRuntimeState {
+  scrap: number;
+  ritualShortPending: boolean;
+  perTurnFlags: Record<string, boolean>;
+  perCombatFlags: Record<string, boolean>;
+  lockBonusByRollId: Record<string, number>;
+}
 
 export type CombatFxEvent =
   | {
@@ -411,6 +451,7 @@ export interface RunState {
   pendingRevealNodes: number;
   pendingShopNodes: number;
   pendingSkipDangerNodes: number;
+  captainConfig: CaptainConfig | null;
 }
 
 export interface RolledDie {
@@ -477,6 +518,10 @@ export interface CombatState {
   log: string[];
   enemyIntentCursor: Record<string, number>;
   classPassivesUsedThisTurn: Record<string, boolean>;
+  captainConfig: CaptainConfig | null;
+  captainRuntime: CaptainRuntimeState;
+  rerolledRollIdsThisTurn: Record<string, boolean>;
+  freeRerollCharges: number;
   enemyRollSnapshot?: Array<{
     enemyId: string;
     tier: EnemyDieTier;
@@ -554,6 +599,12 @@ export interface PartySelectionItem {
   classId: string;
   backgroundId: string;
   row: 'front' | 'back';
+}
+
+export interface DraftRosterCandidate {
+  classId: string;
+  backgroundId: string;
+  hireCost: number;
 }
 
 export interface ContentValidationIssue {

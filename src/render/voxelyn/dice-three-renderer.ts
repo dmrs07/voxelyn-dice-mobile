@@ -46,14 +46,14 @@ const placeholderFace = (sideIndex: number): DiceFaceDef => ({
 });
 
 const baseScaleForDiceCount = (count: number): number => {
-  if (count >= 10) return 0.7;
-  if (count >= 8) return 0.82;
-  if (count >= 6) return 0.92;
-  if (count >= 5) return 1;
-  return 1.08;
+  if (count >= 10) return 0.96;
+  if (count >= 8) return 1.05;
+  if (count >= 6) return 1.14;
+  if (count >= 5) return 1.22;
+  return 1.3;
 };
 
-const DIE_FACE_TEXTURE_SIZE = 128;
+const DIE_FACE_TEXTURE_SIZE = 192;
 
 export class DiceThreeRenderer {
   private canvas: HTMLCanvasElement | null = null;
@@ -470,7 +470,7 @@ export class DiceThreeRenderer {
     const cssWidth = Math.max(1, this.canvas.clientWidth || this.canvas.width);
     const cssHeight = Math.max(1, this.canvas.clientHeight || this.canvas.height);
 
-    const scale = this.qualityPreset === 'quality' ? 0.92 : 0.7;
+    const scale = this.qualityPreset === 'quality' ? 1 : 0.88;
     const internalWidth = Math.max(240, Math.floor(cssWidth * scale));
     const internalHeight = Math.max(140, Math.floor(cssHeight * scale));
 
@@ -586,7 +586,8 @@ export class DiceThreeRenderer {
       return;
     }
     const clamped = Math.max(1, diceCount);
-    this.cameraTargetRadius = clamped >= 10 ? 5.1 : clamped >= 8 ? 4.35 : clamped >= 6 ? 3.9 : clamped >= 4 ? 3.35 : 2.9;
+    this.cameraTargetRadius =
+      clamped >= 10 ? 4.16 : clamped >= 8 ? 3.72 : clamped >= 6 ? 3.36 : clamped >= 4 ? 3.02 : 2.64;
     const fovRad = (this.camera.fov * Math.PI) / 180;
     const height = this.cameraTargetRadius / Math.tan(fovRad * 0.5);
 

@@ -1,5 +1,14 @@
 import { materializeAllDieFaces } from '../domain/shared/dice-face-utils';
-import type { GameContent, PartySelectionItem, ProfileState } from '../domain/shared/types';
+import { getCaptainFaceDefinition } from '../domain/combat/captain-loadouts';
+import type {
+  CaptainFaceId,
+  CaptainLoadoutSelection,
+  CaptainPassiveId,
+  DraftRosterCandidate,
+  GameContent,
+  PartySelectionItem,
+  ProfileState,
+} from '../domain/shared/types';
 import { resolveCombatantAvatarSrc } from '../render/pixel/asset-loader';
 import { renderFaceTooltipPopover } from '../render/ui/dice-face-tooltip';
 import { renderDieFaceMiniSprite } from '../render/voxelyn/dice-renderer';
@@ -7,8 +16,13 @@ import { renderDieFaceMiniSprite } from '../render/voxelyn/dice-renderer';
 export interface MetaScreenHandlers {
   onStartRun: (seed: number) => void;
   onSetSeed: (seed: number) => void;
-  onDraftPartyChange: (party: PartySelectionItem[]) => void;
-  onSelectSlot: (slotIndex: number) => void;
+  onRegenerateRoster: () => void;
+  onFocusCandidate: (classId: string) => void;
+  onRecruitCandidate: (classId: string) => void;
+  onRemovePartyMember: (classId: string) => void;
+  onSetCaptain: (classId: string) => void;
+  onSetCaptainPassive: (passiveId: CaptainPassiveId) => void;
+  onSetCaptainFace: (faceId: CaptainFaceId) => void;
   onToggleFaceTooltip: (faceKey: string | null) => void;
   onResetProfile: () => void;
 }
@@ -16,8 +30,13 @@ export interface MetaScreenHandlers {
 export interface MetaScreenState {
   content: GameContent;
   profile: ProfileState;
+  rosterCandidates: DraftRosterCandidate[];
   draftParty: PartySelectionItem[];
-  selectedSlotIndex: number;
+  selectedCandidateClassId: string | null;
+  captainClassId: string | null;
+  captainLoadoutSelection: CaptainLoadoutSelection | null;
+  captainPassiveOptions: ReadonlyArray<{ id: CaptainPassiveId; label: string; description: string }>;
+  captainFaceOptions: ReadonlyArray<{ id: CaptainFaceId; label: string; description: string }>;
   openFaceTooltipKey: string | null;
   seed: number;
   hiringBudget: number;
@@ -34,89 +53,129 @@ export const renderMetaScreen = (
   state: MetaScreenState,
   handlers: MetaScreenHandlers,
 ): void => {
-  const unlockedClasses = state.content.classes.filter((entry) =>
-    state.profile.unlocks.classes.includes(entry.id),
-  );
-  const unlockedBackgrounds = state.content.backgrounds.filter((entry) =>
-    state.profile.unlocks.backgrounds.includes(entry.id),
-  );
+  const candidateByClass = new Map<string, DraftRosterCandidate>();
+  for (const candidate of state.rosterCandidates) {
+    candidateByClass.set(candidate.classId, candidate);
+  }
 
-  const clampedSelected = Math.max(0, Math.min(state.selectedSlotIndex, state.draftParty.length - 1));
-  const selectedSlot = state.draftParty[clampedSelected];
+  const selectedCandidate =
+    (state.selectedCandidateClassId ? candidateByClass.get(state.selectedCandidateClassId) : undefined) ??
+    state.rosterCandidates[0];
 
-  const usedClasses = new Set(
-    state.draftParty
-      .map((entry, index) => (index === clampedSelected ? null : entry.classId))
-      .filter((entry): entry is string => Boolean(entry)),
+  const selectedClassDef = selectedCandidate
+    ? state.content.byId.classes[selectedCandidate.classId]
+    : undefined;
+  const selectedBgDef = selectedCandidate
+    ? state.content.byId.backgrounds[selectedCandidate.backgroundId]
+    : undefined;
+
+  const captainClassId = state.captainClassId ?? state.draftParty[0]?.classId ?? null;
+  const captainSlot = captainClassId
+    ? state.draftParty.find((entry) => entry.classId === captainClassId) ?? null
+    : null;
+  const captainClass = captainSlot ? state.content.byId.classes[captainSlot.classId] : null;
+  const captainBackground = captainSlot ? state.content.byId.backgrounds[captainSlot.backgroundId] : null;
+  const captainAvatar = resolveCombatantAvatarSrc(
+    `party:${captainSlot?.classId ?? selectedCandidate?.classId ?? 'default'}`,
   );
+  const activePassiveId = state.captainLoadoutSelection?.passiveId ?? '';
+  const activeFaceId = state.captainLoadoutSelection?.faceId ?? '';
 
-  const rosterMarkup = state.draftParty
+  const partyClassSet = new Set(state.draftParty.map((entry) => entry.classId));
+
+  const teamMarkup = state.draftParty
     .map((slot, index) => {
       const classDef = state.content.byId.classes[slot.classId];
       const bgDef = state.content.byId.backgrounds[slot.backgroundId];
+      const isCaptain = slot.classId === captainClassId || index === 0;
       const avatar = resolveCombatantAvatarSrc(`party:${slot.classId}`);
-      const isCaptain = index === 0;
-      const cost = classDef?.hireCost ?? 0;
+      const classId = slot.classId;
       return `
-        <article class="roster-slot ${index === clampedSelected ? 'selected' : ''}" data-select-slot="${index}">
-          <img class="roster-avatar" src="${avatar}" alt="${classDef?.name ?? 'Classe'}" />
-          <div class="roster-meta">
-            <strong>${classDef?.name ?? slot.classId}${isCaptain ? ' · CAPITAO' : ''}</strong>
-            <small>${bgDef?.name ?? slot.backgroundId} · ${slot.row === 'front' ? 'Frente' : 'Tras'}</small>
-            <small>${isCaptain ? 'Custo: gratis' : `Custo: ${cost} ouro`}</small>
+        <article class="team-member-card ${isCaptain ? 'is-captain' : ''}">
+          <img class="team-member-portrait" src="${avatar}" alt="${classDef?.name ?? slot.classId}" />
+          <div class="team-member-meta">
+            <strong>${classDef?.name ?? slot.classId}</strong>
+            <small>${bgDef?.name ?? slot.backgroundId} · ${slot.row === 'front' ? 'FRONT' : 'BACK'}</small>
+            <small>${isCaptain ? 'Capitao · custo gratis' : `Hiring ${classDef?.hireCost ?? 0} ouro`}</small>
           </div>
-          <div class="roster-actions">
-            <button type="button" class="secondary-btn mini" data-select-slot="${index}">Editar</button>
-            <button type="button" class="secondary-btn mini danger" data-remove-slot="${index}" ${
-              state.draftParty.length <= 1 ? 'disabled' : ''
-            }>Remover</button>
+          <div class="team-member-actions">
+            <button type="button" class="secondary-btn mini" data-set-captain="${classId}" ${
+              isCaptain ? 'disabled' : ''
+            }>Definir capitao</button>
+            <button type="button" class="secondary-btn mini danger" data-remove-party-class="${classId}">Remover</button>
+          </div>
+          ${isCaptain ? '<span class="captain-badge">CAPITAO</span>' : ''}
+        </article>
+      `;
+    })
+    .join('');
+
+  const candidateMarkup = state.rosterCandidates
+    .map((candidate) => {
+      const classDef = state.content.byId.classes[candidate.classId];
+      const backgroundDef = state.content.byId.backgrounds[candidate.backgroundId];
+      const isFocused = selectedCandidate?.classId === candidate.classId;
+      const isRecruited = partyClassSet.has(candidate.classId);
+      const isCaptain = candidate.classId === captainClassId;
+      const avatar = resolveCombatantAvatarSrc(`party:${candidate.classId}`);
+      const cardClass = [
+        'candidate-card',
+        isFocused ? 'selected' : '',
+        isRecruited ? 'is-recruited' : '',
+        isCaptain ? 'is-captain' : '',
+      ]
+        .filter(Boolean)
+        .join(' ');
+      return `
+        <article class="${cardClass}" data-focus-candidate="${candidate.classId}">
+          <img class="candidate-avatar" src="${avatar}" alt="${classDef?.name ?? candidate.classId}" />
+          <div class="candidate-meta">
+            <strong>${classDef?.name ?? candidate.classId}</strong>
+            <small>${backgroundDef?.name ?? candidate.backgroundId}</small>
+            <small>${isRecruited ? 'No time' : `Hiring ${candidate.hireCost} ouro`}</small>
+          </div>
+          <div class="candidate-actions">
+            <button type="button" class="secondary-btn mini" data-focus-candidate="${candidate.classId}">Foco</button>
+            <button type="button" class="${isRecruited ? 'secondary-btn mini danger' : 'primary-btn mini'}" data-toggle-recruit="${candidate.classId}">
+              ${isRecruited ? 'Remover' : 'Recrutar'}
+            </button>
           </div>
         </article>
       `;
     })
     .join('');
 
-  const classCardsMarkup = unlockedClasses
-    .map((entry) => {
-      const avatar = resolveCombatantAvatarSrc(`party:${entry.id}`);
-      const isUsed = usedClasses.has(entry.id);
-      const isSelected = selectedSlot?.classId === entry.id;
-      const cost = entry.hireCost ?? 0;
-      return `
-        <button type="button" class="class-pick-card ${isSelected ? 'selected' : ''}" data-pick-class="${entry.id}" ${
-          isUsed && !isSelected ? 'disabled' : ''
-        }>
-          <img class="class-avatar" src="${avatar}" alt="${entry.name}" />
-          <strong>${entry.name}</strong>
-          <small>${entry.verb}</small>
-          <small>${clampedSelected === 0 ? 'Gratis (capitao)' : `Custo ${cost} ouro`}</small>
-        </button>
-      `;
-    })
-    .join('');
-
-  const bgOptions = unlockedBackgrounds
-    .map(
-      (entry) =>
-        `<option value="${entry.id}" ${
-          selectedSlot?.backgroundId === entry.id ? 'selected' : ''
-        }>${entry.name} (${entry.perk})</option>`,
-    )
-    .join('');
-
-  const selectedClassDef = selectedSlot ? state.content.byId.classes[selectedSlot.classId] : undefined;
-  const selectedBgDef = selectedSlot ? state.content.byId.backgrounds[selectedSlot.backgroundId] : undefined;
   const classDie = selectedClassDef?.starterDiceIds[0]
     ? state.content.byId.dice[selectedClassDef.starterDiceIds[0]]
     : undefined;
   const bgDie = selectedBgDef ? state.content.byId.dice[selectedBgDef.starterDieId] : undefined;
 
   const classFaces = classDie ? materializeAllDieFaces(classDie) : [];
+  const isFocusedCaptain = Boolean(
+    selectedCandidate?.classId &&
+      captainClassId &&
+      selectedCandidate.classId === captainClassId &&
+      state.captainLoadoutSelection,
+  );
+  if (classDie && isFocusedCaptain && state.captainLoadoutSelection) {
+    const emptyIndex = classDie.emptyFaceIndices?.[0];
+    const captainFace = getCaptainFaceDefinition(state.captainLoadoutSelection.faceId);
+    if (
+      captainFace &&
+      Number.isInteger(emptyIndex) &&
+      typeof emptyIndex === 'number' &&
+      emptyIndex >= 0 &&
+      emptyIndex < classFaces.length &&
+      classFaces[emptyIndex]?.kind === 'empty'
+    ) {
+      classFaces[emptyIndex] = captainFace;
+    }
+  }
   const bgFaces = bgDie ? materializeAllDieFaces(bgDie) : [];
 
   const classFaceMarkup = classFaces
     .map((face, index) => {
-      const key = `class_${index}`;
+      const key = `class_${selectedCandidate?.classId ?? 'none'}_${index}`;
       return `
         <button type="button" class="face-preview-card ${face.kind === 'empty' ? 'empty' : 'filled'}" data-face-key="${key}">
           <img src="${renderDieFaceMiniSprite(face)}" alt="${face.label}" />
@@ -129,7 +188,7 @@ export const renderMetaScreen = (
 
   const bgFaceMarkup = bgFaces
     .map((face, index) => {
-      const key = `bg_${index}`;
+      const key = `bg_${selectedCandidate?.classId ?? 'none'}_${index}`;
       return `
         <button type="button" class="face-preview-card ${face.kind === 'empty' ? 'empty' : 'filled'}" data-face-key="${key}">
           <img src="${renderDieFaceMiniSprite(face)}" alt="${face.label}" />
@@ -141,69 +200,112 @@ export const renderMetaScreen = (
     .join('');
 
   root.innerHTML = `
-    <main class="screen meta-screen">
-      <header class="title-block">
-        <h1>Voxelyn Dice Expedition</h1>
-        <p class="subtitle">Monte sua trip, contrate membros e visualize cada face antes da run.</p>
+    <main class="screen meta-screen recruitment-screen">
+      <header class="title-block recruitment-header">
+        <h1>Recrutamento da Expedicao</h1>
+        <p class="subtitle">Escolha o capitao, monte a trip e revise as faces antes de iniciar a run.</p>
       </header>
 
-      <section class="meta-stats">
+      <section class="meta-stats recruitment-stats">
         <div><span>Runs</span><strong>${state.profile.runsPlayed}</strong></div>
         <div><span>Vitorias</span><strong>${state.profile.runsWon}</strong></div>
         <div><span>Eventos vistos</span><strong>${state.profile.compendium.eventsSeen.length}</strong></div>
         <div><span>Reliquias vistas</span><strong>${state.profile.compendium.relicsSeen.length}</strong></div>
       </section>
 
-      <section class="hiring-summary">
-        <h2>Hiring</h2>
+      <section class="recruitment-hero">
+        <div class="captain-stage">
+          <div class="captain-scene">
+            <img class="captain-portrait" src="${captainAvatar}" alt="${captainClass?.name ?? 'Candidato'}" />
+            <div class="captain-table-map"></div>
+          </div>
+          <div class="captain-meta">
+            <h2>Capitao da Missao</h2>
+            ${
+              captainSlot && captainClass && captainBackground
+                ? `
+                <p><strong>${captainClass.name}</strong> · ${captainBackground.name}</p>
+                <p class="subtitle">Passiva: ${captainClass.passive}</p>
+              `
+                : '<p class="subtitle">Recrute integrantes e defina um capitao para liderar a expedicao.</p>'
+            }
+          </div>
+        </div>
+        <div class="captain-loadout-panel ${captainSlot ? '' : 'is-disabled'}">
+          <h3>Loadout do Capitao</h3>
+          ${
+            captainSlot
+              ? `
+              <label>
+                Passiva de Capitao
+                <select data-captain-passive>
+                  ${state.captainPassiveOptions
+                    .map(
+                      (entry) =>
+                        `<option value="${entry.id}" ${entry.id === activePassiveId ? 'selected' : ''}>${entry.label}</option>`,
+                    )
+                    .join('')}
+                </select>
+              </label>
+              <p class="subtitle captain-loadout-description">${
+                state.captainPassiveOptions.find((entry) => entry.id === activePassiveId)?.description ??
+                'Selecione a passiva tematica.'
+              }</p>
+              <label>
+                Face Especial
+                <select data-captain-face>
+                  ${state.captainFaceOptions
+                    .map(
+                      (entry) =>
+                        `<option value="${entry.id}" ${entry.id === activeFaceId ? 'selected' : ''}>${entry.label}</option>`,
+                    )
+                    .join('')}
+                </select>
+              </label>
+              <p class="subtitle captain-loadout-description">${
+                state.captainFaceOptions.find((entry) => entry.id === activeFaceId)?.description ??
+                'Selecione a face especial.'
+              }</p>
+            `
+              : '<p class="subtitle">Defina um capitao para editar passiva e face especial.</p>'
+          }
+        </div>
+      </section>
+
+      <section class="recruitment-funds">
+        <h2>Fundos de Recrutamento</h2>
         <p>Orcamento: <strong>${state.hiringBudget}</strong> ouro</p>
         <p>Gasto: <strong>${state.hiringSpent}</strong> ouro</p>
         <p>Restante inicial da run: <strong>${state.hiringRemaining}</strong> ouro</p>
+        <button type="button" class="secondary-btn" id="regenerate-roster-btn">Novo roster</button>
       </section>
 
-      <section class="roster-grid">
-        <h2>Roster da expedicao</h2>
-        <div class="roster-list">${rosterMarkup}</div>
-        <button type="button" class="secondary-btn" id="add-slot-btn" ${
-          state.draftParty.length >= 4 ? 'disabled' : ''
-        }>Adicionar integrante</button>
+      <section class="team-strip">
+        <h2>Time Recrutado</h2>
+        <div class="team-member-list">${teamMarkup || '<p>Nenhum integrante recrutado.</p>'}</div>
       </section>
 
-      <section class="class-pick-grid">
-        <h2>Classe (sem repeticao)</h2>
-        <div class="class-pick-list">${classCardsMarkup}</div>
+      <section class="candidate-grid">
+        <h2>Candidatos</h2>
+        <div class="candidate-list">${candidateMarkup || '<p>Sem candidatos disponiveis.</p>'}</div>
       </section>
 
-      <section class="slot-config">
-        <h2>Configuracao do integrante</h2>
+      <section class="candidate-detail">
+        <h2>Preview de Faces</h2>
         ${
-          selectedSlot
+          selectedClassDef && selectedBgDef
             ? `
-              <label>
-                Background
-                <select id="slot-background">${bgOptions}</select>
-              </label>
-              <label>
-                Linha
-                <select id="slot-row">
-                  <option value="front" ${selectedSlot.row === 'front' ? 'selected' : ''}>Frente</option>
-                  <option value="back" ${selectedSlot.row === 'back' ? 'selected' : ''}>Tras</option>
-                </select>
-              </label>
+            <p class="subtitle"><strong>${selectedClassDef.name}</strong> + ${selectedBgDef.name}</p>
+            <h3>Dado de classe</h3>
+            <div class="face-preview-list dice-preview-grid">${classFaceMarkup || '<p>Sem dado de classe.</p>'}</div>
+            <h3>Dado de background</h3>
+            <div class="face-preview-list dice-preview-grid">${bgFaceMarkup || '<p>Sem dado de background.</p>'}</div>
             `
-            : '<p>Nenhum integrante selecionado.</p>'
+            : '<p>Selecione um candidato para ver o preview completo de faces.</p>'
         }
       </section>
 
-      <section class="face-preview-grid">
-        <h2>Preview de faces</h2>
-        <h3>Dado de classe</h3>
-        <div class="face-preview-list">${classFaceMarkup || '<p>Sem dado de classe.</p>'}</div>
-        <h3>Dado de background</h3>
-        <div class="face-preview-list">${bgFaceMarkup || '<p>Sem dado de background.</p>'}</div>
-      </section>
-
-      <section class="meta-form">
+      <section class="meta-form recruitment-actions">
         <label>
           Seed da run
           <input id="meta-seed-input" type="number" value="${safeNumber(state.seed)}" min="1" max="2147483647" />
@@ -219,86 +321,62 @@ export const renderMetaScreen = (
     </main>
   `;
 
-  const addSlotBtn = root.querySelector<HTMLButtonElement>('#add-slot-btn');
-  addSlotBtn?.addEventListener('click', () => {
-    if (state.draftParty.length >= 4) {
-      return;
-    }
-    const defaultClass = unlockedClasses.find((entry) =>
-      !state.draftParty.some((slot) => slot.classId === entry.id),
-    ) ?? unlockedClasses[0];
-    const defaultBg = unlockedBackgrounds[0];
-    if (!defaultClass || !defaultBg) {
-      return;
-    }
-    handlers.onDraftPartyChange([
-      ...state.draftParty,
-      { classId: defaultClass.id, backgroundId: defaultBg.id, row: state.draftParty.length % 2 === 0 ? 'front' : 'back' },
-    ]);
-    handlers.onSelectSlot(state.draftParty.length);
+  root.querySelector<HTMLButtonElement>('#regenerate-roster-btn')?.addEventListener('click', () => {
+    handlers.onRegenerateRoster();
   });
 
-  root.querySelectorAll<HTMLElement>('[data-select-slot]').forEach((el) => {
+  root.querySelectorAll<HTMLElement>('[data-focus-candidate]').forEach((el) => {
     el.addEventListener('click', () => {
-      const raw = el.dataset.selectSlot;
-      const index = raw ? Number(raw) : NaN;
-      if (!Number.isFinite(index)) {
-        return;
-      }
-      handlers.onSelectSlot(index);
-    });
-  });
-
-  root.querySelectorAll<HTMLButtonElement>('[data-remove-slot]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const raw = button.dataset.removeSlot;
-      const index = raw ? Number(raw) : NaN;
-      if (!Number.isFinite(index) || state.draftParty.length <= 1) {
-        return;
-      }
-      const next = state.draftParty.filter((_, slotIndex) => slotIndex !== index);
-      handlers.onDraftPartyChange(next);
-      handlers.onSelectSlot(Math.max(0, Math.min(next.length - 1, clampedSelected)));
-    });
-  });
-
-  root.querySelectorAll<HTMLButtonElement>('[data-pick-class]').forEach((button) => {
-    button.addEventListener('click', () => {
-      if (!selectedSlot) {
-        return;
-      }
-      const classId = button.dataset.pickClass;
+      const classId = el.dataset.focusCandidate;
       if (!classId) {
         return;
       }
-      const next = state.draftParty.map((slot, index) =>
-        index === clampedSelected ? { ...slot, classId } : slot,
-      );
-      handlers.onDraftPartyChange(next);
+      handlers.onFocusCandidate(classId);
     });
   });
 
-  root.querySelector<HTMLSelectElement>('#slot-background')?.addEventListener('change', (event) => {
-    const target = event.currentTarget as HTMLSelectElement;
-    if (!selectedSlot) {
-      return;
-    }
-    const next = state.draftParty.map((slot, index) =>
-      index === clampedSelected ? { ...slot, backgroundId: target.value } : slot,
-    );
-    handlers.onDraftPartyChange(next);
+  root.querySelectorAll<HTMLButtonElement>('[data-toggle-recruit]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const classId = button.dataset.toggleRecruit;
+      if (!classId) {
+        return;
+      }
+      if (partyClassSet.has(classId)) {
+        handlers.onRemovePartyMember(classId);
+      } else {
+        handlers.onRecruitCandidate(classId);
+      }
+    });
   });
 
-  root.querySelector<HTMLSelectElement>('#slot-row')?.addEventListener('change', (event) => {
-    const target = event.currentTarget as HTMLSelectElement;
-    if (!selectedSlot) {
-      return;
-    }
-    const row: PartySelectionItem['row'] = target.value === 'back' ? 'back' : 'front';
-    const next = state.draftParty.map((slot, index) =>
-      index === clampedSelected ? { ...slot, row } : slot,
-    );
-    handlers.onDraftPartyChange(next);
+  root.querySelectorAll<HTMLButtonElement>('[data-remove-party-class]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const classId = button.dataset.removePartyClass;
+      if (!classId) {
+        return;
+      }
+      handlers.onRemovePartyMember(classId);
+    });
+  });
+
+  root.querySelectorAll<HTMLButtonElement>('[data-set-captain]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const classId = button.dataset.setCaptain;
+      if (!classId) {
+        return;
+      }
+      handlers.onSetCaptain(classId);
+    });
+  });
+
+  root.querySelector<HTMLSelectElement>('[data-captain-passive]')?.addEventListener('change', (event) => {
+    const target = event.target as HTMLSelectElement;
+    handlers.onSetCaptainPassive(target.value as CaptainPassiveId);
+  });
+
+  root.querySelector<HTMLSelectElement>('[data-captain-face]')?.addEventListener('change', (event) => {
+    const target = event.target as HTMLSelectElement;
+    handlers.onSetCaptainFace(target.value as CaptainFaceId);
   });
 
   root.querySelectorAll<HTMLButtonElement>('[data-face-key]').forEach((button) => {

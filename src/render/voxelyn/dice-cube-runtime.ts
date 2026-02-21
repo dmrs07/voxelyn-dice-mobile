@@ -89,6 +89,14 @@ const PERF_DEGRADE_THRESHOLD_MS = 24;
 const RENDERER_INIT_TIMEOUT_MS = 1200;
 const ROLL_STUCK_TIMEOUT_MS = 1800;
 const SETTLE_STUCK_TIMEOUT_MS = 2200;
+const SETTLED_TABLE_Y = -0.92;
+const SETTLED_MIN_SPACING = 1.12;
+const SETTLED_LAYOUT_EDGE = 1.92;
+const SETTLED_LAYOUT_ITERATIONS = 9;
+const SETTLED_GRID_LERP = 0.4;
+const LONG_PRESS_MS = 360;
+const LONG_PRESS_CANCEL_MOVE_PX = 18;
+const HOVER_REEMIT_DELTA_PX = 6;
 
 const clamp01 = (value: number): number => Math.max(0, Math.min(1, value));
 
@@ -209,6 +217,24 @@ const idlePositionForIndex = (index: number): DiceVector3 => ({
   z: ((index % 2) - 0.5) * 0.42,
 });
 
+const settledSlotForIndex = (
+  index: number,
+  count: number,
+): { x: number; z: number } => {
+  const clampedCount = Math.max(1, count);
+  const cols = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(clampedCount))));
+  const rows = Math.max(1, Math.ceil(clampedCount / cols));
+  const col = index % cols;
+  const row = Math.floor(index / cols);
+  const spacing = clampedCount >= 8 ? 0.92 : clampedCount >= 6 ? 0.98 : 1.06;
+  const x = (col - (cols - 1) * 0.5) * spacing;
+  const z = (row - (rows - 1) * 0.5) * spacing;
+  return {
+    x: Math.max(-SETTLED_LAYOUT_EDGE, Math.min(SETTLED_LAYOUT_EDGE, x)),
+    z: Math.max(-SETTLED_LAYOUT_EDGE, Math.min(SETTLED_LAYOUT_EDGE, z)),
+  };
+};
+
 export class DiceCubeRuntime {
   private root: HTMLElement | null = null;
 
@@ -282,6 +308,20 @@ export class DiceCubeRuntime {
 
   private interactionSuspended = false;
 
+  private longPressTimerId: number | null = null;
+
+  private longPressPointerId: number | null = null;
+
+  private longPressRollId: string | null = null;
+
+  private longPressClientX = 0;
+
+  private longPressClientY = 0;
+
+  private longPressTriggered = false;
+
+  private lastHoverEmit: { rollId: string; x: number; y: number } | null = null;
+
   public getMode(): DiceCubeMode {
     return this.mode;
   }
@@ -323,6 +363,9 @@ export class DiceCubeRuntime {
     this.interactionSuspended = suspended;
     if (suspended) {
       this.hoverRollId = null;
+      this.lastHoverEmit = null;
+      this.clearLongPressState();
+      this.emitTooltipClearEvent();
       this.emitTrayEvent('dice-tray:clear', undefined);
     }
     this.refreshInteractionState();
@@ -361,6 +404,8 @@ export class DiceCubeRuntime {
     this.pendingRollRequests.clear();
     this.pendingSettleRequests.clear();
     this.interactionSuspended = false;
+    this.clearLongPressState();
+    this.lastHoverEmit = null;
     this.rendererInitStartedAtMs = 0;
     this.rendererInitToken += 1;
     this.rendererInitPromise = null;
@@ -534,6 +579,7 @@ export class DiceCubeRuntime {
     }
     this.cleanupExpiredTransientRolls();
     this.refreshInteractionState();
+    this.applyPostSettleSpread();
     this.reconcileSelectedRoll();
     this.simMs = Math.max(0, performance.now() - frameStart);
 
@@ -782,7 +828,7 @@ export class DiceCubeRuntime {
     state.faceIndex = roll.faceIndex;
     state.phase = 'rolling';
     state.inactive = false;
-    state.rollUntilMs = this.clockMs + Math.max(120, durationMs);
+    state.rollUntilMs = this.clockMs + Math.max(240, durationMs + 80);
     state.queuedSettle = null;
     state.euler = {
       x: rand() * Math.PI * 2,
@@ -790,9 +836,9 @@ export class DiceCubeRuntime {
       z: rand() * Math.PI * 2,
     };
     state.angularVel = {
-      x: (rand() * 2 - 1) * 8.6,
-      y: (rand() * 2 - 1) * 8.6,
-      z: (rand() * 2 - 1) * 8.6,
+      x: (rand() * 2 - 1) * 12.2,
+      y: (rand() * 2 - 1) * 12.2,
+      z: (rand() * 2 - 1) * 12.2,
     };
     state.rotation = quatFromEuler(state.euler.x, state.euler.y, state.euler.z);
     state.settleFromRotation = state.rotation;
@@ -805,12 +851,16 @@ export class DiceCubeRuntime {
     if (this.interactionReady) {
       this.interactionReady = false;
       this.hoverRollId = null;
+      this.lastHoverEmit = null;
+      this.emitTooltipClearEvent();
       this.emitTrayEvent('dice-tray:clear', undefined);
     }
 
     if (this.selectedRollId === rollId || this.hoverRollId === rollId) {
+      this.emitTooltipClearEvent();
       this.emitTrayEvent('dice-tray:clear', undefined);
       this.hoverRollId = null;
+      this.lastHoverEmit = null;
     }
 
     this.states.set(rollId, state);
@@ -824,7 +874,7 @@ export class DiceCubeRuntime {
 
     state.queuedSettle = {
       faceId,
-      durationMs: Math.max(140, durationMs),
+      durationMs: Math.max(220, durationMs),
     };
 
     if (this.clockMs >= state.rollUntilMs) {
@@ -862,13 +912,14 @@ export class DiceCubeRuntime {
     state.settleDeadlineMs = state.settleStartMs + queued.durationMs + 320;
     state.alignFromRotation = state.rotation;
     state.alignStartMs = state.settleStartMs;
-    state.alignDurationMs = Math.max(140, Math.floor(queued.durationMs * 0.36));
+    state.alignDurationMs = Math.max(220, Math.floor(queued.durationMs * 0.62));
 
     if (this.mode === 'three_rapier' && this.rapierReady) {
       this.rapier.requestSettle(
         state.rollId,
         state.targetRotation as RapierQuat,
         state.settleDeadlineMs,
+        this.clockMs,
       );
     }
   }
@@ -892,9 +943,9 @@ export class DiceCubeRuntime {
         state.euler.x += state.angularVel.x * dtSeconds;
         state.euler.y += state.angularVel.y * dtSeconds;
         state.euler.z += state.angularVel.z * dtSeconds;
-        state.angularVel.x *= 0.988;
-        state.angularVel.y *= 0.988;
-        state.angularVel.z *= 0.988;
+        state.angularVel.x *= 0.992;
+        state.angularVel.y *= 0.992;
+        state.angularVel.z *= 0.992;
         state.rotation = quatFromEuler(state.euler.x, state.euler.y, state.euler.z);
       }
       state.inactive = false;
@@ -926,12 +977,12 @@ export class DiceCubeRuntime {
           state.phase = 'aligning';
           state.alignFromRotation = state.rotation;
           state.alignStartMs = this.clockMs;
-          state.alignDurationMs = Math.max(120, Math.min(280, state.alignDurationMs));
+          state.alignDurationMs = Math.max(220, Math.min(420, state.alignDurationMs));
         } else if (this.clockMs >= state.settleDeadlineMs + SETTLE_STUCK_TIMEOUT_MS) {
           state.phase = 'aligning';
           state.alignFromRotation = state.rotation;
           state.alignStartMs = this.clockMs;
-          state.alignDurationMs = 140;
+          state.alignDurationMs = 260;
         }
         return;
       }
@@ -988,6 +1039,101 @@ export class DiceCubeRuntime {
       w: pose.rotation.w,
     });
     state.inactive = Math.abs(state.position.x) > 2.18 || Math.abs(state.position.z) > 2.18;
+  }
+
+  private applyPostSettleSpread(): void {
+    if (this.mode === 'sprite_2d' || !this.interactionReady) {
+      return;
+    }
+
+    const settledStates: DieVisualState[] = [];
+    for (const rollId of this.rollOrder) {
+      const state = this.states.get(rollId);
+      if (!state) {
+        continue;
+      }
+      if (state.phase === 'rolling' || state.phase === 'settling') {
+        return;
+      }
+      settledStates.push(state);
+    }
+
+    if (settledStates.length === 0) {
+      return;
+    }
+
+    for (const state of settledStates) {
+      state.position.y = SETTLED_TABLE_Y;
+      state.position.x = Math.max(-SETTLED_LAYOUT_EDGE, Math.min(SETTLED_LAYOUT_EDGE, state.position.x));
+      state.position.z = Math.max(-SETTLED_LAYOUT_EDGE, Math.min(SETTLED_LAYOUT_EDGE, state.position.z));
+      state.inactive = false;
+    }
+
+    if (settledStates.length < 2) {
+      return;
+    }
+
+    const minDistSq = SETTLED_MIN_SPACING * SETTLED_MIN_SPACING;
+    const gridLerp = Math.min(
+      0.56,
+      SETTLED_GRID_LERP + Math.max(0, settledStates.length - 5) * 0.03,
+    );
+
+    for (let iteration = 0; iteration < SETTLED_LAYOUT_ITERATIONS; iteration += 1) {
+      let moved = false;
+
+      for (let index = 0; index < settledStates.length; index += 1) {
+        const state = settledStates[index] as DieVisualState;
+        const slot = settledSlotForIndex(index, settledStates.length);
+        state.position.x += (slot.x - state.position.x) * gridLerp;
+        state.position.z += (slot.z - state.position.z) * gridLerp;
+      }
+
+      for (let i = 0; i < settledStates.length; i += 1) {
+        const a = settledStates[i] as DieVisualState;
+        for (let j = i + 1; j < settledStates.length; j += 1) {
+          const b = settledStates[j] as DieVisualState;
+          let dx = b.position.x - a.position.x;
+          let dz = b.position.z - a.position.z;
+          let distSq = dx * dx + dz * dz;
+
+          if (distSq >= minDistSq) {
+            continue;
+          }
+
+          if (distSq < 0.00001) {
+            const rand = mulberry32(hashString(`${a.rollId}:${b.rollId}:${iteration}`));
+            dx = rand() * 2 - 1;
+            dz = rand() * 2 - 1;
+            distSq = Math.max(0.0001, dx * dx + dz * dz);
+          }
+
+          const dist = Math.sqrt(distSq);
+          const nx = dx / dist;
+          const nz = dz / dist;
+          const overlap = SETTLED_MIN_SPACING - dist;
+          if (overlap <= 0) {
+            continue;
+          }
+
+          const push = overlap * 0.5 + 0.0005;
+          a.position.x -= nx * push;
+          a.position.z -= nz * push;
+          b.position.x += nx * push;
+          b.position.z += nz * push;
+          moved = true;
+        }
+      }
+
+      for (const state of settledStates) {
+        state.position.x = Math.max(-SETTLED_LAYOUT_EDGE, Math.min(SETTLED_LAYOUT_EDGE, state.position.x));
+        state.position.z = Math.max(-SETTLED_LAYOUT_EDGE, Math.min(SETTLED_LAYOUT_EDGE, state.position.z));
+      }
+
+      if (!moved) {
+        break;
+      }
+    }
   }
 
   private renderCurrentMode(): void {
@@ -1107,17 +1253,25 @@ export class DiceCubeRuntime {
     this.unbindPointerHandlers(this.pointerBoundCanvas);
 
     canvas.addEventListener('pointermove', this.onPointerMove);
-    canvas.addEventListener('click', this.onPointerTap);
+    canvas.addEventListener('pointerdown', this.onPointerDown);
+    canvas.addEventListener('pointerup', this.onPointerUp);
+    canvas.addEventListener('pointercancel', this.onPointerCancel);
+    canvas.addEventListener('pointerleave', this.onPointerLeave);
     this.pointerBoundCanvas = canvas;
   }
 
   private unbindPointerHandlers(canvas: HTMLCanvasElement | null): void {
     if (!canvas) {
+      this.clearLongPressState();
       this.pointerBoundCanvas = null;
       return;
     }
     canvas.removeEventListener('pointermove', this.onPointerMove);
-    canvas.removeEventListener('click', this.onPointerTap);
+    canvas.removeEventListener('pointerdown', this.onPointerDown);
+    canvas.removeEventListener('pointerup', this.onPointerUp);
+    canvas.removeEventListener('pointercancel', this.onPointerCancel);
+    canvas.removeEventListener('pointerleave', this.onPointerLeave);
+    this.clearLongPressState();
     if (this.pointerBoundCanvas === canvas) {
       this.pointerBoundCanvas = null;
     }
@@ -1125,38 +1279,125 @@ export class DiceCubeRuntime {
 
   private readonly onPointerMove = (event: PointerEvent): void => {
     if (event.pointerType !== 'mouse') {
+      if (this.longPressTimerId !== null && event.pointerId === this.longPressPointerId) {
+        const movedX = Math.abs(event.clientX - this.longPressClientX);
+        const movedY = Math.abs(event.clientY - this.longPressClientY);
+        if (movedX > LONG_PRESS_CANCEL_MOVE_PX || movedY > LONG_PRESS_CANCEL_MOVE_PX) {
+          this.clearLongPressState();
+        }
+      }
       return;
     }
     if (!this.interactionReady) {
+      if (this.hoverRollId !== null) {
+        this.hoverRollId = null;
+        this.lastHoverEmit = null;
+        this.emitTooltipClearEvent();
+      }
       return;
     }
 
     const picked = this.pickInteractiveRollAtEvent(event);
-    if (picked === this.hoverRollId) {
+    if (!picked) {
+      if (this.hoverRollId !== null) {
+        this.hoverRollId = null;
+        this.lastHoverEmit = null;
+        this.emitTooltipClearEvent();
+      }
       return;
     }
 
+    const last = this.lastHoverEmit;
+    const shouldEmit =
+      picked !== this.hoverRollId ||
+      !last ||
+      last.rollId !== picked ||
+      Math.abs(last.x - event.clientX) >= HOVER_REEMIT_DELTA_PX ||
+      Math.abs(last.y - event.clientY) >= HOVER_REEMIT_DELTA_PX;
+
     this.hoverRollId = picked;
-    if (!picked) {
+    if (!shouldEmit) {
       return;
     }
     this.emitTooltipEvent(picked, event.clientX, event.clientY, 'hover');
+    this.lastHoverEmit = { rollId: picked, x: event.clientX, y: event.clientY };
   };
 
-  private readonly onPointerTap = (event: MouseEvent): void => {
+  private readonly onPointerDown = (event: PointerEvent): void => {
+    if (event.pointerType === 'mouse') {
+      return;
+    }
     if (!this.interactionReady) {
-      this.emitTrayEvent('dice-tray:clear', undefined);
+      return;
+    }
+    const picked = this.pickInteractiveRollAtEvent(event);
+    if (!picked) {
+      return;
+    }
+
+    this.clearLongPressState();
+    this.longPressPointerId = event.pointerId;
+    this.longPressRollId = picked;
+    this.longPressClientX = event.clientX;
+    this.longPressClientY = event.clientY;
+    this.longPressTriggered = false;
+    this.longPressTimerId = window.setTimeout(() => {
+      if (!this.interactionReady || !this.longPressRollId) {
+        this.clearLongPressState();
+        return;
+      }
+      const rollId = this.longPressRollId;
+      if (!this.isRollInteractive(rollId)) {
+        this.clearLongPressState();
+        return;
+      }
+      this.longPressTriggered = true;
+      this.hoverRollId = rollId;
+      this.emitTooltipEvent(rollId, this.longPressClientX, this.longPressClientY, 'tap');
+    }, LONG_PRESS_MS);
+  };
+
+  private readonly onPointerUp = (event: PointerEvent): void => {
+    if (event.pointerType !== 'mouse' && event.pointerId === this.longPressPointerId) {
+      const longPressWasTriggered = this.longPressTriggered;
+      this.clearLongPressState();
+      if (longPressWasTriggered) {
+        return;
+      }
+    }
+
+    if (!this.interactionReady) {
+      this.emitTooltipClearEvent();
       return;
     }
 
     const picked = this.pickInteractiveRollAtEvent(event);
     if (!picked) {
-      this.emitTrayEvent('dice-tray:clear', undefined);
+      this.emitTooltipClearEvent();
       return;
     }
 
     this.emitTrayEvent<DiceTraySelectDetail>('dice-tray:select', { rollId: picked });
-    this.emitTooltipEvent(picked, event.clientX, event.clientY, 'tap');
+    if (event.pointerType === 'mouse') {
+      this.emitTooltipEvent(picked, event.clientX, event.clientY, 'tap');
+      this.lastHoverEmit = { rollId: picked, x: event.clientX, y: event.clientY };
+    }
+  };
+
+  private readonly onPointerCancel = (): void => {
+    this.clearLongPressState();
+  };
+
+  private readonly onPointerLeave = (event: PointerEvent): void => {
+    if (event.pointerType !== 'mouse') {
+      this.clearLongPressState();
+      return;
+    }
+    if (this.hoverRollId !== null) {
+      this.hoverRollId = null;
+      this.lastHoverEmit = null;
+      this.emitTooltipClearEvent();
+    }
   };
 
   private emitTooltipEvent(
@@ -1183,6 +1424,10 @@ export class DiceCubeRuntime {
       y,
       interaction,
     });
+  }
+
+  private emitTooltipClearEvent(): void {
+    this.emitTrayEvent('dice-tray:tooltip-clear', undefined);
   }
 
   private pickInteractiveRollAtEvent(event: MouseEvent | PointerEvent): string | null {
@@ -1318,6 +1563,9 @@ export class DiceCubeRuntime {
     }
 
     this.hoverRollId = null;
+    this.lastHoverEmit = null;
+    this.clearLongPressState();
+    this.emitTooltipClearEvent();
     this.emitTrayEvent('dice-tray:clear', undefined);
   }
 
@@ -1349,6 +1597,7 @@ export class DiceCubeRuntime {
     }
     this.selectedRollId = null;
     this.renderer.setSelectedRollId(null);
+    this.emitTooltipClearEvent();
     this.emitTrayEvent('dice-tray:clear', undefined);
   }
 
@@ -1399,5 +1648,15 @@ export class DiceCubeRuntime {
       .finally(() => {
         this.rapierInitPromise = null;
       });
+  }
+
+  private clearLongPressState(): void {
+    if (this.longPressTimerId !== null) {
+      window.clearTimeout(this.longPressTimerId);
+      this.longPressTimerId = null;
+    }
+    this.longPressPointerId = null;
+    this.longPressRollId = null;
+    this.longPressTriggered = false;
   }
 }

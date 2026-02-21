@@ -28,6 +28,7 @@ const TRAY_HALF_X = 1.92;
 const TRAY_HALF_Z = 1.92;
 const TRAY_WALL_CENTER = 2.12;
 const TRAY_WALL_HALF = 2.12;
+const SETTLE_BLEND_WINDOW_MS = 340;
 
 const mulberry32 = (seed: number): (() => number) => {
   let t = seed >>> 0;
@@ -37,6 +38,50 @@ const mulberry32 = (seed: number): (() => number) => {
     r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
     return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
   };
+};
+
+const normalizeQuat = (q: QuatLike): QuatLike => {
+  const lenSq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+  if (lenSq <= 0) {
+    return { x: 0, y: 0, z: 0, w: 1 };
+  }
+  const invLen = 1 / Math.sqrt(lenSq);
+  return {
+    x: q.x * invLen,
+    y: q.y * invLen,
+    z: q.z * invLen,
+    w: q.w * invLen,
+  };
+};
+
+const slerpQuat = (from: QuatLike, to: QuatLike, t: number): QuatLike => {
+  const clamped = Math.max(0, Math.min(1, t));
+  let dot = from.x * to.x + from.y * to.y + from.z * to.z + from.w * to.w;
+  let end = to;
+  if (dot < 0) {
+    dot = -dot;
+    end = { x: -to.x, y: -to.y, z: -to.z, w: -to.w };
+  }
+
+  if (dot > 0.9995) {
+    return normalizeQuat({
+      x: from.x + clamped * (end.x - from.x),
+      y: from.y + clamped * (end.y - from.y),
+      z: from.z + clamped * (end.z - from.z),
+      w: from.w + clamped * (end.w - from.w),
+    });
+  }
+
+  const theta = Math.acos(dot);
+  const sinTheta = Math.sin(theta);
+  const scaleA = Math.sin((1 - clamped) * theta) / sinTheta;
+  const scaleB = Math.sin(clamped * theta) / sinTheta;
+  return normalizeQuat({
+    x: from.x * scaleA + end.x * scaleB,
+    y: from.y * scaleA + end.y * scaleB,
+    z: from.z * scaleA + end.z * scaleB,
+    w: from.w * scaleA + end.w * scaleB,
+  });
 };
 
 const spawnSlot = (ordinal: number, totalDice: number): { x: number; z: number } => {
@@ -165,10 +210,10 @@ export class DicePhysicsRapier {
 
     const body = this.world.createRigidBody(bodyDesc);
     if (typeof body.setLinearDamping === 'function') {
-      body.setLinearDamping(0.22);
+      body.setLinearDamping(0.18);
     }
     if (typeof body.setAngularDamping === 'function') {
-      body.setAngularDamping(0.28);
+      body.setAngularDamping(0.2);
     }
 
     const colliderDesc = R.ColliderDesc.cuboid(0.48, 0.48, 0.48)
@@ -178,17 +223,17 @@ export class DicePhysicsRapier {
 
     body.applyImpulse(
       {
-        x: (rand() * 2 - 1) * 0.95,
-        y: 2.5 + rand() * 0.5,
-        z: (rand() * 2 - 1) * 0.95,
+        x: (rand() * 2 - 1) * 1.15,
+        y: 2.9 + rand() * 0.8,
+        z: (rand() * 2 - 1) * 1.15,
       },
       true,
     );
     body.applyTorqueImpulse(
       {
-        x: (rand() * 2 - 1) * 4.1,
-        y: (rand() * 2 - 1) * 4.1,
-        z: (rand() * 2 - 1) * 4.1,
+        x: (rand() * 2 - 1) * 6.1,
+        y: (rand() * 2 - 1) * 6.1,
+        z: (rand() * 2 - 1) * 6.1,
       },
       true,
     );
@@ -201,14 +246,22 @@ export class DicePhysicsRapier {
     });
   }
 
-  public requestSettle(rollId: string, targetRotation: QuatLike, deadlineMs: number): void {
+  public requestSettle(
+    rollId: string,
+    targetRotation: QuatLike,
+    deadlineMs: number,
+    nowMs: number = performance.now(),
+  ): void {
     const state = this.bodies.get(rollId);
     if (!state) {
       return;
     }
-    state.settleTarget = targetRotation;
+    state.settleTarget = normalizeQuat(targetRotation);
     state.settleDeadlineMs = deadlineMs;
     state.settled = false;
+    if (typeof state.body.wakeUp === 'function') {
+      state.body.wakeUp();
+    }
   }
 
   public step(nowMs: number): void {
@@ -228,12 +281,22 @@ export class DicePhysicsRapier {
       }
 
       const body = state.body;
+      const remainingMs = state.settleDeadlineMs - nowMs;
       const sleeping = typeof body.isSleeping === 'function' ? body.isSleeping() : false;
-      const canFinalizeBySleep = sleeping && nowMs >= state.settleDeadlineMs - 180;
-      if (!canFinalizeBySleep && nowMs < state.settleDeadlineMs) {
-        continue;
+
+      if (remainingMs > 0) {
+        if (remainingMs <= SETTLE_BLEND_WINDOW_MS) {
+          this.blendBodyToTarget(body, state.settleTarget, remainingMs);
+        }
+        const canFinalizeBySleep = sleeping && remainingMs <= 100;
+        if (!canFinalizeBySleep) {
+          continue;
+        }
       }
 
+      if (typeof body.setRotation === 'function') {
+        body.setRotation(state.settleTarget, true);
+      }
       if (typeof body.setLinvel === 'function') {
         body.setLinvel({ x: 0, y: 0, z: 0 }, true);
       }
@@ -245,6 +308,44 @@ export class DicePhysicsRapier {
       }
 
       state.settled = true;
+    }
+  }
+
+  private blendBodyToTarget(body: any, target: QuatLike, remainingMs: number): void {
+    if (!body || typeof body.rotation !== 'function' || typeof body.setRotation !== 'function') {
+      return;
+    }
+
+    const current = body.rotation?.();
+    if (!current) {
+      return;
+    }
+
+    const from = normalizeQuat({
+      x: Number(current.x ?? 0),
+      y: Number(current.y ?? 0),
+      z: Number(current.z ?? 0),
+      w: Number(current.w ?? 1),
+    });
+
+    const closeness = 1 - Math.max(0, Math.min(1, remainingMs / SETTLE_BLEND_WINDOW_MS));
+    const blend = 0.1 + closeness * 0.26;
+    const next = slerpQuat(from, target, blend);
+    body.setRotation(next, true);
+
+    if (typeof body.setAngvel === 'function') {
+      body.setAngvel({ x: 0, y: 0, z: 0 }, true);
+    }
+    if (typeof body.setLinvel === 'function') {
+      const lv = body.linvel?.();
+      body.setLinvel(
+        {
+          x: Number(lv?.x ?? 0) * 0.92,
+          y: Number(lv?.y ?? 0) * 0.92,
+          z: Number(lv?.z ?? 0) * 0.92,
+        },
+        true,
+      );
     }
   }
 

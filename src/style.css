@@ -765,6 +765,342 @@ select {
   border-width: 1px;
 }
 
+.primary-btn.mini {
+  padding: 4px 6px;
+  font-size: 0.62rem;
+  letter-spacing: 0.2px;
+  border-width: 1px;
+  text-align: center;
+}
+
+.recruitment-screen {
+  gap: 10px;
+}
+
+.recruitment-header {
+  padding: 8px 10px;
+}
+
+.recruitment-header h1 {
+  font-size: 1rem;
+  line-height: 1.1;
+}
+
+.recruitment-header .subtitle {
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.recruitment-stats {
+  gap: 6px;
+}
+
+.recruitment-stats div {
+  padding: 6px;
+}
+
+.recruitment-stats strong {
+  font-size: 0.9rem;
+}
+
+.recruitment-hero,
+.recruitment-funds,
+.team-strip,
+.candidate-grid,
+.candidate-detail {
+  background: linear-gradient(180deg, rgba(20, 20, 20, 0.94), rgba(14, 14, 14, 0.97));
+  border: 2px solid rgba(201, 162, 39, 0.75);
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: var(--shadow);
+}
+
+.captain-stage {
+  display: grid;
+  gap: 8px;
+}
+
+.captain-scene {
+  position: relative;
+  border: 2px solid rgba(201, 162, 39, 0.52);
+  border-radius: 4px;
+  min-height: 140px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(201, 162, 39, 0.18), transparent 50%),
+    linear-gradient(180deg, rgba(40, 29, 20, 0.96), rgba(21, 15, 11, 0.98));
+  overflow: hidden;
+}
+
+.captain-table-map {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  height: 46px;
+  border: 1px solid rgba(201, 162, 39, 0.44);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 30% 50%, rgba(127, 165, 98, 0.2), transparent 42%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(190, 166, 111, 0.16),
+      rgba(190, 166, 111, 0.16) 2px,
+      rgba(49, 37, 26, 0.18) 2px,
+      rgba(49, 37, 26, 0.18) 4px
+    ),
+    linear-gradient(180deg, rgba(74, 54, 32, 0.92), rgba(37, 26, 17, 0.96));
+}
+
+.captain-portrait {
+  width: 88px;
+  height: 88px;
+  image-rendering: pixelated;
+  border: 2px solid rgba(201, 162, 39, 0.68);
+  border-radius: 3px;
+  background: #090d16;
+  z-index: 1;
+}
+
+.captain-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.captain-meta h2 {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.captain-meta p {
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+
+.captain-loadout-panel {
+  margin-top: 8px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 3px;
+  padding: 8px;
+  display: grid;
+  gap: 6px;
+  background: linear-gradient(180deg, rgba(13, 19, 30, 0.92), rgba(10, 15, 25, 0.96));
+}
+
+.captain-loadout-panel.is-disabled {
+  opacity: 0.75;
+}
+
+.captain-loadout-panel h3 {
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.captain-loadout-panel label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.66rem;
+  color: #e0cea2;
+}
+
+.captain-loadout-panel select {
+  width: 100%;
+  border: 1px solid rgba(201, 162, 39, 0.65);
+  background: rgba(9, 11, 18, 0.95);
+  color: #efe2bf;
+  font-family: var(--pixel-font);
+  font-size: 0.62rem;
+  padding: 4px;
+}
+
+.captain-loadout-description {
+  font-size: 0.62rem;
+  color: #d3c39d;
+}
+
+.recruitment-funds {
+  display: grid;
+  gap: 4px;
+}
+
+.recruitment-funds h2 {
+  font-size: 0.88rem;
+}
+
+.recruitment-funds p {
+  font-size: 0.78rem;
+}
+
+.recruitment-funds .secondary-btn {
+  margin-top: 6px;
+}
+
+.team-strip {
+  display: grid;
+  gap: 8px;
+}
+
+.team-strip h2,
+.candidate-grid h2,
+.candidate-detail h2 {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.team-member-list {
+  display: grid;
+  gap: 8px;
+}
+
+.team-member-card {
+  position: relative;
+  border: 2px solid rgba(201, 162, 39, 0.48);
+  border-radius: 4px;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(16, 18, 24, 0.94), rgba(9, 11, 18, 0.98));
+}
+
+.team-member-card.is-captain {
+  border-color: #e3b647;
+}
+
+.team-member-portrait {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(201, 162, 39, 0.64);
+  border-radius: 3px;
+  image-rendering: pixelated;
+  background: #090d16;
+}
+
+.team-member-meta {
+  display: grid;
+  gap: 2px;
+}
+
+.team-member-meta strong {
+  font-size: 0.77rem;
+}
+
+.team-member-meta small {
+  font-size: 0.62rem;
+  color: #d3c39d;
+}
+
+.team-member-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.captain-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.56rem;
+  letter-spacing: 0.3px;
+  color: #150c04;
+  background: linear-gradient(180deg, #e2bf63, #b1802b);
+  border: 1px solid #f0cd7a;
+  border-radius: 2px;
+  padding: 1px 4px;
+}
+
+.candidate-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.candidate-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.candidate-card {
+  border: 2px solid rgba(201, 162, 39, 0.44);
+  border-radius: 4px;
+  padding: 6px;
+  display: grid;
+  gap: 6px;
+  background: linear-gradient(180deg, rgba(16, 19, 28, 0.94), rgba(9, 11, 18, 0.98));
+  cursor: pointer;
+}
+
+.candidate-card.selected {
+  border-color: #e3b647;
+}
+
+.candidate-card.is-recruited {
+  box-shadow: 0 0 0 1px rgba(111, 162, 89, 0.42) inset;
+}
+
+.candidate-card.is-captain {
+  box-shadow:
+    0 0 0 1px rgba(111, 162, 89, 0.42) inset,
+    0 0 0 1px rgba(227, 182, 71, 0.42);
+}
+
+.candidate-avatar {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  image-rendering: pixelated;
+  border: 1px solid rgba(201, 162, 39, 0.62);
+  border-radius: 3px;
+  background: #080c15;
+}
+
+.candidate-meta {
+  display: grid;
+  gap: 2px;
+  text-align: center;
+}
+
+.candidate-meta strong {
+  font-size: 0.74rem;
+  line-height: 1;
+}
+
+.candidate-meta small {
+  font-size: 0.58rem;
+  line-height: 1.1;
+  color: #d3c39d;
+}
+
+.candidate-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.candidate-actions .secondary-btn,
+.candidate-actions .primary-btn {
+  text-align: center;
+}
+
+.candidate-detail {
+  display: grid;
+  gap: 8px;
+}
+
+.candidate-detail h3 {
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.dice-preview-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.recruitment-actions {
+  gap: 8px;
+}
+
 .hiring-summary,
 .slot-config,
 .class-pick-grid,
@@ -1384,9 +1720,9 @@ select {
 }
 
 .combat-screen.revamp {
-  --combat-tray-row: minmax(160px, 38%);
+  --combat-tray-row: minmax(180px, 42%);
   --combat-battle-row: minmax(140px, 1fr);
-  --combat-bottom-row: minmax(168px, 24%);
+  --combat-bottom-row: minmax(154px, 21%);
   height: var(--app-vh);
   max-height: var(--app-vh);
   overflow: hidden;

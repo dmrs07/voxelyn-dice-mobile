@@ -12,6 +12,10 @@ import {
 } from '../domain/combat/combat-reducer';
 import { canUsePlayerDieOnTarget } from '../domain/combat/action-resolver';
 import {
+  getCaptainOptionsForClass,
+  getDefaultCaptainLoadoutForClass,
+} from '../domain/combat/captain-loadouts';
+import {
   pickEventForRun,
   resolveEventChoice as resolveEventChoiceRoll,
 } from '../domain/expedition/event-runner';
@@ -30,7 +34,11 @@ import {
   sanitizeProfileForContent,
 } from '../domain/meta/unlocks';
 import type {
+  CaptainFaceId,
+  CaptainLoadoutSelection,
+  CaptainPassiveId,
   CombatFxEvent,
+  DraftRosterCandidate,
   DieSource,
   EventDef,
   GameState,
@@ -81,7 +89,15 @@ export class GameRouter {
 
   private draftParty: PartySelectionItem[];
 
-  private selectedDraftSlot = 0;
+  private draftRosterCandidates: DraftRosterCandidate[] = [];
+
+  private selectedCandidateClassId: string | null = null;
+
+  private captainClassId: string | null = null;
+
+  private rosterRollCounter = 0;
+
+  private captainLoadoutByClass: Record<string, CaptainLoadoutSelection> = {};
 
   private metaFaceTooltipKey: string | null = null;
 
@@ -110,26 +126,9 @@ export class GameRouter {
     this.combatFxController = new CombatFxController(this.animationDriver);
     this.combatFxController.setDiceDefinitions(initialState.content.byId.dice);
     this.startAnimationLoop();
-
-    const defaultClass = this.state.profile.unlocks.classes[0] ?? this.state.content.classes[0]?.id;
-    const defaultBackground =
-      this.state.profile.unlocks.backgrounds[0] ?? this.state.content.backgrounds[0]?.id;
-
-    const secondClass =
-      this.state.profile.unlocks.classes.find((entry) => entry !== defaultClass) ??
-      this.state.content.classes.find((entry) => entry.id !== defaultClass)?.id ??
-      defaultClass;
-
-    this.draftParty =
-      defaultClass && defaultBackground
-        ? [
-            { classId: defaultClass, backgroundId: defaultBackground, row: 'front' },
-            { classId: secondClass ?? defaultClass, backgroundId: defaultBackground, row: 'back' },
-          ]
-        : [];
-
-    this.draftParty = this.ensureDraftValidity(this.draftParty);
-    this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, this.draftParty.length - 1);
+    this.draftParty = [];
+    this.ensureCaptainLoadoutDefaults({ resetExisting: true });
+    this.regenerateRosterCandidates(false);
   }
 
   public render(): void {
@@ -138,20 +137,42 @@ export class GameRouter {
     const message = this.state.message;
 
     if (this.state.phase === 'meta') {
-      const sanitizedDraft = this.ensureDraftValidity(this.draftParty);
+      if (this.draftRosterCandidates.length === 0) {
+        this.regenerateRosterCandidates(false);
+      }
+      this.ensureCaptainLoadoutDefaults();
+
+      const sanitizedDraft = this.ensureDraftValidity(this.draftParty, { allowEmpty: true });
       if (sanitizedDraft.length !== this.draftParty.length) {
         this.draftParty = sanitizedDraft;
       }
+      if (this.captainClassId && !this.draftParty.some((entry) => entry.classId === this.captainClassId)) {
+        this.captainClassId = this.draftParty[0]?.classId ?? null;
+      }
+      if (!this.selectedCandidateClassId || !this.draftRosterCandidates.some((entry) => entry.classId === this.selectedCandidateClassId)) {
+        this.selectedCandidateClassId = this.draftRosterCandidates[0]?.classId ?? null;
+      }
       const hiringSpent = this.calculateHiringSpent(this.draftParty);
       const hiringRemaining = Math.max(0, START_HIRING_GOLD - hiringSpent);
+      const activeCaptainClassId = this.captainClassId ?? this.draftParty[0]?.classId ?? null;
+      const captainOptions = activeCaptainClassId
+        ? getCaptainOptionsForClass(activeCaptainClassId)
+        : null;
+      const captainLoadoutSelection =
+        activeCaptainClassId ? this.getCaptainLoadoutSelectionForClass(activeCaptainClassId) : null;
 
       renderMetaScreen(
         this.root,
         {
           content: this.state.content,
           profile: this.state.profile,
+          rosterCandidates: this.draftRosterCandidates,
           draftParty: this.draftParty,
-          selectedSlotIndex: this.selectedDraftSlot,
+          selectedCandidateClassId: this.selectedCandidateClassId,
+          captainClassId: this.captainClassId,
+          captainLoadoutSelection,
+          captainPassiveOptions: captainOptions?.passives ?? [],
+          captainFaceOptions: captainOptions?.faces ?? [],
           openFaceTooltipKey: this.metaFaceTooltipKey,
           seed: this.draftSeed,
           hiringBudget: START_HIRING_GOLD,
@@ -160,31 +181,33 @@ export class GameRouter {
           message,
         },
         {
-          onStartRun: (seed) => {
-            this.startRun(seed);
-          },
-          onSetSeed: (seed) => {
-            this.draftSeed = seed;
+          onRegenerateRoster: () => {
+            this.regenerateRosterCandidates(true);
+            this.state = withMessage(this.state, 'Roster regenerado.');
             this.render();
           },
-          onDraftPartyChange: (party) => {
-            const sanitized = this.ensureDraftValidity(party);
-            const hadDuplicateClass = new Set(party.map((entry) => entry.classId)).size !== party.length;
-            this.draftParty = sanitized;
-            this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, this.draftParty.length - 1);
-            this.metaFaceTooltipKey = null;
-            this.state = withMessage(
-              this.state,
-              hadDuplicateClass
-                ? 'Classe duplicada removida do roster.'
-                : 'Draft atualizado.',
-            );
-            this.render();
-          },
-          onSelectSlot: (slotIndex) => {
-            this.selectedDraftSlot = clamp(slotIndex, 0, this.draftParty.length - 1);
+          onFocusCandidate: (classId) => {
+            if (!this.draftRosterCandidates.some((entry) => entry.classId === classId)) {
+              return;
+            }
+            this.selectedCandidateClassId = classId;
             this.metaFaceTooltipKey = null;
             this.render();
+          },
+          onRecruitCandidate: (classId) => {
+            this.recruitCandidate(classId);
+          },
+          onRemovePartyMember: (classId) => {
+            this.removePartyMember(classId);
+          },
+          onSetCaptain: (classId) => {
+            this.setCaptain(classId);
+          },
+          onSetCaptainPassive: (passiveId) => {
+            this.setCaptainPassive(passiveId);
+          },
+          onSetCaptainFace: (faceId) => {
+            this.setCaptainFace(faceId);
           },
           onToggleFaceTooltip: (faceKey) => {
             this.metaFaceTooltipKey = faceKey;
@@ -192,6 +215,14 @@ export class GameRouter {
           },
           onResetProfile: () => {
             void this.resetProfile();
+          },
+          onStartRun: (seed) => {
+            this.startRun(seed);
+          },
+          onSetSeed: (seed) => {
+            this.draftSeed = seed;
+            this.metaFaceTooltipKey = null;
+            this.render();
           },
         },
       );
@@ -425,7 +456,9 @@ export class GameRouter {
             this.selectedTargetId = null;
             this.combatLogCollapsed = true;
             this.metaFaceTooltipKey = null;
-            this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, Math.max(0, this.draftParty.length - 1));
+            if (!this.selectedCandidateClassId || !this.draftRosterCandidates.some((entry) => entry.classId === this.selectedCandidateClassId)) {
+              this.selectedCandidateClassId = this.draftRosterCandidates[0]?.classId ?? null;
+            }
             this.render();
           },
         },
@@ -561,7 +594,236 @@ export class GameRouter {
     }
   }
 
-  private ensureDraftValidity(party: PartySelectionItem[]): PartySelectionItem[] {
+  private unlockedClassIds(): string[] {
+    const unlocked = new Set(this.state.profile.unlocks.classes);
+    const fromContent = this.state.content.classes
+      .map((entry) => entry.id)
+      .filter((id) => unlocked.size === 0 || unlocked.has(id));
+    if (fromContent.length > 0) {
+      return fromContent;
+    }
+    return this.state.content.classes.map((entry) => entry.id);
+  }
+
+  private unlockedBackgroundIds(): string[] {
+    const unlocked = new Set(this.state.profile.unlocks.backgrounds);
+    const fromContent = this.state.content.backgrounds
+      .map((entry) => entry.id)
+      .filter((id) => unlocked.size === 0 || unlocked.has(id));
+    if (fromContent.length > 0) {
+      return fromContent;
+    }
+    return this.state.content.backgrounds.map((entry) => entry.id);
+  }
+
+  private ensureCaptainLoadoutDefaults(options?: { resetExisting?: boolean }): void {
+    const classIds = this.unlockedClassIds();
+    const resetExisting = Boolean(options?.resetExisting);
+    const next: Record<string, CaptainLoadoutSelection> = resetExisting
+      ? {}
+      : { ...this.captainLoadoutByClass };
+
+    for (const classId of classIds) {
+      const preset = getDefaultCaptainLoadoutForClass(classId);
+      if (!preset) {
+        continue;
+      }
+      if (!next[classId] || resetExisting) {
+        next[classId] = preset;
+      }
+    }
+
+    this.captainLoadoutByClass = next;
+  }
+
+  private getCaptainLoadoutSelectionForClass(classId: string): CaptainLoadoutSelection | null {
+    const fromState = this.captainLoadoutByClass[classId];
+    if (fromState) {
+      return { ...fromState };
+    }
+    const fallback = getDefaultCaptainLoadoutForClass(classId);
+    if (!fallback) {
+      return null;
+    }
+    this.captainLoadoutByClass[classId] = fallback;
+    return { ...fallback };
+  }
+
+  private generateRosterCandidates(seed: number): DraftRosterCandidate[] {
+    const classIds = this.unlockedClassIds();
+    const backgroundIds = this.unlockedBackgroundIds();
+    if (classIds.length === 0 || backgroundIds.length === 0) {
+      return [];
+    }
+
+    const rng = new SeededRng(Math.max(1, seed));
+    return classIds.map((classId) => ({
+      classId,
+      backgroundId: backgroundIds[rng.nextInt(backgroundIds.length)] as string,
+      hireCost: hireCostForClass(classId, this.state),
+    }));
+  }
+
+  private regenerateRosterCandidates(clearParty: boolean): void {
+    if (clearParty) {
+      this.rosterRollCounter += 1;
+      this.ensureCaptainLoadoutDefaults({ resetExisting: true });
+    }
+    const rollSeed = (this.draftSeed ^ ((this.rosterRollCounter + 1) * 0x9e3779b9)) >>> 0;
+    this.draftRosterCandidates = this.generateRosterCandidates(rollSeed || 1);
+    this.selectedCandidateClassId = this.draftRosterCandidates[0]?.classId ?? null;
+    this.metaFaceTooltipKey = null;
+
+    if (clearParty) {
+      this.draftParty = [];
+      this.captainClassId = null;
+    }
+  }
+
+  private recruitCandidate(classId: string): void {
+    const candidate = this.draftRosterCandidates.find((entry) => entry.classId === classId);
+    if (!candidate) {
+      this.state = withMessage(this.state, 'Candidato nao encontrado.');
+      this.render();
+      return;
+    }
+    if (this.draftParty.some((entry) => entry.classId === classId)) {
+      this.state = withMessage(this.state, 'Esta classe ja esta no time.');
+      this.render();
+      return;
+    }
+    if (this.draftParty.length >= 4) {
+      this.state = withMessage(this.state, 'A trip aceita no maximo 4 integrantes.');
+      this.render();
+      return;
+    }
+
+    const nextDraft = this.ensureDraftValidity(
+      [
+        ...this.draftParty,
+        {
+          classId,
+          backgroundId: candidate.backgroundId,
+          row: this.draftParty.length % 2 === 0 ? 'front' : 'back',
+        },
+      ],
+      { allowEmpty: true },
+    );
+
+    const nextCaptain = this.captainClassId ?? classId;
+    const reordered = this.promoteCaptain(nextDraft, nextCaptain);
+    const projectedSpent = this.calculateHiringSpent(reordered);
+    if (projectedSpent > START_HIRING_GOLD) {
+      this.state = withMessage(
+        this.state,
+        `Orcamento insuficiente para contratar ${this.state.content.byId.classes[classId]?.name ?? classId}.`,
+      );
+      this.render();
+      return;
+    }
+
+    this.draftParty = reordered;
+    this.captainClassId = nextCaptain;
+    this.selectedCandidateClassId = classId;
+    this.metaFaceTooltipKey = null;
+    this.state = withMessage(this.state, 'Candidato recrutado.');
+    this.render();
+  }
+
+  private removePartyMember(classId: string): void {
+    if (!this.draftParty.some((entry) => entry.classId === classId)) {
+      return;
+    }
+    const nextDraft = this.ensureDraftValidity(
+      this.draftParty.filter((entry) => entry.classId !== classId),
+      { allowEmpty: true },
+    );
+    this.draftParty = nextDraft;
+    if (this.captainClassId === classId) {
+      this.captainClassId = this.draftParty[0]?.classId ?? null;
+    }
+    if (this.draftParty.length === 0) {
+      this.captainClassId = null;
+    }
+    this.metaFaceTooltipKey = null;
+    this.state = withMessage(this.state, 'Integrante removido.');
+    this.render();
+  }
+
+  private promoteCaptain(party: PartySelectionItem[], classId: string): PartySelectionItem[] {
+    const index = party.findIndex((entry) => entry.classId === classId);
+    if (index <= 0) {
+      return [...party];
+    }
+    const copy = [...party];
+    const [captain] = copy.splice(index, 1);
+    if (!captain) {
+      return copy;
+    }
+    copy.unshift(captain);
+    return copy;
+  }
+
+  private setCaptain(classId: string): void {
+    if (!this.draftParty.some((entry) => entry.classId === classId)) {
+      this.state = withMessage(this.state, 'Escolha um integrante recrutado para ser capitao.');
+      this.render();
+      return;
+    }
+    this.draftParty = this.promoteCaptain(this.draftParty, classId);
+    this.captainClassId = classId;
+    this.state = withMessage(this.state, 'Capitao definido.');
+    this.render();
+  }
+
+  private setCaptainPassive(passiveId: CaptainPassiveId): void {
+    const captainClassId = this.captainClassId ?? this.draftParty[0]?.classId ?? null;
+    if (!captainClassId) {
+      this.state = withMessage(this.state, 'Defina um capitao antes de escolher a passiva.');
+      this.render();
+      return;
+    }
+    const options = getCaptainOptionsForClass(captainClassId);
+    if (!options || !options.passives.some((entry) => entry.id === passiveId)) {
+      this.state = withMessage(this.state, 'Passiva de capitao invalida para esta classe.');
+      this.render();
+      return;
+    }
+    const current = this.getCaptainLoadoutSelectionForClass(captainClassId) ?? options.preset;
+    this.captainLoadoutByClass[captainClassId] = {
+      ...current,
+      passiveId,
+    };
+    this.state = withMessage(this.state, 'Passiva de capitao atualizada.');
+    this.render();
+  }
+
+  private setCaptainFace(faceId: CaptainFaceId): void {
+    const captainClassId = this.captainClassId ?? this.draftParty[0]?.classId ?? null;
+    if (!captainClassId) {
+      this.state = withMessage(this.state, 'Defina um capitao antes de escolher a face.');
+      this.render();
+      return;
+    }
+    const options = getCaptainOptionsForClass(captainClassId);
+    if (!options || !options.faces.some((entry) => entry.id === faceId)) {
+      this.state = withMessage(this.state, 'Face de capitao invalida para esta classe.');
+      this.render();
+      return;
+    }
+    const current = this.getCaptainLoadoutSelectionForClass(captainClassId) ?? options.preset;
+    this.captainLoadoutByClass[captainClassId] = {
+      ...current,
+      faceId,
+    };
+    this.state = withMessage(this.state, 'Face de capitao atualizada.');
+    this.render();
+  }
+
+  private ensureDraftValidity(
+    party: PartySelectionItem[],
+    options?: { allowEmpty?: boolean },
+  ): PartySelectionItem[] {
     const unlockedClasses = new Set(this.state.profile.unlocks.classes);
     const unlockedBackgrounds = new Set(this.state.profile.unlocks.backgrounds);
 
@@ -593,7 +855,8 @@ export class GameRouter {
       });
     }
 
-    if (next.length === 0 && classFallback && backgroundFallback) {
+    const allowEmpty = Boolean(options?.allowEmpty);
+    if (!allowEmpty && next.length === 0 && classFallback && backgroundFallback) {
       next.push({ classId: classFallback, backgroundId: backgroundFallback, row: 'front' });
     }
 
@@ -632,7 +895,18 @@ export class GameRouter {
   }
 
   private startRun(seed: number): void {
-    const sanitizedParty = this.ensureDraftValidity(this.draftParty);
+    let sanitizedParty = this.ensureDraftValidity(this.draftParty, { allowEmpty: true });
+    if (this.captainClassId) {
+      sanitizedParty = this.promoteCaptain(sanitizedParty, this.captainClassId);
+    }
+    const fallbackCaptain = sanitizedParty[0]?.classId ?? null;
+    if (!this.captainClassId) {
+      this.captainClassId = fallbackCaptain;
+    }
+    const effectiveCaptainClassId = this.captainClassId ?? fallbackCaptain;
+    const captainLoadout = effectiveCaptainClassId
+      ? this.getCaptainLoadoutSelectionForClass(effectiveCaptainClassId)
+      : null;
 
     if (sanitizedParty.length < 1 || sanitizedParty.length > 4) {
       this.state = withMessage(this.state, 'A trip precisa ter entre 1 e 4 integrantes.');
@@ -648,7 +922,7 @@ export class GameRouter {
     }
 
     this.draftParty = sanitizedParty;
-    this.selectedDraftSlot = Math.min(this.selectedDraftSlot, this.draftParty.length - 1);
+    this.selectedCandidateClassId = this.selectedCandidateClassId ?? this.draftRosterCandidates[0]?.classId ?? null;
     this.draftSeed = seed;
     this.runRng = new SeededRng(seed);
 
@@ -711,6 +985,13 @@ export class GameRouter {
       pendingRevealNodes: 0,
       pendingShopNodes: 0,
       pendingSkipDangerNodes: 0,
+      captainConfig:
+        effectiveCaptainClassId && captainLoadout
+          ? {
+              captainClassId: effectiveCaptainClassId,
+              loadout: captainLoadout,
+            }
+          : null,
     };
 
     this.applyPendingMapModifiers(run);
@@ -1127,7 +1408,7 @@ export class GameRouter {
       return;
     }
 
-    if (combat.focus <= 0) {
+    if (combat.focus <= 0 && combat.freeRerollCharges <= 0) {
       this.state = withMessage(this.state, 'Sem FOCO para rerrolar.');
       this.render();
       return;
@@ -1530,8 +1811,8 @@ export class GameRouter {
     };
 
     this.draftSeed = makeSeed();
-    this.draftParty = this.ensureDraftValidity(this.draftParty);
-    this.selectedDraftSlot = clamp(this.selectedDraftSlot, 0, this.draftParty.length - 1);
+    this.rosterRollCounter = 0;
+    this.regenerateRosterCandidates(true);
     this.metaFaceTooltipKey = null;
     this.selectedRollId = null;
     this.selectedTargetId = null;
