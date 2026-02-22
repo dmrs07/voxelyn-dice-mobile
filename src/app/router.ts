@@ -62,6 +62,7 @@ const makeStatusRecord = (): Record<StatusId, number> => ({
   dodge: 0,
   mark: 0,
   poison: 0,
+  burn: 0,
   bleed: 0,
   stun: 0,
   fear: 0,
@@ -108,8 +109,6 @@ export class GameRouter {
   private combatFaceTooltipPosition: { x: number; y: number } | null = null;
 
   private selectedTargetId: string | null = null;
-
-  private combatLogCollapsed = true;
 
   private readonly animationDriver: AnimationDriver;
 
@@ -185,6 +184,12 @@ export class GameRouter {
             this.regenerateRosterCandidates(true);
             this.state = withMessage(this.state, 'Roster regenerado.');
             this.render();
+          },
+          onResetRoster: () => {
+            this.resetRosterDraft();
+          },
+          onRandomRecruit: () => {
+            this.recruitRandomCandidate();
           },
           onFocusCandidate: (classId) => {
             if (!this.draftRosterCandidates.some((entry) => entry.classId === classId)) {
@@ -281,7 +286,6 @@ export class GameRouter {
           selectedRollId: this.selectedRollId,
           openFaceTooltipRollId: this.combatFaceTooltipRollId,
           trayTooltipPosition: this.combatFaceTooltipPosition,
-          combatLogCollapsed: this.combatLogCollapsed,
           validTargetIds,
           selectedTargetId: this.selectedTargetId,
           biomeId: this.state.run?.map.biomeId ?? this.state.content.biome.id,
@@ -319,6 +323,7 @@ export class GameRouter {
             this.selectedTargetId = null;
             this.combatFaceTooltipRollId = null;
             this.combatFaceTooltipPosition = null;
+            this.render();
           },
           onClearSelection: () => this.clearCombatSelection(true),
           onTapTarget: (team, targetId) => {
@@ -399,10 +404,6 @@ export class GameRouter {
             this.combatFaceTooltipPosition = nextPosition;
             this.render();
           },
-          onToggleCombatLog: () => {
-            this.combatLogCollapsed = !this.combatLogCollapsed;
-            this.render();
-          },
         },
       );
       this.combatFxController.attach(this.root);
@@ -454,7 +455,6 @@ export class GameRouter {
             this.combatFaceTooltipRollId = null;
             this.combatFaceTooltipPosition = null;
             this.selectedTargetId = null;
-            this.combatLogCollapsed = true;
             this.metaFaceTooltipKey = null;
             if (!this.selectedCandidateClassId || !this.draftRosterCandidates.some((entry) => entry.classId === this.selectedCandidateClassId)) {
               this.selectedCandidateClassId = this.draftRosterCandidates[0]?.classId ?? null;
@@ -748,6 +748,65 @@ export class GameRouter {
     this.metaFaceTooltipKey = null;
     this.state = withMessage(this.state, 'Integrante removido.');
     this.render();
+  }
+
+  private resetRosterDraft(): void {
+    this.draftParty = [];
+    this.captainClassId = null;
+    this.metaFaceTooltipKey = null;
+    if (!this.selectedCandidateClassId || !this.draftRosterCandidates.some((entry) => entry.classId === this.selectedCandidateClassId)) {
+      this.selectedCandidateClassId = this.draftRosterCandidates[0]?.classId ?? null;
+    }
+    this.state = withMessage(this.state, 'Roster resetado.');
+    this.render();
+  }
+
+  private recruitRandomCandidate(): void {
+    if (this.draftParty.length >= 4) {
+      this.state = withMessage(this.state, 'A trip aceita no maximo 4 integrantes.');
+      this.render();
+      return;
+    }
+
+    const alreadyInParty = new Set(this.draftParty.map((entry) => entry.classId));
+    const pool = this.draftRosterCandidates.filter((entry) => !alreadyInParty.has(entry.classId));
+    if (pool.length === 0) {
+      this.state = withMessage(this.state, 'Nao ha candidatos disponiveis para recrutamento aleatorio.');
+      this.render();
+      return;
+    }
+
+    const affordable = pool.filter((candidate) => {
+      const nextDraft = this.ensureDraftValidity(
+        [
+          ...this.draftParty,
+          {
+            classId: candidate.classId,
+            backgroundId: candidate.backgroundId,
+            row: this.draftParty.length % 2 === 0 ? 'front' : 'back',
+          },
+        ],
+        { allowEmpty: true },
+      );
+      const nextCaptain = this.captainClassId ?? candidate.classId;
+      const reordered = this.promoteCaptain(nextDraft, nextCaptain);
+      return this.calculateHiringSpent(reordered) <= START_HIRING_GOLD;
+    });
+
+    if (affordable.length === 0) {
+      this.state = withMessage(this.state, 'Sem ouro suficiente para recrutamento aleatorio.');
+      this.render();
+      return;
+    }
+
+    const pick = affordable[this.runRng.nextInt(affordable.length)];
+    if (!pick) {
+      this.state = withMessage(this.state, 'Falha ao escolher candidato aleatorio.');
+      this.render();
+      return;
+    }
+
+    this.recruitCandidate(pick.classId);
   }
 
   private promoteCaptain(party: PartySelectionItem[], classId: string): PartySelectionItem[] {
@@ -1260,7 +1319,6 @@ export class GameRouter {
     this.combatFaceTooltipRollId = null;
     this.combatFaceTooltipPosition = null;
     this.selectedTargetId = null;
-    this.combatLogCollapsed = true;
     this.combatFxController.setCombatId(combat.id);
 
     const idleEvents: CombatFxEvent[] = [
@@ -1569,7 +1627,6 @@ export class GameRouter {
       this.selectedRollId = null;
       this.combatFaceTooltipRollId = null;
       this.combatFaceTooltipPosition = null;
-      this.combatLogCollapsed = true;
       this.render();
       return;
     }
@@ -1763,7 +1820,6 @@ export class GameRouter {
     if (!run) {
       this.state = setPhase(this.state, 'meta', message);
       this.clearCombatSelection(false);
-      this.combatLogCollapsed = true;
       this.render();
       return;
     }
@@ -1788,7 +1844,6 @@ export class GameRouter {
     this.selectedTargetId = null;
     this.combatFaceTooltipRollId = null;
     this.combatFaceTooltipPosition = null;
-    this.combatLogCollapsed = true;
 
     void saveProfile(nextProfile);
     this.render();
@@ -1818,7 +1873,6 @@ export class GameRouter {
     this.selectedTargetId = null;
     this.combatFaceTooltipRollId = null;
     this.combatFaceTooltipPosition = null;
-    this.combatLogCollapsed = true;
 
     await saveProfile(next);
     this.render();

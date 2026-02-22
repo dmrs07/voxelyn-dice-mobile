@@ -52,7 +52,7 @@ const pushIdleDisabledIfDead = (
 };
 
 const cleanOneNegativeStatus = (target: CombatantState): string | null => {
-  const order: StatusId[] = ['stun', 'bleed', 'poison', 'fear', 'mark'];
+  const order: StatusId[] = ['stun', 'bleed', 'burn', 'poison', 'fear', 'mark'];
   for (const statusId of order) {
     if ((target.statuses[statusId] ?? 0) > 0) {
       target.statuses[statusId] -= 1;
@@ -1096,8 +1096,9 @@ export const applyEndTurnStatusEffects = (
   const events: CombatFxEvent[] = [];
 
   const poison = combatant.statuses.poison ?? 0;
+  const burn = combatant.statuses.burn ?? 0;
   const bleed = combatant.statuses.bleed ?? 0;
-  const incoming = poison + bleed;
+  const incoming = poison + burn + bleed;
 
   if (incoming > 0) {
     const hpBefore = combatant.hp;
@@ -1106,7 +1107,7 @@ export const applyEndTurnStatusEffects = (
       consumeMark: false,
       allowDodge: false,
     });
-    logs.push(`${combatant.name} sofre ${dealt.dealt} por VENENO/SANGRAMENTO.`);
+    logs.push(`${combatant.name} sofre ${dealt.dealt} por VENENO/QUEIMADURA/SANGRAMENTO.`);
     events.push({
       type: 'hit',
       targetId: combatant.id,
@@ -1120,6 +1121,10 @@ export const applyEndTurnStatusEffects = (
 
   if (poison > 0) {
     combatant.statuses.poison -= 1;
+  }
+
+  if (burn > 0) {
+    combatant.statuses.burn -= 1;
   }
 
   if ((combatant.statuses.fear ?? 0) > 0) {

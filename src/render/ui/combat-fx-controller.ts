@@ -1,8 +1,25 @@
 import type { AnimationDriver } from '../../anim/voxelyn-animation-adapter';
-import type { CombatFxEvent, CombatState, CombatantState, DieDef } from '../../domain/shared/types';
+import type {
+  CombatFxEvent,
+  CombatState,
+  CombatantState,
+  DieDef,
+  StatusId,
+} from '../../domain/shared/types';
 import { COMBATANT_INTERNAL_PX } from '../pixel/constants';
 import type { CombatantEmotionState } from '../pixel/types';
 import { DiceCubeRuntime, type DiceCubeDiagnostics } from '../voxelyn/dice-cube-runtime';
+import { getStatusFxSprite } from '../voxelyn/status-fx-sprites';
+import type { StatusFxTier } from './status-fx-defs';
+import {
+  STATUS_FX_CLASS_NAMES,
+  STATUS_FX_CSS_VARS,
+  STATUS_FX_DEFS,
+  STATUS_FX_LAYER_ORDER,
+  resolveStatusFxCadence,
+  resolveStatusFxParticles,
+  resolveStatusFxTier,
+} from './status-fx-defs';
 
 type RollFxState = {
   rollId: string;
@@ -41,9 +58,17 @@ type CombatantBinding = {
   state: CombatantEmotionState;
 };
 
+type ActiveStatusFx = {
+  id: StatusId;
+  stacks: number;
+  tier: StatusFxTier;
+  particles: number;
+  cadenceMs: number;
+};
+
 const positiveStatuses = new Set(['block', 'dodge', 'inspired', 'charged', 'turret']);
-const heavyDebuffStatuses = new Set(['stun', 'poison', 'bleed', 'fear']);
-const cursedStatuses = new Set(['stun', 'fear', 'poison', 'bleed']);
+const heavyDebuffStatuses = new Set(['stun', 'poison', 'burn', 'bleed', 'fear']);
+const cursedStatuses = new Set(['stun', 'fear', 'poison', 'burn', 'bleed']);
 const statusCount = (combatant: CombatantState, statusId: string): number =>
   (combatant.statuses as Record<string, number>)[statusId] ?? 0;
 
@@ -145,6 +170,10 @@ export class CombatFxController {
 
   private targetCanvases = new Map<string, HTMLCanvasElement>();
 
+  private statusHostsByTargetId = new Map<string, HTMLElement[]>();
+
+  private statusSignatureByHost = new WeakMap<HTMLElement, string>();
+
   private rollStates = new Map<string, RollFxState>();
 
   private pulseStates: PulseFxState[] = [];
@@ -226,6 +255,7 @@ export class CombatFxController {
 
     this.combatantVisuals = next;
     this.rebindCombatants();
+    this.syncStatusFx(combat);
     this.diceCubeRuntime.syncCombat(combat);
 
     for (const [entityId, descriptor] of this.combatantVisuals) {
@@ -447,6 +477,8 @@ export class CombatFxController {
     this.rollElements.clear();
     this.targetElements.clear();
     this.targetCanvases.clear();
+    this.statusHostsByTargetId.clear();
+    this.statusSignatureByHost = new WeakMap<HTMLElement, string>();
     this.rollStates.clear();
     this.pulseStates = [];
     this.idleTargets.clear();
@@ -463,6 +495,7 @@ export class CombatFxController {
     this.rollElements.clear();
     this.targetElements.clear();
     this.targetCanvases.clear();
+    this.statusHostsByTargetId.clear();
 
     if (!this.root) {
       return;
@@ -481,11 +514,31 @@ export class CombatFxController {
       if (!targetId) {
         return;
       }
-      this.targetElements.set(targetId, el);
+      const existing = this.targetElements.get(targetId);
+      const existingIsStatusHost = existing?.dataset.statusHost === 'true';
+      const nextIsStatusHost = el.dataset.statusHost === 'true';
+      if (!existing || (!existingIsStatusHost && nextIsStatusHost)) {
+        this.targetElements.set(targetId, el);
+      }
+    });
 
+    for (const [targetId, el] of this.targetElements) {
       const canvas = el.querySelector<HTMLCanvasElement>('.combatant-canvas');
       if (canvas) {
         this.targetCanvases.set(targetId, canvas);
+      }
+    }
+
+    this.root.querySelectorAll<HTMLElement>('[data-status-host][data-target-id]').forEach((el) => {
+      const targetId = el.dataset.targetId;
+      if (!targetId) {
+        return;
+      }
+      const existing = this.statusHostsByTargetId.get(targetId);
+      if (existing) {
+        existing.push(el);
+      } else {
+        this.statusHostsByTargetId.set(targetId, [el]);
       }
     });
   }
@@ -592,6 +645,146 @@ export class CombatFxController {
       this.driver.playIdle(el);
       this.idleBindings.set(targetId, el);
     }
+  }
+
+  private syncStatusFx(combat: CombatState): void {
+    const combatantsById = new Map<string, CombatantState>();
+    for (const entry of combat.party) {
+      combatantsById.set(entry.id, entry);
+    }
+    for (const entry of combat.enemies) {
+      combatantsById.set(entry.id, entry);
+    }
+
+    for (const [targetId, hosts] of this.statusHostsByTargetId) {
+      const activeStatuses = this.collectActiveStatuses(combatantsById.get(targetId));
+      for (const host of hosts) {
+        this.applyStatusFxToHost(host, activeStatuses);
+      }
+    }
+  }
+
+  private collectActiveStatuses(combatant: CombatantState | undefined): ActiveStatusFx[] {
+    if (!combatant || !combatant.alive) {
+      return [];
+    }
+
+    const active: ActiveStatusFx[] = [];
+    for (const statusId of STATUS_FX_LAYER_ORDER) {
+      const stacks = Math.max(0, Math.floor(Number(combatant.statuses[statusId] ?? 0)));
+      if (stacks <= 0) {
+        continue;
+      }
+      active.push({
+        id: statusId,
+        stacks,
+        tier: resolveStatusFxTier(stacks),
+        particles: resolveStatusFxParticles(statusId, stacks),
+        cadenceMs: resolveStatusFxCadence(statusId, stacks),
+      });
+    }
+    return active;
+  }
+
+  private applyStatusFxToHost(host: HTMLElement, activeStatuses: ActiveStatusFx[]): void {
+    const signature = this.statusSignature(activeStatuses);
+    if (this.statusSignatureByHost.get(host) === signature) {
+      return;
+    }
+    this.statusSignatureByHost.set(host, signature);
+
+    this.clearStatusFx(host);
+    if (activeStatuses.length === 0) {
+      return;
+    }
+
+    host.classList.add('has-status');
+    const maxTier = activeStatuses.reduce<StatusFxTier>(
+      (max, status) => (status.tier > max ? status.tier : max),
+      1,
+    );
+    host.classList.add(`status-tier-${maxTier}`);
+    host.style.setProperty('--status-max-tier', String(maxTier));
+
+    const overlay = this.ensureStatusOverlay(host);
+    overlay.replaceChildren();
+
+    for (const status of activeStatuses) {
+      const def = STATUS_FX_DEFS[status.id];
+      host.classList.add(def.className);
+      host.style.setProperty(def.cssVar, String(status.stacks));
+
+      const node = document.createElement('div');
+      node.className = `status-fx-node status-fx-${status.id} status-tier-${status.tier}`;
+      node.dataset.statusId = status.id;
+      node.style.zIndex = String(def.layer);
+      node.style.setProperty('--status-stacks', String(status.stacks));
+      node.style.setProperty('--status-particles', String(status.particles));
+      node.style.setProperty('--status-cadence-ms', `${status.cadenceMs}ms`);
+
+      const spriteCount = Math.max(1, status.particles);
+      for (let index = 0; index < spriteCount; index += 1) {
+        const sprite = document.createElement('img');
+        sprite.className = 'status-fx-sprite';
+        sprite.alt = '';
+        sprite.draggable = false;
+        sprite.decoding = 'async';
+        sprite.src = getStatusFxSprite(status.id, `${status.id}-${status.tier}-${index}`);
+        sprite.style.setProperty('--fx-index', String(index));
+        sprite.style.setProperty('--fx-total', String(spriteCount));
+        sprite.style.setProperty(
+          '--fx-delay-ms',
+          `${Math.round((status.cadenceMs / Math.max(1, spriteCount)) * index)}ms`,
+        );
+        node.appendChild(sprite);
+      }
+
+      overlay.appendChild(node);
+    }
+  }
+
+  private clearStatusFx(host: HTMLElement): void {
+    host.classList.remove('has-status', 'status-tier-1', 'status-tier-2', 'status-tier-3');
+    host.classList.remove(...STATUS_FX_CLASS_NAMES);
+    host.style.removeProperty('--status-max-tier');
+    for (const cssVar of STATUS_FX_CSS_VARS) {
+      host.style.removeProperty(cssVar);
+    }
+
+    const overlay = this.findStatusOverlay(host);
+    if (overlay) {
+      overlay.replaceChildren();
+      overlay.remove();
+    }
+  }
+
+  private statusSignature(activeStatuses: ActiveStatusFx[]): string {
+    if (activeStatuses.length === 0) {
+      return 'none';
+    }
+    return activeStatuses.map((status) => `${status.id}:${status.stacks}`).join('|');
+  }
+
+  private findStatusOverlay(host: HTMLElement): HTMLElement | null {
+    for (const child of Array.from(host.children)) {
+      if (child instanceof HTMLElement && child.classList.contains('status-fx-overlay')) {
+        return child;
+      }
+    }
+    return null;
+  }
+
+  private ensureStatusOverlay(host: HTMLElement): HTMLElement {
+    const existing = this.findStatusOverlay(host);
+    if (existing) {
+      return existing;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'status-fx-overlay';
+    overlay.setAttribute('aria-hidden', 'true');
+    host.appendChild(overlay);
+    return overlay;
   }
 
   private pushPulse(targetId: string, kind: PulseKind, flavor: PulseFlavor, amount: number): void {

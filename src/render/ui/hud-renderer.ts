@@ -1,4 +1,4 @@
-import type { CombatState, RunState } from '../../domain/shared/types';
+import type { RunState } from '../../domain/shared/types';
 
 const pct = (current: number, max: number): number => {
   if (max <= 0) {
@@ -72,48 +72,3 @@ export const renderRunHud = (run: RunState): string => `
     <div class="hud-item"><span>Consumiveis</span><strong>${run.consumables}</strong></div>
   </section>
 `;
-
-export const renderEnemyIntentHud = (combat: CombatState): string => {
-  const kindGlyph = (kind: string): string => {
-    if (kind === 'attack') return 'ATK';
-    if (kind === 'defend') return 'BLK';
-    if (kind === 'heal') return 'HEAL';
-    if (kind === 'status') return 'STS';
-    return 'SPC';
-  };
-
-  const intentMarkup = combat.intents
-    .map((intent) => {
-      const enemy = combat.enemies.find((entry) => entry.id === intent.enemyId);
-      const enemyName = enemy?.name ?? 'Inimigo';
-      const detail = `${enemyName}: ${intent.label} (${intent.value})`;
-      return `
-        <span class="intent-chip intent-${intent.kind}" title="${detail}">
-          <strong>${enemyName}</strong>
-          <em>${kindGlyph(intent.kind)} ${intent.value}</em>
-        </span>
-      `;
-    })
-    .join('');
-
-  return `
-    <section class="hud intent-hud compact" aria-label="Intencoes inimigas">
-      <h3>Intencoes</h3>
-      <div class="intent-chip-row">${intentMarkup || '<span class="intent-chip empty">Sem intencoes ativas</span>'}</div>
-    </section>
-  `;
-};
-
-export const renderPartyHealthBars = (combat: CombatState): string => {
-  const markup = combat.party
-    .map((member) => `
-      <div class="bar-row ${member.alive ? '' : 'dead'}">
-        <span>${member.name}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${pct(member.hp, member.maxHp)}%"></div></div>
-        <em>${member.hp}/${member.maxHp}</em>
-      </div>
-    `)
-    .join('');
-
-  return `<section class="party-bars">${markup}</section>`;
-};

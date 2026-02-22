@@ -16,6 +16,7 @@ export const STATUS_IDS = [
   'dodge',
   'mark',
   'poison',
+  'burn',
   'bleed',
   'stun',
   'fear',
@@ -24,7 +25,7 @@ export const STATUS_IDS = [
   'turret',
 ] as const;
 
-export const NEGATIVE_STATUS_IDS = ['mark', 'poison', 'bleed', 'stun', 'fear'] as const;
+export const NEGATIVE_STATUS_IDS = ['mark', 'poison', 'burn', 'bleed', 'stun', 'fear'] as const;
 
 export const NODE_TYPES = [
   'start',

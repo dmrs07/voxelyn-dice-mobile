@@ -311,6 +311,7 @@ const summonEnemy = (
       dodge: 0,
       mark: 0,
       poison: 0,
+      burn: 0,
       bleed: 0,
       stun: 0,
       fear: 0,

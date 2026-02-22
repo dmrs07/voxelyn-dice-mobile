@@ -38,6 +38,10 @@ body[data-phase='combat'] {
   overflow: hidden;
 }
 
+body[data-phase='meta'] {
+  overflow: hidden;
+}
+
 #app {
   min-height: var(--app-vh);
 }
@@ -774,7 +778,13 @@ select {
 }
 
 .recruitment-screen {
-  gap: 10px;
+  height: var(--app-vh);
+  max-height: var(--app-vh);
+  min-height: var(--app-vh);
+  overflow: hidden;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  gap: 6px;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
 }
 
 .recruitment-header {
@@ -791,95 +801,242 @@ select {
   line-height: 1.2;
 }
 
-.recruitment-stats {
-  gap: 6px;
-}
-
-.recruitment-stats div {
-  padding: 6px;
-}
-
-.recruitment-stats strong {
-  font-size: 0.9rem;
-}
-
-.recruitment-hero,
-.recruitment-funds,
-.team-strip,
-.candidate-grid,
-.candidate-detail {
+.recruitment-roster-shell,
+.captain-wizard-shell {
   background: linear-gradient(180deg, rgba(20, 20, 20, 0.94), rgba(14, 14, 14, 0.97));
   border: 2px solid rgba(201, 162, 39, 0.75);
   border-radius: 4px;
   padding: 10px;
   box-shadow: var(--shadow);
-}
-
-.captain-stage {
+  min-height: 0;
+  overflow: hidden;
   display: grid;
   gap: 8px;
 }
 
-.captain-scene {
-  position: relative;
-  border: 2px solid rgba(201, 162, 39, 0.52);
+.recruitment-roster-shell {
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+}
+
+.captain-wizard-shell {
+  grid-template-rows: minmax(0, 1fr) auto auto;
+}
+
+.captain-wizard-stage {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.captain-wizard-card {
+  border: 2px solid rgba(201, 162, 39, 0.58);
   border-radius: 4px;
-  min-height: 140px;
+  padding: 8px;
   display: grid;
-  place-items: center;
+  gap: 8px;
+  grid-template-columns: 130px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   background:
-    radial-gradient(circle at 50% 10%, rgba(201, 162, 39, 0.18), transparent 50%),
-    linear-gradient(180deg, rgba(40, 29, 20, 0.96), rgba(21, 15, 11, 0.98));
-  overflow: hidden;
+    radial-gradient(circle at 78% 18%, rgba(201, 162, 39, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(17, 20, 28, 0.95), rgba(9, 12, 20, 0.98));
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.14);
 }
 
-.captain-table-map {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-  height: 46px;
-  border: 1px solid rgba(201, 162, 39, 0.44);
-  border-radius: 2px;
-  background:
-    radial-gradient(circle at 30% 50%, rgba(127, 165, 98, 0.2), transparent 42%),
-    repeating-linear-gradient(
-      0deg,
-      rgba(190, 166, 111, 0.16),
-      rgba(190, 166, 111, 0.16) 2px,
-      rgba(49, 37, 26, 0.18) 2px,
-      rgba(49, 37, 26, 0.18) 4px
-    ),
-    linear-gradient(180deg, rgba(74, 54, 32, 0.92), rgba(37, 26, 17, 0.96));
-}
-
-.captain-portrait {
-  width: 88px;
-  height: 88px;
+.captain-wizard-portrait {
+  width: 126px;
+  height: 126px;
   image-rendering: pixelated;
-  border: 2px solid rgba(201, 162, 39, 0.68);
+  border: 2px solid rgba(201, 162, 39, 0.74);
   border-radius: 3px;
-  background: #090d16;
-  z-index: 1;
+  background: #080c15;
 }
 
-.captain-meta {
+.captain-wizard-meta {
   display: grid;
   gap: 4px;
+  align-content: start;
 }
 
-.captain-meta h2 {
-  font-size: 0.9rem;
+.captain-wizard-meta h2 {
+  font-size: 1rem;
   line-height: 1;
 }
 
-.captain-meta p {
-  font-size: 0.74rem;
+.captain-wizard-meta p {
+  font-size: 0.7rem;
   line-height: 1.2;
+  color: #d4c29b;
+}
+
+.captain-wizard-meta strong {
+  color: #f0d08a;
+}
+
+.captain-wizard-faces {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.captain-wizard-list {
+  min-height: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(124px, 1fr);
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  padding-bottom: 4px;
+}
+
+.captain-choice-tile {
+  border: 2px solid rgba(201, 162, 39, 0.44);
+  border-radius: 4px;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 5px;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(14, 19, 30, 0.95), rgba(8, 11, 18, 0.98));
+  color: var(--paper-0);
+  text-align: left;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+.captain-choice-tile.selected {
+  border-color: #f0ca6e;
+  box-shadow: 0 0 0 1px rgba(240, 202, 110, 0.2);
+}
+
+.captain-choice-tile img {
+  width: 38px;
+  height: 38px;
+  image-rendering: pixelated;
+  border: 1px solid rgba(201, 162, 39, 0.64);
+  border-radius: 3px;
+  background: #080c15;
+}
+
+.captain-choice-tile strong {
+  display: block;
+  font-size: 0.64rem;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.captain-choice-tile small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.52rem;
+  line-height: 1;
+  color: #d3c39d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.captain-wizard-controls {
+  display: grid;
+  gap: 6px;
+}
+
+.recruitment-roster-header {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.95fr) minmax(112px, 0.65fr);
+  gap: 8px;
+  align-items: stretch;
+}
+
+.recruitment-overview-card {
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 3px;
+  padding: 6px;
+  display: grid;
+  gap: 3px;
+  align-content: center;
+  background: linear-gradient(180deg, rgba(17, 24, 36, 0.95), rgba(9, 13, 22, 0.98));
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.16);
+}
+
+.recruitment-overview-card strong {
+  font-size: 0.62rem;
+  line-height: 1;
+  color: #d2c19a;
+  text-transform: uppercase;
+}
+
+.recruitment-overview-card em {
+  font-size: 0.92rem;
+  line-height: 1;
+  color: #f1d78f;
+  font-style: normal;
+}
+
+.recruitment-overview-card small {
+  font-size: 0.58rem;
+  line-height: 1.1;
+  color: #d0be96;
+}
+
+.recruitment-funds {
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 3px;
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+  background: linear-gradient(180deg, rgba(11, 18, 27, 0.95), rgba(8, 12, 20, 0.98));
+}
+
+.recruitment-funds h2 {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.recruitment-funds p {
+  font-size: 0.7rem;
+}
+
+.captain-id-block {
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 3px;
+  padding: 6px;
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 6px;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(14, 18, 30, 0.95), rgba(9, 12, 21, 0.98));
+}
+
+.captain-id-portrait {
+  width: 44px;
+  height: 44px;
+  image-rendering: pixelated;
+  border: 1px solid rgba(201, 162, 39, 0.62);
+  border-radius: 3px;
+  background: #080c15;
+}
+
+.captain-id-meta {
+  display: grid;
+  gap: 2px;
+}
+
+.captain-id-meta strong {
+  font-size: 0.62rem;
+  line-height: 1;
+}
+
+.captain-id-meta small {
+  font-size: 0.58rem;
+  color: #d3c39d;
 }
 
 .captain-loadout-panel {
-  margin-top: 8px;
   border: 1px solid rgba(201, 162, 39, 0.45);
   border-radius: 3px;
   padding: 8px;
@@ -919,121 +1076,111 @@ select {
   color: #d3c39d;
 }
 
-.recruitment-funds {
+.recruitment-funds-actions {
   display: grid;
-  gap: 4px;
-}
-
-.recruitment-funds h2 {
-  font-size: 0.88rem;
-}
-
-.recruitment-funds p {
-  font-size: 0.78rem;
-}
-
-.recruitment-funds .secondary-btn {
-  margin-top: 6px;
-}
-
-.team-strip {
-  display: grid;
-  gap: 8px;
-}
-
-.team-strip h2,
-.candidate-grid h2,
-.candidate-detail h2 {
-  font-size: 0.9rem;
-  line-height: 1;
-}
-
-.team-member-list {
-  display: grid;
-  gap: 8px;
-}
-
-.team-member-card {
-  position: relative;
-  border: 2px solid rgba(201, 162, 39, 0.48);
-  border-radius: 4px;
-  padding: 6px;
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 8px;
-  background: linear-gradient(180deg, rgba(16, 18, 24, 0.94), rgba(9, 11, 18, 0.98));
-}
-
-.team-member-card.is-captain {
-  border-color: #e3b647;
-}
-
-.team-member-portrait {
-  width: 48px;
-  height: 48px;
-  border: 1px solid rgba(201, 162, 39, 0.64);
-  border-radius: 3px;
-  image-rendering: pixelated;
-  background: #090d16;
-}
-
-.team-member-meta {
-  display: grid;
-  gap: 2px;
-}
-
-.team-member-meta strong {
-  font-size: 0.77rem;
-}
-
-.team-member-meta small {
-  font-size: 0.62rem;
-  color: #d3c39d;
-}
-
-.team-member-actions {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
-.captain-badge {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 0.56rem;
-  letter-spacing: 0.3px;
-  color: #150c04;
-  background: linear-gradient(180deg, #e2bf63, #b1802b);
-  border: 1px solid #f0cd7a;
-  border-radius: 2px;
-  padding: 1px 4px;
+.recruitment-funds-actions .secondary-btn {
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.candidate-grid {
+.recruitment-carousel-shell {
+  min-height: 0;
   display: grid;
-  gap: 8px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: stretch;
 }
 
-.candidate-list {
+.recruitment-carousel-nav {
+  width: 28px;
+  min-width: 28px;
+  border: 1px solid rgba(201, 162, 39, 0.78);
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(36, 51, 86, 0.95), rgba(21, 31, 53, 0.98));
+  color: #f0dfb1;
+  font-size: 0.68rem;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.16);
+}
+
+.recruitment-carousel-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.recruitment-roster-carousel {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 39, 0.72) rgba(8, 10, 16, 0.75);
+  padding-right: 2px;
+  cursor: grab;
+}
+
+.recruitment-roster-carousel:active {
+  cursor: grabbing;
+}
+
+.recruitment-roster-carousel::-webkit-scrollbar {
+  height: 8px;
+}
+
+.recruitment-roster-carousel::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.72);
+  border-radius: 6px;
+}
+
+.recruitment-roster-track {
+  min-height: 0;
+  width: max-content;
+  display: flex;
   gap: 8px;
+  align-items: stretch;
+  padding: 2px 2px 8px;
+  user-select: none;
+}
+
+.recruitment-carousel-empty {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #d3c39d;
+  align-self: center;
 }
 
 .candidate-card {
+  scroll-snap-align: center;
+  flex: 0 0 min(338px, 82vw);
   border: 2px solid rgba(201, 162, 39, 0.44);
   border-radius: 4px;
-  padding: 6px;
+  padding: 8px;
   display: grid;
-  gap: 6px;
-  background: linear-gradient(180deg, rgba(16, 19, 28, 0.94), rgba(9, 11, 18, 0.98));
+  gap: 8px;
+  background:
+    radial-gradient(circle at 84% 12%, rgba(201, 162, 39, 0.1), transparent 32%),
+    linear-gradient(180deg, rgba(16, 19, 28, 0.94), rgba(9, 11, 18, 0.98));
   cursor: pointer;
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 162, 39, 0.14),
+    0 4px 0 rgba(0, 0, 0, 0.34);
 }
 
 .candidate-card.selected {
-  border-color: #e3b647;
+  border-color: #f0ca6e;
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 202, 110, 0.22),
+    0 0 10px rgba(240, 202, 110, 0.2);
 }
 
 .candidate-card.is-recruited {
@@ -1046,35 +1193,120 @@ select {
     0 0 0 1px rgba(227, 182, 71, 0.42);
 }
 
-.candidate-avatar {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto;
+.roster-entry-top {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+}
+
+.roster-entry-portrait {
+  width: 72px;
+  height: 72px;
   image-rendering: pixelated;
-  border: 1px solid rgba(201, 162, 39, 0.62);
+  border: 2px solid rgba(201, 162, 39, 0.64);
   border-radius: 3px;
   background: #080c15;
 }
 
-.candidate-meta {
+.roster-entry-meta {
   display: grid;
   gap: 2px;
-  text-align: center;
 }
 
-.candidate-meta strong {
-  font-size: 0.74rem;
+.roster-entry-meta strong {
+  font-size: 0.82rem;
   line-height: 1;
 }
 
-.candidate-meta small {
-  font-size: 0.58rem;
+.roster-entry-meta small {
+  font-size: 0.62rem;
   line-height: 1.1;
   color: #d3c39d;
 }
 
-.candidate-actions {
+.roster-entry-badges {
   display: grid;
+  gap: 4px;
+  justify-items: end;
+}
+
+.roster-badge {
+  font-size: 0.52rem;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 2px;
+  border: 1px solid rgba(201, 162, 39, 0.7);
+  text-transform: uppercase;
+}
+
+.roster-badge.available {
+  background: rgba(24, 37, 60, 0.7);
+  color: #d3c39d;
+}
+
+.roster-badge.recruited {
+  background: rgba(25, 72, 41, 0.75);
+  color: #dbf3d3;
+  border-color: rgba(111, 162, 89, 0.85);
+}
+
+.roster-badge.captain {
+  background: linear-gradient(180deg, #e2bf63, #b1802b);
+  color: #170c05;
+  border-color: #f0cd7a;
+}
+
+.roster-entry-faces {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.roster-face-section {
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 3px;
+  padding: 5px;
+  display: grid;
+  gap: 4px;
+  background: linear-gradient(180deg, rgba(10, 12, 19, 0.92), rgba(8, 10, 16, 0.96));
+}
+
+.roster-face-section h3 {
+  font-size: 0.62rem;
+  line-height: 1;
+}
+
+.roster-face-list {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.roster-face-list .face-preview-card {
+  padding: 2px;
+  gap: 2px;
+}
+
+.roster-face-list .face-preview-card img {
+  width: 20px;
+  height: 20px;
+}
+
+.roster-face-list .face-preview-card small {
+  width: 100%;
+  font-size: 0.44rem;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.candidate-actions,
+.roster-entry-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -1083,22 +1315,24 @@ select {
   text-align: center;
 }
 
-.candidate-detail {
-  display: grid;
-  gap: 8px;
-}
-
-.candidate-detail h3 {
-  font-size: 0.72rem;
-  line-height: 1;
-}
-
-.dice-preview-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.recruitment-carousel-hint {
+  margin: 0;
+  font-size: 0.62rem;
+  line-height: 1.2;
+  color: #d4c29b;
+  text-align: center;
 }
 
 .recruitment-actions {
   gap: 8px;
+}
+
+.recruitment-screen > .status-line,
+.recruitment-screen > .recruitment-actions,
+.recruitment-screen > .recruitment-header,
+.recruitment-screen > .recruitment-roster-shell,
+.recruitment-screen > .captain-wizard-shell {
+  min-height: 0;
 }
 
 .hiring-summary,
@@ -1719,6 +1953,262 @@ select {
   }
 }
 
+@media (max-width: 420px) {
+  .recruitment-screen {
+    gap: 5px;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+  }
+
+  .recruitment-header {
+    padding: 6px 8px;
+  }
+
+  .recruitment-header h1 {
+    font-size: 0.9rem;
+  }
+
+  .recruitment-header .subtitle {
+    font-size: 0.62rem;
+  }
+
+  .recruitment-roster-shell,
+  .captain-wizard-shell {
+    padding: 7px;
+    gap: 6px;
+  }
+
+  .captain-wizard-card {
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 6px;
+    padding: 5px;
+  }
+
+  .captain-wizard-portrait {
+    width: 70px;
+    height: 70px;
+  }
+
+  .captain-wizard-meta h2 {
+    font-size: 0.76rem;
+  }
+
+  .captain-wizard-meta p {
+    font-size: 0.58rem;
+  }
+
+  .captain-wizard-faces {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .captain-wizard-list {
+    grid-auto-columns: minmax(108px, 1fr);
+    gap: 4px;
+    padding-bottom: 2px;
+  }
+
+  .captain-choice-tile {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 4px;
+    padding: 4px;
+  }
+
+  .captain-choice-tile img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .captain-choice-tile strong {
+    font-size: 0.54rem;
+  }
+
+  .captain-choice-tile small {
+    font-size: 0.46rem;
+  }
+
+  .recruitment-roster-header {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .recruitment-overview-card {
+    padding: 5px;
+    gap: 2px;
+  }
+
+  .recruitment-overview-card strong {
+    font-size: 0.56rem;
+  }
+
+  .recruitment-overview-card em {
+    font-size: 0.8rem;
+  }
+
+  .recruitment-overview-card small {
+    font-size: 0.52rem;
+  }
+
+  .recruitment-funds h2 {
+    font-size: 0.74rem;
+  }
+
+  .recruitment-funds {
+    padding: 5px;
+  }
+
+  .recruitment-funds p {
+    font-size: 0.64rem;
+    line-height: 1.15;
+  }
+
+  .captain-id-block {
+    grid-template-columns: 40px 1fr;
+    padding: 5px;
+  }
+
+  .captain-id-portrait {
+    width: 38px;
+    height: 38px;
+  }
+
+  .captain-id-meta strong {
+    font-size: 0.56rem;
+  }
+
+  .captain-id-meta small {
+    font-size: 0.52rem;
+  }
+
+  .recruitment-funds-actions {
+    gap: 4px;
+  }
+
+  .recruitment-funds-actions .secondary-btn {
+    padding: 3px 2px;
+    font-size: 0.5rem;
+    letter-spacing: 0;
+  }
+
+  .candidate-card {
+    padding: 5px;
+    gap: 5px;
+    flex-basis: calc(100vw - 96px);
+    max-width: 320px;
+  }
+
+  .roster-entry-top {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .roster-entry-portrait {
+    width: 54px;
+    height: 54px;
+  }
+
+  .roster-entry-meta strong {
+    font-size: 0.68rem;
+  }
+
+  .roster-entry-meta small {
+    font-size: 0.54rem;
+  }
+
+  .roster-entry-badges {
+    grid-column: 1 / -1;
+    grid-auto-flow: column;
+    justify-content: start;
+    justify-items: start;
+  }
+
+  .roster-entry-faces {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .roster-face-section {
+    padding: 4px;
+  }
+
+  .roster-face-section h3 {
+    font-size: 0.56rem;
+  }
+
+  .roster-face-list {
+    gap: 3px;
+  }
+
+  .roster-face-list .face-preview-card img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .roster-face-list .face-preview-card small {
+    font-size: 0.4rem;
+  }
+
+  .captain-loadout-panel {
+    padding: 6px;
+    gap: 5px;
+  }
+
+  .captain-loadout-panel h3 {
+    font-size: 0.72rem;
+  }
+
+  .captain-loadout-panel label {
+    font-size: 0.6rem;
+  }
+
+  .captain-loadout-panel select {
+    font-size: 0.56rem;
+    padding: 3px;
+  }
+
+  .captain-loadout-description {
+    font-size: 0.56rem;
+    line-height: 1.15;
+  }
+
+  .recruitment-screen .secondary-btn.mini,
+  .recruitment-screen .primary-btn.mini {
+    padding: 3px 4px;
+    font-size: 0.54rem;
+  }
+
+  .recruitment-carousel-shell {
+    grid-template-columns: 22px minmax(0, 1fr) 22px;
+    gap: 4px;
+  }
+
+  .recruitment-carousel-nav {
+    width: 22px;
+    min-width: 22px;
+    font-size: 0.5rem;
+  }
+
+  .recruitment-carousel-hint {
+    font-size: 0.52rem;
+  }
+
+  .recruitment-actions {
+    gap: 6px;
+  }
+
+  .recruitment-actions label {
+    font-size: 0.72rem;
+  }
+
+  .recruitment-screen > .status-line {
+    padding: 5px 6px;
+    font-size: 0.62rem;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .combat-screen.revamp {
   --combat-tray-row: minmax(180px, 42%);
   --combat-battle-row: minmax(140px, 1fr);
@@ -2105,4 +2595,1227 @@ select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Combat revamp v2: topo de monstros + alvos + dados em serie + roll central + party no rodape */
+.combat-screen.revamp {
+  position: relative;
+  height: var(--app-vh);
+  max-height: var(--app-vh);
+  overflow: hidden;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  gap: 6px;
+  grid-template-rows:
+    minmax(0, 33%)
+    minmax(0, 16%)
+    minmax(0, 17%)
+    minmax(0, 10%)
+    minmax(0, 24%);
+}
+
+.combat-screen.revamp .combat-top-zone,
+.combat-screen.revamp .combat-action-strip,
+.combat-screen.revamp .combat-dice-zone,
+.combat-screen.revamp .combat-roll-zone,
+.combat-screen.revamp .combat-party-zone {
+  border: 2px solid rgba(201, 162, 39, 0.78);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(16, 16, 16, 0.95), rgba(10, 10, 10, 0.98));
+  box-shadow: var(--shadow);
+  min-height: 0;
+}
+
+.combat-screen.revamp .combat-top-zone {
+  display: grid;
+  gap: 5px;
+  padding: 5px;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.combat-screen.revamp .combat-status-strip {
+  border: 1px solid rgba(201, 162, 39, 0.72);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(12, 16, 28, 0.96), rgba(8, 11, 19, 0.98));
+  padding: 4px 6px;
+  font-size: 0.68rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  text-transform: uppercase;
+}
+
+.combat-screen.revamp .combat-status-strip strong {
+  font-size: 0.74rem;
+  color: #f2d491;
+}
+
+.combat-screen.revamp .combat-status-strip small {
+  color: #d0ba8b;
+  font-size: 0.54rem;
+}
+
+.combat-screen.revamp .combat-top-targets {
+  min-height: 0;
+  height: 100%;
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield {
+  grid-template-rows: minmax(0, 1fr);
+  padding: 5px;
+  gap: 0;
+  border-color: rgba(201, 162, 39, 0.86);
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield::before {
+  display: none;
+}
+
+.combat-screen.revamp .combat-top-targets .battleline.enemy-line {
+  gap: 6px;
+  justify-content: space-between;
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield.enemy-solo .battleline.enemy-line {
+  justify-content: center;
+  align-items: stretch;
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield.enemy-solo .battlefield-unit.team-enemy {
+  flex: 0 0 clamp(172px, 46vw, 236px);
+  width: clamp(172px, 46vw, 236px);
+  max-width: clamp(172px, 46vw, 236px);
+  min-height: 100%;
+  align-self: stretch;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 4px;
+  padding: 4px;
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield.enemy-solo .battlefield-unit.team-enemy .combatant-canvas {
+  min-height: clamp(126px, 23vh, 224px);
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield.enemy-solo .battlefield-unit.team-enemy .unit-name {
+  font-size: 0.68rem;
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield.enemy-solo .battlefield-unit.team-enemy .unit-bars,
+.combat-screen.revamp .combat-top-targets .battlefield.enemy-solo .battlefield-unit.team-enemy .unit-armor-chip {
+  font-size: 0.54rem;
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield.enemy-solo .battlefield-unit.team-enemy .enemy-intent-badge {
+  font-size: 0.54rem;
+}
+
+.combat-screen.revamp .combat-top-targets .party-line {
+  display: none;
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield-unit {
+  max-width: none;
+  min-width: 0;
+  gap: 3px;
+  padding: 3px;
+  border-color: rgba(201, 162, 39, 0.66);
+  background: linear-gradient(180deg, rgba(8, 12, 20, 0.94), rgba(5, 7, 14, 0.98));
+}
+
+.combat-screen.revamp .combat-top-targets .battlefield-unit .combatant-canvas {
+  min-height: clamp(80px, 13vh, 128px);
+  border-color: rgba(201, 162, 39, 0.56);
+}
+
+.combat-screen.revamp .enemy-intent-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  justify-content: center;
+}
+
+.combat-screen.revamp .enemy-intent-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid rgba(201, 162, 39, 0.56);
+  border-radius: 3px;
+  padding: 1px 3px;
+  font-size: 0.5rem;
+  line-height: 1;
+  background: rgba(7, 10, 18, 0.92);
+  min-height: 14px;
+}
+
+.combat-screen.revamp .enemy-intent-badge em {
+  font-style: normal;
+  color: #f0cc76;
+}
+
+.combat-screen.revamp .enemy-intent-badge strong {
+  color: #f4e7ca;
+}
+
+.combat-screen.revamp .enemy-intent-badge.intent-attack {
+  border-color: rgba(198, 74, 58, 0.82);
+}
+
+.combat-screen.revamp .enemy-intent-badge.intent-defend {
+  border-color: rgba(62, 116, 184, 0.82);
+}
+
+.combat-screen.revamp .enemy-intent-badge.intent-heal {
+  border-color: rgba(64, 154, 88, 0.82);
+}
+
+.combat-screen.revamp .enemy-intent-badge.intent-status {
+  border-color: rgba(132, 95, 178, 0.82);
+}
+
+.combat-screen.revamp .enemy-intent-badge.intent-empty {
+  opacity: 0.65;
+}
+
+.combat-screen.revamp .battlefield-unit.is-selected-target {
+  border-color: rgba(250, 201, 83, 0.96);
+  box-shadow: 0 0 0 1px rgba(250, 201, 83, 0.45), 0 0 14px rgba(245, 189, 84, 0.36);
+}
+
+.combat-screen.revamp .battlefield-unit.is-valid-target {
+  border-color: rgba(95, 191, 105, 0.86);
+}
+
+.combat-screen.revamp .battlefield-unit.is-invalid-target {
+  opacity: 0.4;
+}
+
+.combat-screen.revamp .unit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.combat-screen.revamp .unit-name {
+  font-size: 0.62rem;
+}
+
+.combat-screen.revamp .unit-row-badge {
+  font-size: 0.42rem;
+}
+
+.combat-screen.revamp .unit-hp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.combat-screen.revamp .unit-bars {
+  font-size: 0.56rem;
+  color: #ead9b4;
+}
+
+.combat-screen.revamp .unit-armor-chip {
+  border: 1px solid rgba(104, 145, 214, 0.82);
+  background: rgba(10, 22, 42, 0.88);
+  color: #d7e6fb;
+  font-size: 0.48rem;
+  padding: 1px 3px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.combat-screen.revamp .unit-hp-track {
+  display: block;
+  height: 6px;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 3px;
+  background: rgba(7, 9, 15, 0.9);
+  overflow: hidden;
+}
+
+.combat-screen.revamp .unit-hp-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #9f2f32, #d15d50);
+}
+
+.combat-screen.revamp .unit-status-line {
+  gap: 2px;
+}
+
+.combat-screen.revamp .unit-status {
+  font-size: 0.5rem;
+  border-color: rgba(236, 198, 106, 0.68);
+  color: #f7e9c8;
+  background: rgba(7, 10, 18, 0.95);
+}
+
+.combat-screen.revamp .combat-action-strip {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  padding: 6px;
+}
+
+.combat-screen.revamp .action-slot-row {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.combat-screen.revamp .action-slot {
+  border: 2px solid rgba(201, 162, 39, 0.55);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(12, 17, 30, 0.95), rgba(7, 11, 20, 0.98));
+  color: var(--paper-0);
+  padding: 5px 4px;
+  display: grid;
+  gap: 2px;
+  align-content: center;
+  text-align: center;
+  min-height: 48px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.combat-screen.revamp .action-slot strong {
+  font-size: 0.56rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combat-screen.revamp .action-slot span {
+  font-size: 0.5rem;
+  color: #d6c4a0;
+}
+
+.combat-screen.revamp .action-slot.team-enemy {
+  border-color: rgba(201, 108, 88, 0.84);
+}
+
+.combat-screen.revamp .action-slot.team-party {
+  border-color: rgba(90, 141, 211, 0.84);
+}
+
+.combat-screen.revamp .action-slot.is-selected-target {
+  border-color: rgba(250, 201, 83, 0.96);
+  box-shadow: 0 0 0 1px rgba(250, 201, 83, 0.36), 0 0 10px rgba(245, 189, 84, 0.3);
+}
+
+.combat-screen.revamp .action-slot.is-valid-target {
+  border-color: rgba(95, 191, 105, 0.86);
+}
+
+.combat-screen.revamp .action-slot.is-invalid-target {
+  opacity: 0.4;
+}
+
+.combat-screen.revamp .action-slot.drop-active {
+  border-color: rgba(250, 201, 83, 0.96);
+  transform: translateY(-1px);
+}
+
+.combat-screen.revamp .action-strip-tip {
+  margin: 0;
+  font-size: 0.6rem;
+  line-height: 1.2;
+  color: #dac89e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combat-screen.revamp .action-empty {
+  grid-column: 1 / -1;
+  align-self: center;
+  justify-self: center;
+  font-size: 0.62rem;
+  color: #d2c09a;
+}
+
+.combat-screen.revamp .combat-dice-zone {
+  position: relative;
+  padding: 6px;
+}
+
+.combat-screen.revamp .dice-owner-grid {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.combat-screen.revamp .dice-owner-group {
+  min-width: 0;
+  border: 1px solid rgba(201, 162, 39, 0.38);
+  border-radius: 4px;
+  background: rgba(6, 9, 16, 0.84);
+  padding: 4px 3px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.combat-screen.revamp .dice-owner-group + .dice-owner-group {
+  position: relative;
+}
+
+.combat-screen.revamp .dice-owner-group + .dice-owner-group::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: rgba(201, 162, 39, 0.45);
+}
+
+.combat-screen.revamp .dice-owner-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.combat-screen.revamp .dice-owner-head img {
+  width: 18px;
+  height: 18px;
+  image-rendering: pixelated;
+  border: 1px solid rgba(201, 162, 39, 0.55);
+  border-radius: 2px;
+  background: #070a13;
+}
+
+.combat-screen.revamp .dice-owner-head strong {
+  font-size: 0.56rem;
+  line-height: 1;
+}
+
+.combat-screen.revamp .dice-owner-row {
+  min-height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  align-content: start;
+}
+
+.combat-screen.revamp .dice-owner-empty {
+  font-size: 0.5rem;
+  color: #c8b898;
+}
+
+.combat-screen.revamp .series-die-card {
+  width: calc(50% - 2px);
+  min-width: 0;
+  padding: 3px;
+  gap: 2px;
+  border-radius: 3px;
+  border-color: rgba(201, 162, 39, 0.62);
+  background: linear-gradient(180deg, rgba(17, 22, 38, 0.95), rgba(8, 10, 18, 0.98));
+}
+
+.combat-screen.revamp .series-die-card .die-face-preview {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.combat-screen.revamp .series-die-card img {
+  width: 100%;
+  max-width: 42px;
+  height: auto;
+}
+
+.combat-screen.revamp .series-die-card .die-kind-tag {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  background: rgba(8, 10, 18, 0.9);
+  padding: 0 2px;
+  font-size: 0.42rem;
+  line-height: 1.1;
+}
+
+.combat-screen.revamp .series-die-card .die-value-badge {
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  min-width: 12px;
+  text-align: center;
+  border: 1px solid rgba(235, 189, 87, 0.8);
+  background: rgba(32, 22, 6, 0.95);
+  color: #f6de9f;
+  font-size: 0.52rem;
+  line-height: 1.05;
+  padding: 0 2px;
+}
+
+.combat-screen.revamp .series-die-card .die-state-badge {
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  font-size: 0.4rem;
+  line-height: 1;
+  padding: 1px 2px;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  background: rgba(8, 10, 18, 0.95);
+}
+
+.combat-screen.revamp .series-die-card .state-lock {
+  border-color: rgba(237, 198, 108, 0.88);
+  color: #f4da9b;
+}
+
+.combat-screen.revamp .series-die-card .state-used {
+  border-color: rgba(164, 164, 164, 0.88);
+  color: #e1e1e1;
+}
+
+.combat-screen.revamp .series-die-card .state-invalid {
+  border-color: rgba(188, 88, 88, 0.88);
+  color: #f4b1a7;
+}
+
+.combat-screen.revamp .series-die-card .die-face-toggle {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 1px solid rgba(201, 162, 39, 0.48);
+  border-radius: 2px;
+  background: rgba(8, 10, 18, 0.92);
+  color: #dfc88f;
+  font-size: 0.48rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.combat-screen.revamp .series-die-card.locked {
+  border-style: solid;
+  box-shadow: 0 0 0 1px rgba(244, 210, 128, 0.24) inset;
+}
+
+.combat-screen.revamp .series-die-card.used {
+  opacity: 0.42;
+}
+
+.combat-screen.revamp .series-die-card.invalid:not(.used):not(.locked) {
+  opacity: 0.52;
+  filter: saturate(0.7);
+}
+
+.combat-screen.revamp .series-die-card.selected,
+.combat-screen.revamp .series-die-card.dragging {
+  border-color: rgba(250, 201, 83, 0.98);
+  box-shadow: 0 0 0 1px rgba(250, 201, 83, 0.38), 0 0 10px rgba(245, 189, 84, 0.3);
+}
+
+.combat-screen.revamp .combat-dice-zone .tray-tooltip-anchor {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 8px));
+  z-index: 9;
+  pointer-events: auto;
+}
+
+.combat-screen.revamp .combat-roll-zone {
+  display: grid;
+  gap: 5px;
+  padding: 5px;
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.combat-screen.revamp .roll-main-row {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: 1fr minmax(126px, 1.35fr) 1fr;
+  align-items: stretch;
+}
+
+.combat-screen.revamp .roll-main-btn {
+  text-align: center;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 4px;
+  border: 2px solid #e8c56f;
+  color: #160c03;
+  background:
+    linear-gradient(180deg, rgba(240, 194, 95, 1) 0%, rgba(196, 132, 44, 1) 70%, rgba(164, 100, 31, 1) 100%);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255, 232, 176, 0.44);
+}
+
+.combat-screen.revamp .roll-main-btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.combat-screen.revamp .roll-main-btn:disabled {
+  filter: saturate(0.15);
+  opacity: 0.65;
+}
+
+.combat-screen.revamp .mini-action {
+  text-align: center;
+  font-size: 0.58rem;
+  padding: 4px 3px;
+}
+
+.combat-screen.revamp .roll-sub-row {
+  display: grid;
+  gap: 5px;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  align-items: center;
+}
+
+.combat-screen.revamp .focus-chip {
+  border: 1px solid rgba(201, 162, 39, 0.6);
+  border-radius: 4px;
+  padding: 3px 6px;
+  background: rgba(8, 10, 18, 0.92);
+  font-size: 0.62rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.combat-screen.revamp .focus-chip strong {
+  color: #f0ce81;
+  font-size: 0.72rem;
+}
+
+.combat-screen.revamp .combat-party-zone {
+  display: grid;
+  gap: 5px;
+  padding: 6px;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+}
+
+.combat-screen.revamp .party-card-row {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--party-columns, 4), minmax(0, 1fr));
+  gap: 5px;
+}
+
+.combat-screen.revamp .party-card {
+  border: 1px solid rgba(201, 162, 39, 0.48);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(10, 14, 24, 0.94), rgba(6, 9, 16, 0.98));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 5px;
+  padding: 4px;
+  min-height: 0;
+  align-items: start;
+}
+
+.combat-screen.revamp .party-card.dead {
+  opacity: 0.45;
+}
+
+.combat-screen.revamp .party-card.is-selected-target {
+  border-color: rgba(250, 201, 83, 0.98);
+  box-shadow: 0 0 0 1px rgba(250, 201, 83, 0.35), 0 0 10px rgba(245, 189, 84, 0.28);
+}
+
+.combat-screen.revamp .party-card.is-valid-target {
+  border-color: rgba(95, 191, 105, 0.86);
+}
+
+.combat-screen.revamp .party-card.is-invalid-target {
+  opacity: 0.38;
+}
+
+.combat-screen.revamp .party-card.drop-active {
+  border-color: rgba(250, 201, 83, 0.98);
+  transform: translateY(-1px);
+}
+
+.combat-screen.revamp .party-bust-frame {
+  border: 1px solid rgba(201, 162, 39, 0.55);
+  border-radius: 3px;
+  overflow: hidden;
+  background: #080b13;
+  width: 100%;
+  min-height: 0;
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.22);
+}
+
+.combat-screen.revamp .party-bust-canvas {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  image-rendering: pixelated;
+  object-fit: cover;
+}
+
+.combat-screen.revamp .party-meta {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.combat-screen.revamp .party-name-row {
+  display: grid;
+  gap: 1px;
+}
+
+.combat-screen.revamp .party-name-row strong {
+  font-size: 0.58rem;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combat-screen.revamp .party-name-row span,
+.combat-screen.revamp .party-block-row span {
+  font-size: 0.52rem;
+  line-height: 1;
+  color: #d8c7a4;
+}
+
+.combat-screen.revamp .party-hp-track {
+  display: block;
+  height: 6px;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(6, 8, 14, 0.92);
+}
+
+.combat-screen.revamp .party-hp-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #9f2f32, #d15d50);
+}
+
+.combat-screen.revamp .party-status-row {
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}
+
+.combat-screen.revamp .status-chip {
+  border: 1px solid rgba(201, 162, 39, 0.38);
+  border-radius: 3px;
+  padding: 1px 2px;
+  background: rgba(7, 10, 18, 0.9);
+  font-size: 0.46rem;
+  line-height: 1;
+}
+
+.combat-screen.revamp .status-chip.status-extra {
+  color: #efcf88;
+}
+
+.combat-screen.revamp .status-empty {
+  font-size: 0.46rem;
+  color: #bfae8a;
+}
+
+.combat-screen.revamp .party-log-line {
+  margin: 0;
+  font-size: 0.58rem;
+  line-height: 1.1;
+  color: #d7c6a5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combat-screen.revamp .combat-party-zone .status-line {
+  margin: 0;
+  border-left: 2px solid rgba(201, 162, 39, 0.7);
+  border-radius: 2px;
+  font-size: 0.56rem;
+  line-height: 1.1;
+  padding: 3px 5px;
+  background: rgba(9, 12, 21, 0.92);
+}
+
+/* Persistent status FX overlays (cards only) */
+.combat-screen.revamp .battlefield-unit[data-status-host],
+.combat-screen.revamp .party-card[data-status-host] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  --st-block: 0;
+  --st-dodge: 0;
+  --st-mark: 0;
+  --st-poison: 0;
+  --st-burn: 0;
+  --st-bleed: 0;
+  --st-stun: 0;
+  --st-fear: 0;
+  --st-inspired: 0;
+  --st-charged: 0;
+  --st-turret: 0;
+}
+
+.combat-screen.revamp .battlefield-unit[data-status-host] .combatant-canvas,
+.combat-screen.revamp .party-card[data-status-host] .party-bust-frame {
+  position: relative;
+  z-index: 2;
+}
+
+.combat-screen.revamp .battlefield-unit[data-status-host] .enemy-intent-row,
+.combat-screen.revamp .battlefield-unit[data-status-host] .unit-overlay,
+.combat-screen.revamp .party-card[data-status-host] .party-meta {
+  position: relative;
+  z-index: 6;
+}
+
+.combat-screen.revamp .status-fx-overlay {
+  position: absolute;
+  inset: 1px;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.combat-screen.revamp .status-fx-node {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: clamp(0.26, calc(0.3 + (var(--status-stacks, 1) * 0.12)), 0.95);
+}
+
+.combat-screen.revamp .status-fx-node::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.combat-screen.revamp .status-fx-sprite {
+  position: absolute;
+  left: calc(((var(--fx-index, 0) + 1) * 100%) / (var(--fx-total, 1) + 1));
+  top: 50%;
+  width: 15px;
+  height: 15px;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.78));
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-delay: var(--fx-delay-ms, 0ms);
+}
+
+.combat-screen.revamp .status-fx-node.status-tier-2 .status-fx-sprite {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.combat-screen.revamp .status-fx-node.status-tier-3 .status-fx-sprite {
+  transform: translate(-50%, -50%) scale(1.18);
+}
+
+.combat-screen.revamp [data-status-host].status-poison .status-fx-node.status-fx-poison::before {
+  background:
+    radial-gradient(circle at 30% 76%, rgba(135, 63, 164, 0.36), transparent 58%),
+    linear-gradient(180deg, rgba(78, 34, 105, 0.24), rgba(28, 12, 40, 0.16));
+  opacity: clamp(0.2, calc(0.16 + (var(--st-poison) * 0.08)), 0.56);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-poison .status-fx-sprite {
+  top: auto;
+  bottom: -20%;
+  width: 11px;
+  height: 11px;
+  opacity: 0.72;
+  animation-name: status-fx-bubble-rise;
+  animation-duration: calc(var(--status-cadence-ms, 820ms) * 1.3);
+}
+
+.combat-screen.revamp [data-status-host].status-burn .status-fx-node.status-fx-burn::before {
+  background:
+    radial-gradient(circle at 36% 82%, rgba(224, 98, 34, 0.4), transparent 56%),
+    linear-gradient(180deg, rgba(172, 62, 20, 0.2), rgba(56, 22, 8, 0.1));
+  opacity: clamp(0.2, calc(0.16 + (var(--st-burn) * 0.09)), 0.58);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-burn .status-fx-sprite {
+  top: auto;
+  bottom: -22%;
+  width: 10px;
+  height: 10px;
+  opacity: 0.8;
+  animation-name: status-fx-ember-rise;
+  animation-duration: calc(var(--status-cadence-ms, 720ms) * 1.08);
+}
+
+.combat-screen.revamp [data-status-host].status-mark .status-fx-node.status-fx-mark .status-fx-sprite {
+  left: 50%;
+  top: 50%;
+  width: clamp(30px, 52%, 72px);
+  height: clamp(30px, 52%, 72px);
+  opacity: clamp(0.84, calc(0.8 + (var(--st-mark) * 0.07)), 1);
+  filter: drop-shadow(0 0 3px rgba(186, 36, 42, 0.9));
+  animation-name: status-fx-mark-pulse;
+  animation-duration: 640ms;
+}
+
+.combat-screen.revamp [data-status-host].status-mark .status-fx-node.status-fx-mark::before {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(218, 56, 60, 0.22), transparent 60%),
+    linear-gradient(90deg, transparent 49%, rgba(232, 64, 68, 0.56) 49%, rgba(232, 64, 68, 0.56) 51%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, rgba(232, 64, 68, 0.56) 49%, rgba(232, 64, 68, 0.56) 51%, transparent 51%);
+  opacity: clamp(0.3, calc(0.28 + (var(--st-mark) * 0.08)), 0.72);
+  animation: status-fx-mark-ring 640ms steps(2, end) infinite;
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-mark .status-fx-sprite:not(:first-child) {
+  display: none;
+}
+
+.combat-screen.revamp [data-status-host].status-stun .status-fx-node.status-fx-stun .status-fx-sprite {
+  left: 50%;
+  top: 12%;
+  width: 12px;
+  height: 12px;
+  transform-origin: 0 20px;
+  animation-name: status-fx-orbit;
+  animation-duration: calc(var(--status-cadence-ms, 980ms) * 2);
+}
+
+.combat-screen.revamp [data-status-host].status-bleed .status-fx-node.status-fx-bleed::before {
+  background:
+    radial-gradient(circle at 52% 18%, rgba(170, 42, 50, 0.24), transparent 46%),
+    linear-gradient(180deg, rgba(120, 30, 37, 0.18), transparent 56%);
+  opacity: clamp(0.18, calc(0.16 + (var(--st-bleed) * 0.06)), 0.44);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-bleed .status-fx-sprite {
+  top: -16%;
+  width: 10px;
+  height: 10px;
+  opacity: 0.72;
+  animation-name: status-fx-bleed-drip;
+  animation-duration: calc(var(--status-cadence-ms, 920ms) * 1.18);
+}
+
+.combat-screen.revamp [data-status-host].status-fear .status-fx-node.status-fx-fear {
+  animation: status-fx-fear-shiver 860ms steps(2, end) infinite;
+}
+
+.combat-screen.revamp [data-status-host].status-fear .status-fx-node.status-fx-fear::before {
+  background:
+    radial-gradient(circle at 48% 42%, rgba(68, 48, 112, 0.28), transparent 50%),
+    linear-gradient(180deg, rgba(32, 23, 54, 0.28), rgba(15, 11, 27, 0.22));
+  opacity: clamp(0.24, calc(0.2 + (var(--st-fear) * 0.07)), 0.58);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-fear .status-fx-sprite {
+  left: 50%;
+  top: 42%;
+  width: 14px;
+  height: 14px;
+  animation-name: status-fx-fear-float;
+  animation-duration: calc(var(--status-cadence-ms, 940ms) * 1.45);
+}
+
+.combat-screen.revamp [data-status-host].status-block .status-fx-node.status-fx-block::before {
+  border: 1px solid rgba(118, 170, 244, 0.8);
+  box-shadow:
+    inset 0 0 0 1px rgba(87, 136, 211, 0.4),
+    0 0 8px rgba(60, 111, 184, 0.25);
+  animation: status-fx-shimmer 980ms steps(4, end) infinite;
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-block .status-fx-sprite {
+  width: 10px;
+  height: 10px;
+  top: 10%;
+  animation-name: status-fx-shimmer;
+  animation-duration: calc(var(--status-cadence-ms, 900ms) * 1.28);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-block .status-fx-sprite:nth-child(1) {
+  left: 14%;
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-block .status-fx-sprite:nth-child(2) {
+  left: 86%;
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-block .status-fx-sprite:nth-child(n + 3) {
+  display: none;
+}
+
+.combat-screen.revamp [data-status-host].status-dodge .status-fx-node.status-fx-dodge::before {
+  background: linear-gradient(110deg, transparent 16%, rgba(118, 232, 248, 0.34) 50%, transparent 84%);
+  animation: status-fx-sweep 760ms steps(6, end) infinite;
+  opacity: clamp(0.14, calc(0.14 + (var(--st-dodge) * 0.08)), 0.45);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-dodge .status-fx-sprite {
+  width: 12px;
+  height: 12px;
+  opacity: 0.65;
+  animation-name: status-fx-sweep;
+  animation-duration: calc(var(--status-cadence-ms, 760ms) * 1.08);
+}
+
+.combat-screen.revamp [data-status-host].status-inspired .status-fx-node.status-fx-inspired::before {
+  background:
+    radial-gradient(circle at 50% 70%, rgba(229, 187, 90, 0.26), transparent 62%),
+    linear-gradient(180deg, rgba(139, 109, 43, 0.16), rgba(47, 37, 14, 0.08));
+  opacity: clamp(0.16, calc(0.14 + (var(--st-inspired) * 0.07)), 0.42);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-inspired .status-fx-sprite {
+  top: auto;
+  bottom: -18%;
+  width: 11px;
+  height: 11px;
+  opacity: 0.78;
+  animation-name: status-fx-spark-rise;
+  animation-duration: calc(var(--status-cadence-ms, 760ms) * 1.24);
+}
+
+.combat-screen.revamp [data-status-host].status-charged .status-fx-node.status-fx-charged::before {
+  border: 1px solid rgba(118, 188, 255, 0.84);
+  box-shadow:
+    inset 0 0 0 1px rgba(79, 150, 224, 0.45),
+    0 0 9px rgba(69, 148, 228, 0.34);
+  animation: status-fx-arc-flicker 300ms steps(2, end) infinite;
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-charged .status-fx-sprite {
+  width: 10px;
+  height: 10px;
+  opacity: 0.86;
+  animation-name: status-fx-arc-flicker;
+  animation-duration: calc(var(--status-cadence-ms, 700ms) * 0.7);
+}
+
+.combat-screen.revamp [data-status-host].status-turret .status-fx-node.status-fx-turret .status-fx-sprite {
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  transform-origin: 0 18px;
+  animation-name: status-fx-orbit;
+  animation-duration: calc(var(--status-cadence-ms, 840ms) * 1.6);
+}
+
+.combat-screen.revamp .status-fx-node.status-fx-turret .status-fx-sprite:nth-child(n + 4) {
+  display: none;
+}
+
+@keyframes status-fx-bubble-rise {
+  0% {
+    transform: translate(-50%, 0) scale(0.84);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.72;
+  }
+  100% {
+    transform: translate(-50%, -128%) scale(1.14);
+    opacity: 0;
+  }
+}
+
+@keyframes status-fx-ember-rise {
+  0% {
+    transform: translate(-50%, 0) scale(0.78);
+    opacity: 0;
+  }
+  14% {
+    opacity: 0.84;
+  }
+  100% {
+    transform: translate(-50%, -132%) scale(1.24);
+    opacity: 0;
+  }
+}
+
+@keyframes status-fx-mark-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.92);
+    opacity: 0.76;
+  }
+  45% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.02);
+    opacity: 0.88;
+  }
+}
+
+@keyframes status-fx-mark-ring {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.42;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.72;
+  }
+}
+
+@keyframes status-fx-orbit {
+  from {
+    transform:
+      rotate(calc((360deg / var(--fx-total, 1)) * var(--fx-index, 0)))
+      translateX(18px);
+  }
+  to {
+    transform:
+      rotate(calc((360deg / var(--fx-total, 1)) * var(--fx-index, 0) + 1turn))
+      translateX(18px);
+  }
+}
+
+@keyframes status-fx-bleed-drip {
+  0% {
+    transform: translate(-50%, 0) scale(0.9);
+    opacity: 0;
+  }
+  26% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(-50%, 148%) scale(0.72);
+    opacity: 0;
+  }
+}
+
+@keyframes status-fx-fear-shiver {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(1px, 0);
+  }
+  65% {
+    transform: translate(-1px, 1px);
+  }
+}
+
+@keyframes status-fx-fear-float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.94);
+    opacity: 0.46;
+  }
+  50% {
+    transform: translate(-50%, -60%) scale(1.08);
+    opacity: 0.78;
+  }
+}
+
+@keyframes status-fx-shimmer {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.88;
+  }
+}
+
+@keyframes status-fx-sweep {
+  0% {
+    transform: translateX(-44%);
+    opacity: 0.16;
+  }
+  50% {
+    opacity: 0.36;
+  }
+  100% {
+    transform: translateX(44%);
+    opacity: 0.12;
+  }
+}
+
+@keyframes status-fx-spark-rise {
+  0% {
+    transform: translate(-50%, 0) scale(0.82);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.84;
+  }
+  100% {
+    transform: translate(-50%, -116%) scale(1.18);
+    opacity: 0;
+  }
+}
+
+@keyframes status-fx-arc-flicker {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  20% {
+    opacity: 0.86;
+  }
+  46% {
+    opacity: 0.34;
+  }
+  72% {
+    opacity: 0.92;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .combat-screen.revamp .status-fx-node,
+  .combat-screen.revamp .status-fx-node::before,
+  .combat-screen.revamp .status-fx-sprite {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .combat-screen.revamp .status-fx-sprite {
+    opacity: 0.62;
+  }
+}
+
+@media (max-width: 420px) {
+  .combat-screen.revamp .action-slot-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .combat-screen.revamp .series-die-card {
+    width: calc(50% - 2px);
+  }
+
+  .combat-screen.revamp .roll-main-row {
+    grid-template-columns: 1fr minmax(112px, 1.25fr) 1fr;
+  }
+
+  .combat-screen.revamp .party-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 4px;
+    padding: 3px;
+  }
+
+  .combat-screen.revamp .party-name-row strong {
+    font-size: 0.52rem;
+  }
+
+  .combat-screen.revamp .party-name-row span,
+  .combat-screen.revamp .party-block-row span,
+  .combat-screen.revamp .status-chip,
+  .combat-screen.revamp .status-empty {
+    font-size: 0.44rem;
+  }
 }
